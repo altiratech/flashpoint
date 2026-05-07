@@ -466,7 +466,8 @@ export const insertClientTelemetry = async (
     turnNumber: payload.turnNumber,
     elapsedMs: payload.elapsedMs,
     metadataJson: toJson(payload.metadata),
-    userAgent: payload.userAgent
+    userAgent: payload.userAgent,
+    createdAt: new Date().toISOString()
   });
 };
 

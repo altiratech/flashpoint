@@ -78,7 +78,10 @@ const runD1Query = (label, command) => {
   throw new Error(`Wrangler JSON for ${label} did not include a results array.`);
 };
 
-const whereParts = [`created_at >= datetime('now', '-${lookbackHours} hours')`];
+const whereParts = [
+  'julianday(created_at) IS NOT NULL',
+  `julianday(created_at) >= julianday('now', '-${lookbackHours} hours')`
+];
 if (expectedScenarioId) {
   whereParts.push(`scenario_id = '${quoteSql(expectedScenarioId)}'`);
 }
