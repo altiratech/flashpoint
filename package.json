@@ -7,6 +7,10 @@
     "apps/*",
     "packages/*"
   ],
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "concurrently -k -n api,web -c yellow,cyan \"npm run dev --workspace @wargames/api\" \"npm run dev --workspace @wargames/web\"",
     "build": "npm run validate:content && npm run build --workspace @wargames/engine && npm run build --workspace @wargames/shared-types && npm run build --workspace @wargames/content && npm run build --workspace @wargames/api && npm run build --workspace @wargames/web",
@@ -37,5 +41,28 @@
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vitest": "^3.0.8"
+  },
+  "overrides": {
+    "anymatch": {
+      "picomatch": "2.3.2"
+    },
+    "fdir": {
+      "picomatch": "4.0.4"
+    },
+    "micromatch": {
+      "picomatch": "2.3.2"
+    },
+    "readdirp": {
+      "picomatch": "2.3.2"
+    },
+    "tinyglobby": {
+      "picomatch": "4.0.4"
+    },
+    "vite": {
+      "picomatch": "4.0.4"
+    },
+    "vitest": {
+      "picomatch": "4.0.4"
+    }
   }
 }

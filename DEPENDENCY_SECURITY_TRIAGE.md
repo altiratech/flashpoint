@@ -1,25 +1,26 @@
 # Flashpoint Dependency Security Triage
 
-Last checked: 2026-05-02
+Last checked: 2026-05-07
 
 ## Current Audit Result
 
-- `npm audit --omit=dev`: 2 high-severity runtime advisories, both reported as no-fix-available by npm.
-- `npm audit`: 30 total advisories, with most additional findings in local dev/build tooling (`vite`, `vitest`, `tailwindcss`, `wrangler`, `miniflare`, `drizzle-kit`, transitive `esbuild`, `picomatch`, `postcss`, `undici`).
+- `npm --cache ./tmp/npm-cache audit --omit=dev --json`: 0 production/runtime advisories.
+- `npm --cache ./tmp/npm-cache audit --json`: 4 moderate advisories, all dev-only through `drizzle-kit` -> `@esbuild-kit/esm-loader` -> old transitive `esbuild`.
+- Runtime/security upgrades applied: `hono` 4.12.18, `drizzle-orm` 0.45.2, `wrangler` 4.89.1, `@cloudflare/workers-types` 4.20260507.1, `vite` 6.4.2, `postcss` 8.5.14, `picomatch` overrides to 2.3.2/4.0.4, `react`/`react-dom` 19.2.6, and related lockfile refresh.
 
 ## Runtime Findings
 
-- `hono`: advisories are concentrated around APIs this app does not currently use in production paths: cookie helpers, static serving middleware, SSE writer, JSX SSR, SSG output, and `parseBody({ dot: true })`. Keep Hono pinned/monitored and upgrade as soon as a fixed release is available.
-- `drizzle-orm`: advisory concerns escaping SQL identifiers. Current API code uses fixed schema/query builders and does not accept user-controlled table or column identifiers. Avoid introducing dynamic identifier construction until this advisory has a fix or a local escaping review.
+- No open production/runtime advisories after the dependency refresh.
+- Keep Hono and Drizzle on supported current release lines; do not reintroduce dynamic SQL identifier construction without a local escaping review.
 
 ## Dev/Build Findings
 
-- `vite`/`esbuild` dev-server advisories affect local development exposure. Do not run dev servers on public interfaces.
-- `wrangler`/`miniflare` `undici` advisories affect local/deploy tooling paths. Keep deployment machines trusted and update Cloudflare tooling when fixes land.
-- `picomatch`/`postcss` findings are transitive through build/test tooling. Treat as build-chain monitoring, not player-facing runtime exposure, unless user-provided globs/CSS enter the build path.
+- Remaining `npm audit` findings are moderate and confined to `drizzle-kit`'s dev dependency chain. npm reports a downgrade to `drizzle-kit@0.18.1` as the available fix, which is not an acceptable hardening move because it reverts the migration toolkit line.
+- `wrangler` 4.89.1 and current Cloudflare local tooling require Node >=22. Use Node 22+ locally; GitHub workflows run on Node 24.
+- Do not run local dev servers on public interfaces.
 
 ## Follow-Up
 
-- Re-run `npm audit --omit=dev` before public playtest.
-- Prefer dependency upgrades that keep Hono, Wrangler, Vite, and Drizzle inside supported release lines.
+- Re-run `npm audit --omit=dev` before public playtest and deploys.
+- Monitor `drizzle-kit` for an upstream release that removes the stale `@esbuild-kit/esm-loader` chain without downgrading.
 - Do not apply broad `npm audit fix --force` without a browser/gameplay regression pass; it can change Vite/Wrangler behavior.

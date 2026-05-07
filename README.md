@@ -22,6 +22,8 @@ Flashpoint does not use real-world leaders or real private networks. Narrative f
 
 ## Quick Start
 
+Requires Node 22+ and npm 10+. GitHub workflows run on Node 24; current Cloudflare local tooling (`wrangler`/`miniflare`) also requires Node 22+.
+
 ```bash
 git clone https://github.com/altiratech/flashpoint.git
 cd flashpoint
