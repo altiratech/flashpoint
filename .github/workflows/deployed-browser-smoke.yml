@@ -17,6 +17,11 @@ on:
           - default
           - varied
           - public-econ
+      seed:
+        description: "Optional deterministic smoke seed"
+        required: false
+        default: ""
+        type: string
   schedule:
     - cron: "37 14 * * 1"
 
@@ -34,6 +39,7 @@ jobs:
     env:
       PLAYTEST_WEB_URL: ${{ github.event.inputs.web_url || vars.FLASHPOINT_VERIFY_WEB_URL || 'https://escalation-web.pages.dev' }}
       PLAYTEST_RESPONSE_STRATEGY: ${{ github.event.inputs.response_strategy || 'default' }}
+      PLAYTEST_SEED: ${{ github.event.inputs.seed || (github.event.inputs.response_strategy == 'public-econ' && 'public-econ-2' || '') }}
       PLAYTEST_OUTPUT_DIR: output/playwright-deployed
     steps:
       - name: Checkout

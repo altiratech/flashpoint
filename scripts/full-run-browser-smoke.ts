@@ -179,6 +179,29 @@ const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]
   return readVisibleImages(page);
 };
 
+const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
+  const deadline = Date.now() + 30_000;
+  const reportHeading = page.getByText(/Mandate Assessment/i).first();
+  const nextDecisionButton = page.getByRole('button', { name: /Proceed To Decision|Return To Selected Response/i }).first();
+
+  while (Date.now() < deadline) {
+    const reachedReport = await reportHeading.isVisible().catch(() => false);
+    if (reachedReport) {
+      return;
+    }
+
+    const reachedNextBriefing =
+      (await nextDecisionButton.isVisible().catch(() => false)) && (await nextDecisionButton.isEnabled().catch(() => false));
+    if (reachedNextBriefing) {
+      return;
+    }
+
+    await sleep(250);
+  }
+
+  throw new Error(`Commit did not advance beyond decision mode for window ${windowIndex}.`);
+};
+
 const run = async (): Promise<void> => {
   await mkdir(outputDir, { recursive: true });
 
@@ -239,8 +262,7 @@ const run = async (): Promise<void> => {
         throw new Error(`Could not commit selected response for window ${index}.`);
       }
 
-      await sleep(350);
-      await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => undefined);
+      await waitForPostCommitAdvance(page, index);
 
       if (await page.getByText(/Mandate Assessment/i).first().isVisible().catch(() => false)) {
         await page.getByText(/Strategic Debrief/i).first().waitFor({ timeout: 10_000 });
