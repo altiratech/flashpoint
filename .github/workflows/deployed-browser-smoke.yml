@@ -1,0 +1,64 @@
+name: Deployed Browser Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      web_url:
+        description: "Deployed Flashpoint web URL"
+        required: false
+        default: "https://escalation-web.pages.dev"
+        type: string
+      response_strategy:
+        description: "Browser smoke response strategy"
+        required: false
+        default: "default"
+        type: choice
+        options:
+          - default
+          - varied
+          - public-econ
+  schedule:
+    - cron: "37 14 * * 1"
+
+concurrency:
+  group: flashpoint-deployed-browser-smoke
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PLAYTEST_WEB_URL: ${{ github.event.inputs.web_url || vars.FLASHPOINT_VERIFY_WEB_URL || 'https://escalation-web.pages.dev' }}
+      PLAYTEST_RESPONSE_STRATEGY: ${{ github.event.inputs.response_strategy || 'default' }}
+      PLAYTEST_OUTPUT_DIR: output/playwright-deployed
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run deployed browser smoke
+        run: npm run smoke:browser
+
+      - name: Upload smoke screenshots
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: flashpoint-deployed-browser-smoke-${{ github.run_id }}
+          path: output/playwright-deployed/
+          if-no-files-found: ignore
+          retention-days: 14
