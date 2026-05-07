@@ -18,7 +18,8 @@ const requiredTables = {
       id: { type: 'TEXT', pk: true },
       profile_id: { type: 'TEXT', notNull: true },
       scenario_id: { type: 'TEXT', notNull: true },
-      adversary_profile_id: { type: 'TEXT', notNull: true },
+      // Legacy remote tables may have this hot-added as nullable; runtime inserts always provide it.
+      adversary_profile_id: { type: 'TEXT' },
       seed: { type: 'TEXT', notNull: true },
       status: { type: 'TEXT', notNull: true },
       current_turn: { type: 'INTEGER', notNull: true },
