@@ -107,4 +107,17 @@ if ! grep -Eiq 'Altira Flashpoint' <<<"${web_html}"; then
   exit 1
 fi
 
+web_asset_path="$(grep -Eo 'src="/assets/[^"]+\.js"' <<<"${web_html}" | head -n 1 | sed -E 's/src="([^"]+)"/\1/')"
+if [[ -z "${web_asset_path}" ]]; then
+  echo "Web verification failed: could not find deployed JavaScript asset" >&2
+  exit 1
+fi
+
+echo "Verifying web API target: ${WEB_URL}${web_asset_path}"
+web_asset="$(curl -fsS "${WEB_URL}${web_asset_path}")"
+if ! grep -Fq "${API_ORIGIN}" <<<"${web_asset}"; then
+  echo "Web verification failed: deployed bundle does not reference API origin ${API_ORIGIN}" >&2
+  exit 1
+fi
+
 echo "Deployment verification checks passed."
