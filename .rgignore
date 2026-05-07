@@ -5,4 +5,5 @@ apps/api/.wrangler/
 output/image-review/
 output/imagegen/
 output/playwright-varied/
+output/playwright-deployed/
 coverage/

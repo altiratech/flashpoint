@@ -147,8 +147,10 @@ export interface TelemetryPayload {
 export const sendTelemetry = (payload: TelemetryPayload): void => {
   const body = JSON.stringify(payload);
   const url = apiUrl('/api/telemetry');
+  const telemetryUrl = new URL(url, window.location.href);
+  const isCrossOrigin = telemetryUrl.origin !== window.location.origin;
 
-  if (navigator.sendBeacon) {
+  if (!isCrossOrigin && navigator.sendBeacon) {
     const blob = new Blob([body], { type: 'application/json' });
     if (navigator.sendBeacon(url, blob)) {
       return;
@@ -161,6 +163,7 @@ export const sendTelemetry = (payload: TelemetryPayload): void => {
       'Content-Type': 'application/json'
     },
     body,
+    credentials: 'omit',
     keepalive: true
   }).catch(() => {
     // Telemetry must never interrupt gameplay.
