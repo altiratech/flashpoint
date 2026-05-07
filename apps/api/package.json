@@ -10,6 +10,7 @@
     "deploy": "wrangler deploy",
     "db:migrate": "node ../../scripts/apply-d1-migrations.mjs",
     "db:migrate:plan": "node ../../scripts/apply-d1-migrations.mjs --dry-run",
+    "db:migrate:remote": "node ../../scripts/apply-d1-migrations.mjs --remote",
     "db:seed": "wrangler d1 execute escalation-db --local --file=../../db/seed/seed.sql"
   },
   "dependencies": {

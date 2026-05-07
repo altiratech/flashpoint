@@ -53,6 +53,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Apply remote D1 migrations
+        run: npm run db:migrate:remote
+
       - name: Deploy API Worker
         run: npm run deploy --workspace @wargames/api
 

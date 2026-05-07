@@ -31,6 +31,7 @@ for (const migration of migrations) {
     'execute',
     databaseName,
     ...(local ? ['--local'] : []),
+    ...(remote ? ['--remote', '--yes'] : []),
     `--file=${migrationPath}`
   ];
 
