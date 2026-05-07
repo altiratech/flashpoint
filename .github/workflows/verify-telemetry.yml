@@ -1,0 +1,43 @@
+name: Verify Telemetry
+
+on:
+  workflow_dispatch:
+    inputs:
+      lookback_hours:
+        description: "Telemetry lookback window in hours"
+        required: false
+        default: "24"
+        type: string
+      scenario_id:
+        description: "Optional scenario id filter"
+        required: false
+        default: "northern_strait_black_swan"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VERIFY_TELEMETRY_LOOKBACK_HOURS: ${{ github.event.inputs.lookback_hours || '24' }}
+      VERIFY_TELEMETRY_SCENARIO_ID: ${{ github.event.inputs.scenario_id || 'northern_strait_black_swan' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify remote telemetry
+        run: npm run verify:telemetry:remote
