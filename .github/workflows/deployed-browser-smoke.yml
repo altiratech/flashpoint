@@ -22,6 +22,16 @@ on:
         required: false
         default: ""
         type: string
+      verify_telemetry:
+        description: "Verify fresh remote D1 telemetry after the browser smoke"
+        required: false
+        default: true
+        type: boolean
+      telemetry_scenario_id:
+        description: "Scenario id filter for post-smoke telemetry verification"
+        required: false
+        default: "northern_strait_black_swan"
+        type: string
   schedule:
     - cron: "37 14 * * 1"
 
@@ -41,6 +51,10 @@ jobs:
       PLAYTEST_RESPONSE_STRATEGY: ${{ github.event.inputs.response_strategy || 'default' }}
       PLAYTEST_SEED: ${{ github.event.inputs.seed || (github.event.inputs.response_strategy == 'public-econ' && 'public-econ-2' || '') }}
       PLAYTEST_OUTPUT_DIR: output/playwright-deployed
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VERIFY_TELEMETRY_LOOKBACK_HOURS: "1"
+      VERIFY_TELEMETRY_SCENARIO_ID: ${{ github.event.inputs.telemetry_scenario_id || 'northern_strait_black_swan' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -57,8 +71,20 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
+      - name: Mark telemetry verification window
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}
+        run: echo "VERIFY_TELEMETRY_NOT_BEFORE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+
       - name: Run deployed browser smoke
         run: npm run smoke:browser
+
+      - name: Wait for telemetry writes
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}
+        run: sleep 5
+
+      - name: Verify fresh remote telemetry
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}
+        run: npm run verify:telemetry:remote
 
       - name: Upload smoke screenshots
         if: always()

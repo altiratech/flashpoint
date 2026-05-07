@@ -7,6 +7,7 @@ const wranglerConfig = process.env.VERIFY_TELEMETRY_WRANGLER_CONFIG || 'apps/api
 const lookbackHours = Number.parseInt(process.env.VERIFY_TELEMETRY_LOOKBACK_HOURS || '24', 10);
 const recentLimit = Number.parseInt(process.env.VERIFY_TELEMETRY_RECENT_LIMIT || '12', 10);
 const expectedScenarioId = process.env.VERIFY_TELEMETRY_SCENARIO_ID || '';
+const notBefore = process.env.VERIFY_TELEMETRY_NOT_BEFORE || '';
 
 if (!Number.isFinite(lookbackHours) || lookbackHours < 1 || lookbackHours > 168) {
   throw new Error('VERIFY_TELEMETRY_LOOKBACK_HOURS must be an integer from 1 to 168.');
@@ -14,6 +15,10 @@ if (!Number.isFinite(lookbackHours) || lookbackHours < 1 || lookbackHours > 168)
 
 if (!Number.isFinite(recentLimit) || recentLimit < 1 || recentLimit > 50) {
   throw new Error('VERIFY_TELEMETRY_RECENT_LIMIT must be an integer from 1 to 50.');
+}
+
+if (notBefore && Number.isNaN(Date.parse(notBefore))) {
+  throw new Error('VERIFY_TELEMETRY_NOT_BEFORE must be an ISO-parseable timestamp when provided.');
 }
 
 const minimums = {
@@ -82,6 +87,9 @@ const whereParts = [
   'julianday(created_at) IS NOT NULL',
   `julianday(created_at) >= julianday('now', '-${lookbackHours} hours')`
 ];
+if (notBefore) {
+  whereParts.push(`julianday(created_at) >= julianday('${quoteSql(notBefore)}')`);
+}
 if (expectedScenarioId) {
   whereParts.push(`scenario_id = '${quoteSql(expectedScenarioId)}'`);
 }
@@ -129,6 +137,9 @@ const recentRows = runD1Query(
 
 console.log(`Remote telemetry verification for ${dbName}`);
 console.log(`Lookback: ${lookbackHours} hour(s)${expectedScenarioId ? `, scenario: ${expectedScenarioId}` : ''}`);
+if (notBefore) {
+  console.log(`Not before: ${notBefore}`);
+}
 console.log('Event summary:');
 for (const row of summaryRows) {
   console.log(
