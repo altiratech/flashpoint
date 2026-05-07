@@ -3,27 +3,20 @@
 Product: Flashpoint / ESCALATION scenario and response simulation.
 
 Current state:
-- Stabilization and visual-expansion work is pushed to `origin/main`; gameplay recovery landed in `d408151`, balance/code fixes landed in `c385af0`, the second US visual tranche landed in `ca3ea5d`, and ALT-38 hardening landed in `fb61ccc`.
-- Belief update now decays `economicallyWeakProb` (* 0.82), `allianceFragileProb` (* 0.82), and `deescalateUnderPressure` (* 0.78) each turn, preventing monotonic saturation that was driving concentrated terminal distributions.
-- Action selection forced-military-posture inject now validates against `scenario.availablePlayerActionIds` before adding to the offered set.
-- `ensureEpisodeProfileColumn` ALTER TABLE is wrapped in try/catch with a re-check, preventing concurrent cold-start crashes on D1.
-- `IMAGE_GENERATION_MATRIX.md` now prioritizes US domestic impact, chips/AI economy, US government response, and technically accurate thermal imagery.
-- Codex-generated image tranche 1 is wired into `images.json`: Situation Room chip crisis, AI/data-center supply exposure, US supermarket panic, nuclear-risk command display, and corrected thermal boarding imagery.
-- Codex-generated image tranche 2 is applied and verified locally: market crash, family cable-news crisis, tech layoffs, port congestion, White House press briefing, Congressional chip hearing, deployment pier families, electronics shortage, gas lines/freight shock, semiconductor fab disruption, and allied coordination call.
-- Image selector weighting now lets selected action/variant context lead over generic beat-matched maritime assets, with regression coverage in `tests/engine/images.test.ts`.
-- `npm run diagnose:visual-targets` now proves the seven priority US/chips/economy images are selector-reachable; electronics, gas/freight, nuclear-risk, and Congress are also reachable under the normal offer model.
-- Browser smoke now has default, varied, and `npm run smoke:browser:public-econ` paths; public-econ uses seed `public-econ-2` and asserts White House, market-crash, and semiconductor-fab imagery.
-- API rate limiting now defaults to D1-backed `rate_limit_buckets` storage with `RATE_LIMIT_STORAGE=memory` available only as a local override; route keys normalize episode UUIDs so unique run IDs do not bypass a bucket.
-- D1 migration governance now uses `scripts/apply-d1-migrations.mjs`; `npm run db:migrate:plan` dry-runs every numbered SQL migration, including telemetry and rate-limit tables.
-- Bootstrap reference payload is module-stable and ETag-backed with stale-while-revalidate caching, reducing repeated full payload fetches during playtest reloads.
-- Active `northern_strait_black_swan` final-window branch gates now split severe endings across blockade lock, limited strike, managed freeze, managed relief, and military-only invasion tail risk instead of over-defaulting to managed freeze.
-- Gameplay/UX recovery pass covers Linear `ALT-27` through `ALT-44`; `ALT-38` still only partially closed.
+- `main` is cleanly pushed to `origin/main`; the latest deployed hardening commits are `1674f8a` (remote D1 migrations before deploy), `c08a6a9` (Pages build API-origin guardrail), and `5684fb0` (cross-origin telemetry/browser-smoke fix).
+- Linear `ALT-38` is implemented through deployed preview verification: D1-backed `rate_limit_buckets`, route-normalized API rate-limit keys, ordered remote D1 migrations, retry/idempotency tests, bootstrap ETag caching, and real Pages + Worker smoke coverage.
+- GitHub Deploy run `25507708225` succeeded for `5684fb0`: quality gate, remote D1 migrations, API Worker deploy, Pages deploy, and production verification all passed.
+- Deployed Pages now bakes `VITE_API_BASE_URL=https://escalation-api.rjameson.workers.dev`; `scripts/verify-deploy.sh` fails if the deployed JS bundle does not reference the expected API origin.
+- Cross-origin telemetry now avoids `sendBeacon` credentialed CORS semantics and uses `fetch(..., keepalive, credentials: 'omit')`; same-origin/local telemetry can still use `sendBeacon`.
+- Browser smoke now has default, varied, public-econ, and deployed-output paths; deployed default smoke reached the mandate report on `https://escalation-web.pages.dev`.
+- Gameplay/UX recovery pass covers Linear `ALT-27` through `ALT-44`; `ALT-38` is no longer blocked on deployed API/web smoke.
 
 Validation:
-- Passed: `npm run lint`, `npm test` (18 files / 54 tests), `npm run build`, `npm run simulate:balance`, `npm run validate:content`, `npm run db:migrate:plan`, `npm run diagnose:decision-visuals`, `npm run diagnose:visual-targets`, and default/varied/public-econ browser smokes against `127.0.0.1:5179`.
-- Balance note: older `northern_strait_flashpoint` top terminal share is 31.5%; active `northern_strait_black_swan` top terminal share is now 30.0% at `ns_blockade_lock` with all five terminals represented.
-- Visual note: screenshot review confirms Situation Room, allied coordination, corrected thermal, electronics shortage, port congestion, AI/data-center, supermarket, family cable-news, deployment-pier, White House, market-crash, semiconductor-fab, and Congress imagery in-game.
+- Passed previously for ALT-38: `npm test`, `npm run lint`, `npm run validate:content`, `npm run simulate:balance`, `npm run db:migrate:plan`, `npm run build`, and `git diff --check`.
+- Passed today: `bash -n scripts/verify-deploy.sh`, `VITE_API_BASE_URL=https://escalation-api.rjameson.workers.dev npm run build --workspace @wargames/web`, `npm run typecheck --workspace @wargames/web`, `npm run verify:deploy`, and `PLAYTEST_WEB_URL=https://escalation-web.pages.dev PLAYTEST_OUTPUT_DIR=output/playwright-deployed npm run smoke:browser`.
+- Deployed browser smoke exercised six decision windows and reached `Mandate Assessment` with no captured console/page errors.
 - Known red: `npm audit` remains red for no-fix Hono/Drizzle runtime advisories; see `DEPENDENCY_SECURITY_TRIAGE.md`.
+- Known yellow: GitHub Actions warns that Node.js 20 action runtimes are deprecated for `actions/checkout@v4` and `actions/setup-node@v4`.
 
 Next:
-- Continue `ALT-38` with live preview D1 migration application and deployed API smoke once Ryan wants to spend Cloudflare deploy cycles.
+- Continue vertical-slice hardening with the GitHub Actions Node runtime warning and decide whether deployed full-browser smoke should become a manual/scheduled CI check.

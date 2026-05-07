@@ -61,3 +61,12 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 - Added ETag and `stale-while-revalidate` handling for `/api/reference/bootstrap` using a module-stable bootstrap payload.
 - Added API tests for D1-backed rate limit behavior and explicit already-applied turn retry semantics.
 - Verification: `npm test`, `npm run lint`, `npm run validate:content`, `npm run simulate:balance`, `npm run db:migrate:plan`, `npm run build`, and `git diff --check` all passed.
+
+## 2026-05-07
+
+- Picked up ALT-38 deployed API/web smoke after `1674f8a` succeeded in GitHub Deploy. `npm run verify:deploy` passed against `https://escalation-api.rjameson.workers.dev` and `https://escalation-web.pages.dev`, proving API health, bootstrap payload, profile creation, episode start, web shell, and deployed JS bundle API-origin wiring.
+- Full deployed browser smoke initially found a real Pages wiring bug: the app loaded the HTML shell but fetched `/api/reference/bootstrap` from the Pages origin, leaving the UI stuck on `Loading strategic theater configuration...`.
+- Added `VITE_API_BASE_URL=https://escalation-api.rjameson.workers.dev` to the Pages build step and hardened `scripts/verify-deploy.sh` so CI fails if the deployed bundle does not reference the expected Worker API origin. Commit `c08a6a9` deployed successfully in GitHub run `25507494544`.
+- Reran deployed browser smoke and found the next real preview-only issue: telemetry beacons were blocked by credentialed CORS because cross-origin `sendBeacon` required `Access-Control-Allow-Credentials: true`.
+- Changed telemetry to reserve `sendBeacon` for same-origin runs and use `fetch` with `keepalive` plus `credentials: 'omit'` for cross-origin API telemetry. Added `output/playwright-deployed/` to ignore files. Commit `5684fb0` deployed successfully in GitHub run `25507708225`.
+- Final verification: `npm run verify:deploy` passed, and `PLAYTEST_WEB_URL=https://escalation-web.pages.dev PLAYTEST_OUTPUT_DIR=output/playwright-deployed npm run smoke:browser` reached the mandate report after six decision windows with no captured console/page errors.
