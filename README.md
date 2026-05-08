@@ -143,6 +143,8 @@ npm run verify:deploy
 
 Override verification targets with `VERIFY_WEB_URL`, `VERIFY_API_ORIGIN`, or `VERIFY_SCENARIO_ID` when testing a branch preview or future standalone domain.
 
+Production diagnostic artifact retention is documented in `docs/PRODUCTION_DIAGNOSTICS.md`; run `npm run verify:diagnostic-retention` after changing deployment or smoke workflows.
+
 ## License
 
 No open-source license has been selected yet. Public source visibility does not grant reuse rights until a license file is added.
