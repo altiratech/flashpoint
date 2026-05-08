@@ -51,6 +51,14 @@ const tradeoffTone: Record<TradeoffScorecardStatus, string> = {
   broken: 'border-red-500/60 text-red-300'
 };
 
+const reportSectionLinks = [
+  ['Mandate', '#mandate-scorecards'],
+  ['Tradeoffs', '#tradeoff-scorecards'],
+  ['Timeline', '#scenario-timeline'],
+  ['Debrief', '#strategic-debrief'],
+  ['Hidden Effects', '#hidden-effects']
+] as const;
+
 const objectiveStatusForScore = (score: number): ObjectiveStatus => {
   if (score >= 68) {
     return 'held';
@@ -60,6 +68,18 @@ const objectiveStatusForScore = (score: number): ObjectiveStatus => {
   }
   return 'failed';
 };
+
+const formatOutcomeLabel = (outcome: PostGameReport['outcome']): string =>
+  outcome
+    .split('_')
+    .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
+    .join(' ');
+
+const finalMeterSnapshot = (report: PostGameReport): string => [
+  `Escalation ${Math.round(report.finalMeters.escalationIndex)}`,
+  `Alliance ${Math.round(report.finalMeters.allianceTrust)}`,
+  `Economy ${Math.round(report.finalMeters.economicStability)}`
+].join(' / ');
 
 const computeObjectiveScore = (objective: MissionObjective, report: PostGameReport): number => {
   const scores = objective.primaryMeters.map((meter) => {
@@ -147,16 +167,20 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
   ) ?? cinematics?.endings[report.outcome] ?? null;
   const objectiveAssessments = deriveObjectiveAssessments(scenario, report);
   const mandateHeadline = deriveMandateHeadline(report, objectiveAssessments);
+  const finalTurn = report.timeline[report.timeline.length - 1]?.turn ?? report.pivotalDecision.turn;
+  const strategicRead = deepDebrief
+    ? `${deepDebrief.grade.title} (${deepDebrief.grade.score})`
+    : report.outcomeExplanation;
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-6">
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4 lg:px-6">
       <section className="card p-5">
         <p className="label">Mandate Assessment</p>
-        <div className="mt-2 flex items-center justify-between gap-4">
-          <h1 className="font-display text-3xl text-accent">{mandateHeadline.title}</h1>
+        <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="font-display text-2xl text-accent sm:text-3xl">{mandateHeadline.title}</h1>
           <button
             type="button"
-            className="rounded-md border border-accent px-4 py-2 text-sm text-accent hover:bg-accent/10"
+            className="w-fit rounded-md border border-accent px-4 py-2 text-sm text-accent hover:bg-accent/10"
             onClick={onRestart}
           >
             Return To Scenario Setup
@@ -168,8 +192,55 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
         <p className="mt-3 text-xs text-textMuted">Baseline outcome model: {report.outcomeExplanation}</p>
       </section>
 
+      <section className="card p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="label">Run Snapshot</p>
+            <h2 className="mt-2 font-display text-2xl text-textMain">
+              {formatOutcomeLabel(report.outcome)} after {finalTurn} decision windows
+            </h2>
+          </div>
+          <p className="rounded-md border border-borderTone bg-panelRaised/70 px-3 py-1 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
+            Episode {report.episodeId.slice(0, 8)}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
+            <p className="label">Strategic Read</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMain">{strategicRead}</p>
+          </article>
+          <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
+            <p className="label">Pivotal Decision</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMain">
+              Window {report.pivotalDecision.turn}: {report.pivotalDecision.actionName}
+            </p>
+          </article>
+          <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
+            <p className="label">Alternative Line</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMain">
+              Window {report.alternativeLine.turn}: {report.alternativeLine.suggestedActionName}
+            </p>
+          </article>
+          <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
+            <p className="label">Final Pressure</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMain">{finalMeterSnapshot(report)}</p>
+          </article>
+        </div>
+        <nav className="mt-4 flex flex-wrap gap-2" aria-label="Report sections">
+          {reportSectionLinks.map(([label, href]) => (
+            <a
+              key={href}
+              href={href}
+              className="rounded-md border border-borderTone bg-surface/50 px-3 py-1.5 text-[0.62rem] uppercase tracking-[0.12em] text-textMuted transition hover:border-accent/70 hover:text-accent"
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      </section>
+
       {objectiveAssessments.length > 0 ? (
-        <section className="card p-5">
+        <section id="mandate-scorecards" className="card scroll-mt-4 p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="label">Mandate Scorecards</p>
@@ -196,7 +267,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
       ) : null}
 
       {report.fullCausality.tradeoffScorecards.length > 0 ? (
-        <section className="card p-5">
+        <section id="tradeoff-scorecards" className="card scroll-mt-4 p-5">
           <div>
             <p className="label">Tradeoff Scorecards</p>
             <p className="mt-2 text-sm text-textMuted">
@@ -229,7 +300,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
       ) : null}
 
       {endingCinematic ? (
-        <section className="card p-5">
+        <section id="aftermath" className="card scroll-mt-4 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="label">Aftermath Sequence</p>
@@ -250,7 +321,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
         </section>
       ) : null}
 
-      <section className="card p-5">
+      <section id="scenario-timeline" className="card scroll-mt-4 p-5">
         <p className="label">Scenario Timeline</p>
         <div className="mt-3">
           <TimelineChart data={report.timeline} />
@@ -286,7 +357,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
       </section>
 
       {deepDebrief ? (
-        <section className="card p-5">
+        <section id="strategic-debrief" className="card scroll-mt-4 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="label">Strategic Debrief</p>
@@ -444,7 +515,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
         </section>
       ) : null}
 
-      <section className="card p-5">
+      <section id="hidden-effects" className="card scroll-mt-4 p-5">
         <p className="label">Hidden Effects (Revealed)</p>
         <div className="mt-3 overflow-x-auto">
           <table className="min-w-full border-collapse text-sm">
