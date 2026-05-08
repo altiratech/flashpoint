@@ -16,9 +16,51 @@ export interface RateLimitConfig {
   maxRequests: number;
   windowSeconds: number;
   nowMs: number;
+  cleanupExpiredBuckets?: {
+    intervalSeconds?: number;
+    maxRows?: number;
+  };
 }
 
 const getChanges = (result: unknown): number => (result as { meta?: { changes?: number } }).meta?.changes ?? 0;
+const DEFAULT_D1_CLEANUP_INTERVAL_SECONDS = 300;
+const DEFAULT_D1_CLEANUP_MAX_ROWS = 500;
+
+let lastD1CleanupAtSeconds = 0;
+
+export const resetD1RateLimitCleanupForTests = (): void => {
+  lastD1CleanupAtSeconds = 0;
+};
+
+const positiveIntOr = (value: number | undefined, fallback: number): number =>
+  Number.isFinite(value) && value !== undefined && value > 0 ? Math.floor(value) : fallback;
+
+const cleanupExpiredD1Buckets = async (rawDb: D1Database, config: RateLimitConfig, nowSeconds: number): Promise<void> => {
+  const intervalSeconds = positiveIntOr(
+    config.cleanupExpiredBuckets?.intervalSeconds,
+    DEFAULT_D1_CLEANUP_INTERVAL_SECONDS
+  );
+  if (lastD1CleanupAtSeconds > 0 && nowSeconds - lastD1CleanupAtSeconds < intervalSeconds) {
+    return;
+  }
+
+  const maxRows = positiveIntOr(config.cleanupExpiredBuckets?.maxRows, DEFAULT_D1_CLEANUP_MAX_ROWS);
+  await rawDb
+    .prepare(
+      `DELETE FROM rate_limit_buckets
+       WHERE bucket_key IN (
+         SELECT bucket_key
+         FROM rate_limit_buckets
+         WHERE reset_at <= ?
+         ORDER BY reset_at ASC
+         LIMIT ?
+       )`
+    )
+    .bind(nowSeconds, maxRows)
+    .run();
+
+  lastD1CleanupAtSeconds = nowSeconds;
+};
 
 export const normalizeRateLimitPath = (path: string): string =>
   path
@@ -65,6 +107,8 @@ export const consumeD1RateLimit = async (
 ): Promise<RateLimitResult> => {
   const nowSeconds = Math.floor(config.nowMs / 1000);
   const resetAtSeconds = nowSeconds + config.windowSeconds;
+
+  await cleanupExpiredD1Buckets(rawDb, config, nowSeconds);
 
   const incrementResult = await rawDb
     .prepare(

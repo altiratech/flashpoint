@@ -4,7 +4,8 @@ import {
   buildRateLimitKey,
   consumeD1RateLimit,
   consumeMemoryRateLimit,
-  normalizeRateLimitPath
+  normalizeRateLimitPath,
+  resetD1RateLimitCleanupForTests
 } from '../../apps/api/src/rateLimit';
 
 class MockRateLimitStatement {
@@ -31,12 +32,29 @@ class MockRateLimitStatement {
 
 class MockRateLimitD1 {
   readonly buckets = new Map<string, { count: number; resetAt: number }>();
+  readonly cleanupRuns: Array<{ nowSeconds: number; maxRows: number; changes: number }> = [];
 
   prepare(query: string): D1PreparedStatement {
     return new MockRateLimitStatement(this, query) as unknown as D1PreparedStatement;
   }
 
   async run(query: string, values: unknown[]): Promise<D1Result> {
+    if (query.includes('DELETE FROM rate_limit_buckets')) {
+      const [nowSeconds, maxRows] = values as [number, number];
+      const expiredKeys = [...this.buckets.entries()]
+        .filter(([, bucket]) => bucket.resetAt <= nowSeconds)
+        .sort(([, left], [, right]) => left.resetAt - right.resetAt)
+        .slice(0, maxRows)
+        .map(([key]) => key);
+
+      for (const key of expiredKeys) {
+        this.buckets.delete(key);
+      }
+
+      this.cleanupRuns.push({ nowSeconds, maxRows, changes: expiredKeys.length });
+      return makeResult(expiredKeys.length);
+    }
+
     if (query.includes('UPDATE rate_limit_buckets') && query.includes('count = count + 1')) {
       const [key, nowSeconds, maxRequests] = values as [string, number, number];
       const bucket = this.buckets.get(key);
@@ -108,6 +126,7 @@ describe('rate limit helpers', () => {
   });
 
   it('persists rate limit buckets in D1-style storage across requests', async () => {
+    resetD1RateLimitCleanupForTests();
     const rawDb = new MockRateLimitD1() as unknown as D1Database;
     const config = {
       bucketKey: 'client:POST:/api/episodes/start',
@@ -129,6 +148,7 @@ describe('rate limit helpers', () => {
   });
 
   it('resets D1-style buckets after the window expires', async () => {
+    resetD1RateLimitCleanupForTests();
     const rawDb = new MockRateLimitD1() as unknown as D1Database;
     const config = {
       bucketKey: 'client:POST:/api/episodes/start',
@@ -144,5 +164,33 @@ describe('rate limit helpers', () => {
     expect(blocked.allowed).toBe(false);
     expect(reset.allowed).toBe(true);
     expect(reset.remaining).toBe(0);
+  });
+
+  it('prunes expired D1-style buckets in bounded batches', async () => {
+    resetD1RateLimitCleanupForTests();
+    const mockDb = new MockRateLimitD1();
+    mockDb.buckets.set('expired:one', { count: 1, resetAt: 10 });
+    mockDb.buckets.set('expired:two', { count: 1, resetAt: 20 });
+    mockDb.buckets.set('expired:three', { count: 1, resetAt: 30 });
+    mockDb.buckets.set('active:recent', { count: 1, resetAt: 120 });
+
+    const result = await consumeD1RateLimit(mockDb as unknown as D1Database, {
+      bucketKey: 'client:POST:/api/episodes/start',
+      maxRequests: 5,
+      windowSeconds: 60,
+      nowMs: 60_000,
+      cleanupExpiredBuckets: {
+        intervalSeconds: 1,
+        maxRows: 2
+      }
+    });
+
+    expect(result.allowed).toBe(true);
+    expect(mockDb.cleanupRuns).toEqual([{ nowSeconds: 60, maxRows: 2, changes: 2 }]);
+    expect(mockDb.buckets.has('expired:one')).toBe(false);
+    expect(mockDb.buckets.has('expired:two')).toBe(false);
+    expect(mockDb.buckets.has('expired:three')).toBe(true);
+    expect(mockDb.buckets.has('active:recent')).toBe(true);
+    expect(mockDb.buckets.has('client:POST:/api/episodes/start')).toBe(true);
   });
 });
