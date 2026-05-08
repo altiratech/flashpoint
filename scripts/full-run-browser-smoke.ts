@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { chromium, type Browser, type Page } from '@playwright/test';
@@ -179,6 +179,67 @@ const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]
   return readVisibleImages(page);
 };
 
+const writeSmokeSummary = async (input: {
+  status: 'passed' | 'failed';
+  currentUrl?: string;
+  error?: string;
+  failureScreenshot?: string;
+  screenshotError?: string;
+  decisionLog: string[];
+  imageLog: string[];
+  consoleErrors: string[];
+  pageErrors: string[];
+}): Promise<void> => {
+  const summary = {
+    status: input.status,
+    webUrl,
+    currentUrl: input.currentUrl ?? null,
+    responseStrategy,
+    seed: deterministicSeed || null,
+    maxDecisionWindows,
+    failureScreenshot: input.failureScreenshot ?? null,
+    screenshotError: input.screenshotError ?? null,
+    error: input.error ?? null,
+    decisionWindows: input.decisionLog.length,
+    decisions: input.decisionLog,
+    visibleImages: input.imageLog,
+    consoleErrors: input.consoleErrors,
+    pageErrors: input.pageErrors,
+    completedAt: new Date().toISOString()
+  };
+
+  await writeFile(path.join(outputDir, 'smoke-summary.json'), `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+  await writeFile(
+    path.join(outputDir, 'smoke-summary.md'),
+    [
+      `# Flashpoint Deployed Browser Smoke: ${input.status}`,
+      '',
+      `- URL: ${webUrl}`,
+      `- Current URL: ${input.currentUrl ?? 'n/a'}`,
+      `- Response strategy: ${responseStrategy}`,
+      `- Seed: ${deterministicSeed || 'n/a'}`,
+      `- Decision windows: ${input.decisionLog.length}`,
+      `- Failure screenshot: ${input.failureScreenshot ?? 'n/a'}`,
+      `- Error: ${input.error ?? 'n/a'}`,
+      `- Screenshot error: ${input.screenshotError ?? 'n/a'}`,
+      '',
+      '## Decisions',
+      input.decisionLog.length > 0 ? input.decisionLog.map((entry) => `- ${entry}`).join('\n') : '- n/a',
+      '',
+      '## Visible Images',
+      input.imageLog.length > 0 ? input.imageLog.map((entry) => `- ${entry}`).join('\n') : '- n/a',
+      '',
+      '## Console Errors',
+      input.consoleErrors.length > 0 ? input.consoleErrors.map((entry) => `- ${entry}`).join('\n') : '- n/a',
+      '',
+      '## Page Errors',
+      input.pageErrors.length > 0 ? input.pageErrors.map((entry) => `- ${entry}`).join('\n') : '- n/a',
+      ''
+    ].join('\n'),
+    'utf8'
+  );
+};
+
 const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
   const deadline = Date.now() + 30_000;
   const reportHeading = page.getByText(/Mandate Assessment/i).first();
@@ -206,6 +267,7 @@ const run = async (): Promise<void> => {
   await mkdir(outputDir, { recursive: true });
 
   let browser: Browser | null = null;
+  let page: Page | null = null;
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   const decisionLog: string[] = [];
@@ -213,7 +275,7 @@ const run = async (): Promise<void> => {
 
   try {
     browser = await chromium.launch({ headless: !headed });
-    const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+    page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
 
     page.on('console', (message) => {
       if (message.type() === 'error') {
@@ -329,10 +391,45 @@ const run = async (): Promise<void> => {
     console.log('Visible images:');
     console.log(imageLog.join('\n'));
     console.log(`Screenshots: ${outputDir}`);
+    await writeSmokeSummary({
+      status: 'passed',
+      currentUrl: page.url(),
+      decisionLog,
+      imageLog,
+      consoleErrors,
+      pageErrors
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    let failureScreenshot: string | undefined;
+    let screenshotError: string | undefined;
+    if (page) {
+      failureScreenshot = path.join(outputDir, 'failure-state.png');
+      try {
+        await page.screenshot({ path: failureScreenshot, fullPage: true });
+      } catch (screenshotFailure) {
+        screenshotError = screenshotFailure instanceof Error ? screenshotFailure.message : String(screenshotFailure);
+        failureScreenshot = undefined;
+      }
+    }
+
+    await writeSmokeSummary({
+      status: 'failed',
+      currentUrl: page?.url(),
+      error: message,
+      failureScreenshot,
+      screenshotError,
+      decisionLog,
+      imageLog,
+      consoleErrors,
+      pageErrors
+    });
+
     console.error(`Browser smoke failed: ${message}`);
     console.error(`URL: ${webUrl}`);
+    if (failureScreenshot) {
+      console.error(`Failure screenshot: ${failureScreenshot}`);
+    }
     console.error(`If no local app is running, start it with: npm run dev`);
     process.exitCode = 1;
   } finally {

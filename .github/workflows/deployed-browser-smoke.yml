@@ -59,6 +59,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Prepare smoke artifact directory
+        run: |
+          mkdir -p "$PLAYTEST_OUTPUT_DIR"
+          {
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_attempt=$GITHUB_RUN_ATTEMPT"
+            echo "event_name=$GITHUB_EVENT_NAME"
+            echo "ref=$GITHUB_REF"
+            echo "sha=$GITHUB_SHA"
+            echo "web_url=$PLAYTEST_WEB_URL"
+            echo "response_strategy=$PLAYTEST_RESPONSE_STRATEGY"
+            echo "seed=$PLAYTEST_SEED"
+            echo "verify_telemetry=${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}"
+            echo "telemetry_scenario_id=$VERIFY_TELEMETRY_SCENARIO_ID"
+          } > "$PLAYTEST_OUTPUT_DIR/github-context.txt"
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -73,10 +89,15 @@ jobs:
 
       - name: Mark telemetry verification window
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}
-        run: echo "VERIFY_TELEMETRY_NOT_BEFORE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+        run: |
+          VERIFY_TELEMETRY_NOT_BEFORE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "VERIFY_TELEMETRY_NOT_BEFORE=$VERIFY_TELEMETRY_NOT_BEFORE" >> "$GITHUB_ENV"
+          echo "telemetry_not_before=$VERIFY_TELEMETRY_NOT_BEFORE" >> "$PLAYTEST_OUTPUT_DIR/github-context.txt"
 
       - name: Run deployed browser smoke
-        run: npm run smoke:browser
+        run: |
+          set -o pipefail
+          npm run smoke:browser 2>&1 | tee "$PLAYTEST_OUTPUT_DIR/browser-smoke.log"
 
       - name: Wait for telemetry writes
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}
@@ -84,13 +105,15 @@ jobs:
 
       - name: Verify fresh remote telemetry
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.verify_telemetry }}
-        run: npm run verify:telemetry:remote
+        run: |
+          set -o pipefail
+          npm run verify:telemetry:remote 2>&1 | tee "$PLAYTEST_OUTPUT_DIR/telemetry-verify.log"
 
-      - name: Upload smoke screenshots
+      - name: Upload smoke diagnostics
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: flashpoint-deployed-browser-smoke-${{ github.run_id }}
+          name: flashpoint-deployed-smoke-diagnostics-${{ github.run_id }}
           path: output/playwright-deployed/
-          if-no-files-found: ignore
+          if-no-files-found: warn
           retention-days: 14
