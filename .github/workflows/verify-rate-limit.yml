@@ -1,0 +1,53 @@
+name: Verify Rate Limit
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_origin:
+        description: "Deployed Flashpoint API origin"
+        required: false
+        default: "https://escalation-api.rjameson.workers.dev"
+        type: string
+      probe_path:
+        description: "No-op POST path used to exercise rate limiting"
+        required: false
+        default: "/api/rate-limit-smoke"
+        type: string
+      max_attempts:
+        description: "Maximum POST attempts before failing"
+        required: false
+        default: "130"
+        type: string
+      max_allowed_limit:
+        description: "Refuse to run if the remote limit is higher than this"
+        required: false
+        default: "240"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VERIFY_RATE_LIMIT_API_ORIGIN: ${{ github.event.inputs.api_origin || 'https://escalation-api.rjameson.workers.dev' }}
+      VERIFY_RATE_LIMIT_PATH: ${{ github.event.inputs.probe_path || '/api/rate-limit-smoke' }}
+      VERIFY_RATE_LIMIT_MAX_ATTEMPTS: ${{ github.event.inputs.max_attempts || '130' }}
+      VERIFY_RATE_LIMIT_MAX_ALLOWED_LIMIT: ${{ github.event.inputs.max_allowed_limit || '240' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify remote rate limit
+        run: npm run verify:rate-limit:remote
