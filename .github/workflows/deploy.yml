@@ -108,6 +108,12 @@ jobs:
           set -o pipefail
           VERIFY_DEPLOY_EVIDENCE_PATH=output/deploy-verification/evidence.json ./scripts/verify-deploy.sh 2>&1 | tee output/deploy-verification/verify-deploy.log
 
+      - name: Summarize deployment verification
+        if: always()
+        env:
+          VERIFY_DEPLOY_ARTIFACT_NAME: flashpoint-deploy-verification-${{ github.run_id }}
+        run: python3 scripts/summarize-deploy-evidence.py output/deploy-verification/evidence.json
+
       - name: Upload deployment verification evidence
         if: always()
         uses: actions/upload-artifact@v6
