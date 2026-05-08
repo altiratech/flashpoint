@@ -89,3 +89,9 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 - Added a read-only remote D1 schema verifier with `scripts/verify-d1-schema-remote.mjs`, root `npm run verify:d1:schema:remote`, and a deploy step after remote migrations and before Worker deploy. The verifier checks 11 runtime tables, critical column names/types/nullability where runtime-critical, and 9 named indexes.
 - First deploy run `25523069627` proved the verifier would stop the API deploy and surfaced one legacy drift detail: remote `episodes.adversary_profile_id` exists as `TEXT` but is nullable because it was hot-added to an older table. The verifier was scoped to require existence/type for that column because runtime inserts always provide it.
 - Final deploy run `25523189838` passed: quality gate, remote migrations, new remote D1 schema verifier, API Worker deploy, Pages deploy, and production verify all succeeded. The schema verifier log showed all expected runtime tables and indexes plus Cloudflare `_cf_KV` migration-tracking presence.
+
+## 2026-05-08
+
+- Added production rate-limit smoke verification with `scripts/verify-rate-limit-remote.mjs`, root `npm run verify:rate-limit:remote`, and manual workflow `.github/workflows/verify-rate-limit.yml`. The verifier uses no-op `POST /api/rate-limit-smoke` calls to exercise the deployed API middleware without creating profile or episode data.
+- Local verification passed: `node --check scripts/verify-rate-limit-remote.mjs`, `git diff --check`, `npm run lint`, `npm test`, `npm run build`, and `npm run verify:rate-limit:remote`. The local production probe saw limit 120, 120 allowed responses, 429 on attempt 121, and positive `Retry-After`.
+- Commit `68414fe` deployed successfully in GitHub run `25530855073`; manual Verify Rate Limit run `25530923840` passed from GitHub Actions with limit 120, 120 allowed responses, 429 on attempt 121, remaining 0, and `Retry-After: 53`.
