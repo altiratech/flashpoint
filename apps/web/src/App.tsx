@@ -20,6 +20,7 @@ import {
   bootstrapReference,
   createProfile,
   extendCountdown,
+  fetchEpisode,
   fetchReport,
   interpretCommand as interpretEpisodeCommand,
   sendTelemetry,
@@ -32,11 +33,72 @@ import { AdvisorPanel } from './components/AdvisorPanel';
 import { BriefingPanel } from './components/BriefingPanel';
 import { CommandInput, type CommandSubmitResult, type CommandSuggestion } from './components/CommandInput';
 import { ReportView } from './components/ReportView';
-import { StartScreen } from './components/StartScreen';
+import { StartScreen, type RecentCompletedReport } from './components/StartScreen';
 import { getAdvisorActionReads } from './lib/decisionSupport';
 
 const normalizeCommand = (value: string): string => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const normalizeTickerLine = (value: string): string => value.replace(/^(risk|market)\s+ticker:\s*/i, '').trim();
+const completedReportsStorageKey = 'flashpoint.completedReports.v1';
+const maxRecentCompletedReports = 5;
+
+const isRecentCompletedReport = (value: unknown): value is RecentCompletedReport => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<RecentCompletedReport>;
+  return (
+    typeof candidate.episodeId === 'string' &&
+    typeof candidate.scenarioId === 'string' &&
+    typeof candidate.outcome === 'string' &&
+    typeof candidate.finalTurn === 'number' &&
+    typeof candidate.finalPressure === 'number' &&
+    typeof candidate.pivotalDecision === 'string' &&
+    typeof candidate.completedAt === 'string'
+  );
+};
+
+const readCompletedReports = (): RecentCompletedReport[] => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(completedReportsStorageKey);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter(isRecentCompletedReport).slice(0, maxRecentCompletedReports)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeCompletedReports = (reports: RecentCompletedReport[]): void => {
+  try {
+    window.localStorage.setItem(completedReportsStorageKey, JSON.stringify(reports.slice(0, maxRecentCompletedReports)));
+  } catch {
+    // Report history is a convenience index; failed storage should not block play.
+  }
+};
+
+const buildRecentReport = (report: PostGameReport, episode: EpisodeView): RecentCompletedReport => ({
+  episodeId: report.episodeId,
+  scenarioId: episode.scenarioId,
+  outcome: report.outcome,
+  finalTurn: report.timeline[report.timeline.length - 1]?.turn ?? report.pivotalDecision.turn,
+  finalPressure: Math.round(report.finalMeters.escalationIndex),
+  pivotalDecision: report.pivotalDecision.actionName,
+  completedAt: new Date().toISOString()
+});
+
+const mergeRecentReport = (
+  reports: RecentCompletedReport[],
+  nextReport: RecentCompletedReport
+): RecentCompletedReport[] => [
+  nextReport,
+  ...reports.filter((report) => report.episodeId !== nextReport.episodeId)
+].slice(0, maxRecentCompletedReports);
 
 const previewImageKinds: ImageAsset['kind'][] = ['scenario_still', 'documentary_still', 'artifact', 'map'];
 
@@ -622,6 +684,7 @@ const App = () => {
   const [episode, setEpisode] = useState<EpisodeView | null>(null);
   const [report, setReport] = useState<PostGameReport | null>(null);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [recentReports, setRecentReports] = useState<RecentCompletedReport[]>(readCompletedReports);
   const [selectedResponse, setSelectedResponse] = useState<SelectedResponseSelection | null>(null);
   const [turnStage, setTurnStage] = useState<TurnStage>('brief');
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -631,6 +694,10 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    writeCompletedReports(recentReports);
+  }, [recentReports]);
 
   useEffect(() => {
     const load = async (): Promise<void> => {
@@ -831,6 +898,7 @@ const App = () => {
       }
       const completedReport = await fetchReport(nextEpisode.episodeId);
       setReport(completedReport);
+      setRecentReports((current) => mergeRecentReport(current, buildRecentReport(completedReport, nextEpisode)));
     }
   }, []);
 
@@ -879,6 +947,28 @@ const App = () => {
       await applyEpisodeUpdate(started);
     } catch (startError) {
       setError(startError instanceof Error ? startError.message : 'Failed to start episode');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenReport = async (episodeId: string): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [reopenedEpisode, reopenedReport] = await Promise.all([
+        fetchEpisode(episodeId),
+        fetchReport(episodeId)
+      ]);
+
+      setEpisode(reopenedEpisode);
+      setReport(reopenedReport);
+      setSelectedResponse(null);
+      setTurnStage('brief');
+    } catch (openError) {
+      setRecentReports((current) => current.filter((entry) => entry.episodeId !== episodeId));
+      setError(openError instanceof Error ? openError.message : 'Failed to reopen completed report');
     } finally {
       setLoading(false);
     }
@@ -1220,7 +1310,16 @@ const App = () => {
   }
 
   if (!episode) {
-    return <StartScreen reference={reference} loading={loading} error={error} onStart={handleStart} />;
+    return (
+      <StartScreen
+        reference={reference}
+        loading={loading}
+        error={error}
+        recentReports={recentReports}
+        onStart={handleStart}
+        onOpenReport={handleOpenReport}
+      />
+    );
   }
 
   const showTakeNoAction =

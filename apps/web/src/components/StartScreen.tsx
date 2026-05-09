@@ -1,17 +1,29 @@
 import { useMemo, useState } from 'react';
 
-import type { BootstrapPayload } from '@wargames/shared-types';
+import type { BootstrapPayload, OutcomeCategory } from '@wargames/shared-types';
+
+export interface RecentCompletedReport {
+  episodeId: string;
+  scenarioId: string;
+  outcome: OutcomeCategory;
+  finalTurn: number;
+  finalPressure: number;
+  pivotalDecision: string;
+  completedAt: string;
+}
 
 interface StartScreenProps {
   reference: BootstrapPayload;
   loading: boolean;
   error: string | null;
+  recentReports: RecentCompletedReport[];
   onStart: (input: {
     codename: string;
     scenarioId: string;
     seed?: string;
     timerMode: 'standard' | 'relaxed' | 'off';
   }) => Promise<void>;
+  onOpenReport: (episodeId: string) => Promise<void>;
 }
 
 const randomSeed = (): string => Math.random().toString(36).slice(2, 10).toUpperCase();
@@ -24,7 +36,22 @@ const environmentLabel: Record<string, string> = {
   generic: 'Global setting'
 };
 
-export const StartScreen = ({ reference, loading, error, onStart }: StartScreenProps) => {
+const outcomeLabel: Record<OutcomeCategory, string> = {
+  stabilization: 'Stabilized',
+  frozen_conflict: 'Frozen Conflict',
+  war: 'War',
+  regime_instability: 'Regime Instability',
+  economic_collapse: 'Economic Collapse'
+};
+
+export const StartScreen = ({
+  reference,
+  loading,
+  error,
+  recentReports,
+  onStart,
+  onOpenReport
+}: StartScreenProps) => {
   const [codename] = useState(() => `RUN-${randomSeed()}`);
   const [seed, setSeed] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -45,6 +72,21 @@ export const StartScreen = ({ reference, loading, error, onStart }: StartScreenP
   const selectedScenarioWorld = useMemo(
     () => reference.scenarioWorld.find((entry) => entry.scenarioId === scenarioId) ?? null,
     [reference.scenarioWorld, scenarioId]
+  );
+  const recentReportCards = useMemo(
+    () =>
+      recentReports.map((report) => ({
+        ...report,
+        scenarioName: reference.scenarios.find((scenario) => scenario.id === report.scenarioId)?.name ?? 'Scenario run',
+        shortId: report.episodeId.slice(0, 8),
+        completedDate: new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit'
+        }).format(new Date(report.completedAt))
+      })),
+    [recentReports, reference.scenarios]
   );
 
   const runProfile = useMemo(
@@ -302,6 +344,48 @@ export const StartScreen = ({ reference, loading, error, onStart }: StartScreenP
             </section>
 
             <div className="space-y-4">
+              {recentReportCards.length > 0 ? (
+                <section className="console-panel p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="label">Completed Reports</p>
+                    <span className="console-chip">
+                      <strong>{recentReportCards.length}</strong>
+                      <span>Saved</span>
+                    </span>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {recentReportCards.map((report) => (
+                      <button
+                        key={report.episodeId}
+                        type="button"
+                        className="console-subpanel block w-full px-3 py-3 text-left transition hover:border-accent/70 hover:bg-accent/8 disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => void onOpenReport(report.episodeId)}
+                        disabled={loading}
+                      >
+                        <span className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-textMain">
+                            {outcomeLabel[report.outcome]}
+                          </span>
+                          <span className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">
+                            {report.completedDate} / {report.shortId}
+                          </span>
+                        </span>
+                        <span className="mt-2 block text-[0.78rem] leading-relaxed text-textMuted">
+                          {report.scenarioName}
+                        </span>
+                        <span className="mt-2 grid gap-2 text-[0.66rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
+                          <span>Windows {report.finalTurn}</span>
+                          <span>Pressure {report.finalPressure}</span>
+                        </span>
+                        <span className="mt-2 block text-[0.72rem] leading-relaxed text-textMain">
+                          Pivotal: {report.pivotalDecision}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
               <section className="console-panel p-5">
                 <p className="label">Run Profile</p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
