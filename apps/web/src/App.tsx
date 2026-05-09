@@ -33,13 +33,31 @@ import { AdvisorPanel } from './components/AdvisorPanel';
 import { BriefingPanel } from './components/BriefingPanel';
 import { CommandInput, type CommandSubmitResult, type CommandSuggestion } from './components/CommandInput';
 import { ReportView } from './components/ReportView';
-import { StartScreen, type RecentCompletedReport } from './components/StartScreen';
+import { StartScreen, type ActiveRunRecovery, type RecentCompletedReport } from './components/StartScreen';
 import { getAdvisorActionReads } from './lib/decisionSupport';
 
 const normalizeCommand = (value: string): string => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const normalizeTickerLine = (value: string): string => value.replace(/^(risk|market)\s+ticker:\s*/i, '').trim();
+const activeRunsStorageKey = 'flashpoint.activeRuns.v1';
 const completedReportsStorageKey = 'flashpoint.completedReports.v1';
+const maxActiveRuns = 3;
 const maxRecentCompletedReports = 5;
+
+const isActiveRunRecovery = (value: unknown): value is ActiveRunRecovery => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<ActiveRunRecovery>;
+  return (
+    typeof candidate.episodeId === 'string' &&
+    typeof candidate.scenarioId === 'string' &&
+    typeof candidate.turn === 'number' &&
+    typeof candidate.currentBeatId === 'string' &&
+    typeof candidate.timerMode === 'string' &&
+    typeof candidate.lastSeenAt === 'string'
+  );
+};
 
 const isRecentCompletedReport = (value: unknown): value is RecentCompletedReport => {
   if (!value || typeof value !== 'object') {
@@ -58,6 +76,22 @@ const isRecentCompletedReport = (value: unknown): value is RecentCompletedReport
   );
 };
 
+const readActiveRuns = (): ActiveRunRecovery[] => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(activeRunsStorageKey);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter(isActiveRunRecovery).slice(0, maxActiveRuns)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 const readCompletedReports = (): RecentCompletedReport[] => {
   if (typeof window === 'undefined') {
     return [];
@@ -71,6 +105,14 @@ const readCompletedReports = (): RecentCompletedReport[] => {
       : [];
   } catch {
     return [];
+  }
+};
+
+const writeActiveRuns = (runs: ActiveRunRecovery[]): void => {
+  try {
+    window.localStorage.setItem(activeRunsStorageKey, JSON.stringify(runs.slice(0, maxActiveRuns)));
+  } catch {
+    // Active-run recovery is best-effort; gameplay should keep moving without storage.
   }
 };
 
@@ -91,6 +133,23 @@ const buildRecentReport = (report: PostGameReport, episode: EpisodeView): Recent
   pivotalDecision: report.pivotalDecision.actionName,
   completedAt: new Date().toISOString()
 });
+
+const buildActiveRun = (episode: EpisodeView): ActiveRunRecovery => ({
+  episodeId: episode.episodeId,
+  scenarioId: episode.scenarioId,
+  turn: episode.turn,
+  currentBeatId: episode.currentBeatId,
+  timerMode: episode.timerMode,
+  lastSeenAt: new Date().toISOString()
+});
+
+const mergeActiveRun = (
+  runs: ActiveRunRecovery[],
+  nextRun: ActiveRunRecovery
+): ActiveRunRecovery[] => [
+  nextRun,
+  ...runs.filter((run) => run.episodeId !== nextRun.episodeId)
+].slice(0, maxActiveRuns);
 
 const mergeRecentReport = (
   reports: RecentCompletedReport[],
@@ -684,6 +743,7 @@ const App = () => {
   const [episode, setEpisode] = useState<EpisodeView | null>(null);
   const [report, setReport] = useState<PostGameReport | null>(null);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [activeRuns, setActiveRuns] = useState<ActiveRunRecovery[]>(readActiveRuns);
   const [recentReports, setRecentReports] = useState<RecentCompletedReport[]>(readCompletedReports);
   const [selectedResponse, setSelectedResponse] = useState<SelectedResponseSelection | null>(null);
   const [turnStage, setTurnStage] = useState<TurnStage>('brief');
@@ -694,6 +754,10 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    writeActiveRuns(activeRuns);
+  }, [activeRuns]);
 
   useEffect(() => {
     writeCompletedReports(recentReports);
@@ -883,6 +947,7 @@ const App = () => {
     setTurnStage('brief');
     turnStartedAtMs.current = Date.now();
     if (nextEpisode.status === 'completed') {
+      setActiveRuns((current) => current.filter((run) => run.episodeId !== nextEpisode.episodeId));
       if (!completedTelemetryEpisodeIds.current.has(nextEpisode.episodeId)) {
         completedTelemetryEpisodeIds.current.add(nextEpisode.episodeId);
         sendTelemetry({
@@ -899,6 +964,8 @@ const App = () => {
       const completedReport = await fetchReport(nextEpisode.episodeId);
       setReport(completedReport);
       setRecentReports((current) => mergeRecentReport(current, buildRecentReport(completedReport, nextEpisode)));
+    } else {
+      setActiveRuns((current) => mergeActiveRun(current, buildActiveRun(nextEpisode)));
     }
   }, []);
 
@@ -964,11 +1031,42 @@ const App = () => {
 
       setEpisode(reopenedEpisode);
       setReport(reopenedReport);
+      setActiveRuns((current) => current.filter((run) => run.episodeId !== episodeId));
       setSelectedResponse(null);
       setTurnStage('brief');
     } catch (openError) {
       setRecentReports((current) => current.filter((entry) => entry.episodeId !== episodeId));
       setError(openError instanceof Error ? openError.message : 'Failed to reopen completed report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResumeRun = async (episodeId: string): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const resumedEpisode = await fetchEpisode(episodeId);
+
+      if (resumedEpisode.status === 'completed') {
+        const completedReport = await fetchReport(episodeId);
+        setEpisode(resumedEpisode);
+        setReport(completedReport);
+        setActiveRuns((current) => current.filter((run) => run.episodeId !== episodeId));
+        setRecentReports((current) => mergeRecentReport(current, buildRecentReport(completedReport, resumedEpisode)));
+        return;
+      }
+
+      setEpisode(resumedEpisode);
+      setReport(null);
+      setSelectedResponse(null);
+      setTurnStage('brief');
+      turnStartedAtMs.current = Date.now();
+      setActiveRuns((current) => mergeActiveRun(current, buildActiveRun(resumedEpisode)));
+    } catch (resumeError) {
+      setActiveRuns((current) => current.filter((entry) => entry.episodeId !== episodeId));
+      setError(resumeError instanceof Error ? resumeError.message : 'Failed to resume active run');
     } finally {
       setLoading(false);
     }
@@ -1315,8 +1413,10 @@ const App = () => {
         reference={reference}
         loading={loading}
         error={error}
+        activeRuns={activeRuns}
         recentReports={recentReports}
         onStart={handleStart}
+        onResumeRun={handleResumeRun}
         onOpenReport={handleOpenReport}
       />
     );

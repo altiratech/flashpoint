@@ -12,10 +12,20 @@ export interface RecentCompletedReport {
   completedAt: string;
 }
 
+export interface ActiveRunRecovery {
+  episodeId: string;
+  scenarioId: string;
+  turn: number;
+  currentBeatId: string;
+  timerMode: 'standard' | 'relaxed' | 'off';
+  lastSeenAt: string;
+}
+
 interface StartScreenProps {
   reference: BootstrapPayload;
   loading: boolean;
   error: string | null;
+  activeRuns: ActiveRunRecovery[];
   recentReports: RecentCompletedReport[];
   onStart: (input: {
     codename: string;
@@ -23,6 +33,7 @@ interface StartScreenProps {
     seed?: string;
     timerMode: 'standard' | 'relaxed' | 'off';
   }) => Promise<void>;
+  onResumeRun: (episodeId: string) => Promise<void>;
   onOpenReport: (episodeId: string) => Promise<void>;
 }
 
@@ -48,8 +59,10 @@ export const StartScreen = ({
   reference,
   loading,
   error,
+  activeRuns,
   recentReports,
   onStart,
+  onResumeRun,
   onOpenReport
 }: StartScreenProps) => {
   const [codename] = useState(() => `RUN-${randomSeed()}`);
@@ -87,6 +100,27 @@ export const StartScreen = ({
         }).format(new Date(report.completedAt))
       })),
     [recentReports, reference.scenarios]
+  );
+  const activeRunCards = useMemo(
+    () =>
+      activeRuns.map((run) => ({
+        ...run,
+        scenarioName: reference.scenarios.find((scenario) => scenario.id === run.scenarioId)?.name ?? 'Scenario run',
+        shortId: run.episodeId.slice(0, 8),
+        timerLabel:
+          run.timerMode === 'off'
+            ? 'User-paced'
+            : run.timerMode === 'relaxed'
+              ? 'Relaxed timed'
+              : 'Standard timed',
+        lastSeenLabel: new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit'
+        }).format(new Date(run.lastSeenAt))
+      })),
+    [activeRuns, reference.scenarios]
   );
 
   const runProfile = useMemo(
@@ -344,6 +378,45 @@ export const StartScreen = ({
             </section>
 
             <div className="space-y-4">
+              {activeRunCards.length > 0 ? (
+                <section className="console-panel p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="label">Active Runs</p>
+                    <span className="console-chip">
+                      <strong>{activeRunCards.length}</strong>
+                      <span>Recoverable</span>
+                    </span>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {activeRunCards.map((run) => (
+                      <button
+                        key={run.episodeId}
+                        type="button"
+                        className="console-subpanel block w-full px-3 py-3 text-left transition hover:border-accent/70 hover:bg-accent/8 disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => void onResumeRun(run.episodeId)}
+                        disabled={loading}
+                      >
+                        <span className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-textMain">
+                            Resume Window {run.turn}
+                          </span>
+                          <span className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">
+                            {run.lastSeenLabel} / {run.shortId}
+                          </span>
+                        </span>
+                        <span className="mt-2 block text-[0.78rem] leading-relaxed text-textMuted">
+                          {run.scenarioName}
+                        </span>
+                        <span className="mt-2 grid gap-2 text-[0.66rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
+                          <span>{run.timerLabel}</span>
+                          <span>{run.currentBeatId.replace(/^ns_/, '').replaceAll('_', ' ')}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
               {recentReportCards.length > 0 ? (
                 <section className="console-panel p-5">
                   <div className="flex items-center justify-between gap-3">
