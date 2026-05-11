@@ -34,7 +34,11 @@ interface StartScreenProps {
     timerMode: 'standard' | 'relaxed' | 'off';
   }) => Promise<void>;
   onResumeRun: (episodeId: string) => Promise<void>;
+  onRemoveActiveRun: (episodeId: string) => void;
+  onClearActiveRuns: () => void;
   onOpenReport: (episodeId: string) => Promise<void>;
+  onRemoveReport: (episodeId: string) => void;
+  onClearReports: () => void;
 }
 
 const randomSeed = (): string => Math.random().toString(36).slice(2, 10).toUpperCase();
@@ -63,7 +67,11 @@ export const StartScreen = ({
   recentReports,
   onStart,
   onResumeRun,
-  onOpenReport
+  onRemoveActiveRun,
+  onClearActiveRuns,
+  onOpenReport,
+  onRemoveReport,
+  onClearReports
 }: StartScreenProps) => {
   const [codename] = useState(() => `RUN-${randomSeed()}`);
   const [seed, setSeed] = useState('');
@@ -380,21 +388,30 @@ export const StartScreen = ({
             <div className="space-y-4">
               {activeRunCards.length > 0 ? (
                 <section className="console-panel p-5">
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="label">Active Runs</p>
-                    <span className="console-chip">
-                      <strong>{activeRunCards.length}</strong>
-                      <span>Recoverable</span>
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {activeRunCards.length > 1 ? (
+                        <button
+                          type="button"
+                          className="console-button px-3 py-1.5 text-[0.58rem]"
+                          onClick={onClearActiveRuns}
+                          disabled={loading}
+                        >
+                          Clear All
+                        </button>
+                      ) : null}
+                      <span className="console-chip">
+                        <strong>{activeRunCards.length}</strong>
+                        <span>Recoverable</span>
+                      </span>
+                    </div>
                   </div>
                   <div className="mt-3 space-y-2">
                     {activeRunCards.map((run) => (
-                      <button
+                      <article
                         key={run.episodeId}
-                        type="button"
-                        className="console-subpanel block w-full px-3 py-3 text-left transition hover:border-accent/70 hover:bg-accent/8 disabled:cursor-not-allowed disabled:opacity-60"
-                        onClick={() => void onResumeRun(run.episodeId)}
-                        disabled={loading}
+                        className="console-subpanel px-3 py-3 transition hover:border-accent/70 hover:bg-accent/8"
                       >
                         <span className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-textMain">
@@ -411,7 +428,26 @@ export const StartScreen = ({
                           <span>{run.timerLabel}</span>
                           <span>{run.currentBeatId.replace(/^ns_/, '').replaceAll('_', ' ')}</span>
                         </span>
-                      </button>
+                        <span className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            className="console-button console-button-primary px-3 py-1.5 text-[0.6rem]"
+                            onClick={() => void onResumeRun(run.episodeId)}
+                            disabled={loading}
+                          >
+                            Resume
+                          </button>
+                          <button
+                            type="button"
+                            className="console-button px-3 py-1.5 text-[0.6rem]"
+                            onClick={() => onRemoveActiveRun(run.episodeId)}
+                            disabled={loading}
+                            aria-label={`Remove active run ${run.shortId}`}
+                          >
+                            Remove
+                          </button>
+                        </span>
+                      </article>
                     ))}
                   </div>
                 </section>
@@ -419,21 +455,30 @@ export const StartScreen = ({
 
               {recentReportCards.length > 0 ? (
                 <section className="console-panel p-5">
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="label">Completed Reports</p>
-                    <span className="console-chip">
-                      <strong>{recentReportCards.length}</strong>
-                      <span>Saved</span>
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {recentReportCards.length > 1 ? (
+                        <button
+                          type="button"
+                          className="console-button px-3 py-1.5 text-[0.58rem]"
+                          onClick={onClearReports}
+                          disabled={loading}
+                        >
+                          Clear All
+                        </button>
+                      ) : null}
+                      <span className="console-chip">
+                        <strong>{recentReportCards.length}</strong>
+                        <span>Saved</span>
+                      </span>
+                    </div>
                   </div>
                   <div className="mt-3 space-y-2">
                     {recentReportCards.map((report) => (
-                      <button
+                      <article
                         key={report.episodeId}
-                        type="button"
-                        className="console-subpanel block w-full px-3 py-3 text-left transition hover:border-accent/70 hover:bg-accent/8 disabled:cursor-not-allowed disabled:opacity-60"
-                        onClick={() => void onOpenReport(report.episodeId)}
-                        disabled={loading}
+                        className="console-subpanel px-3 py-3 transition hover:border-accent/70 hover:bg-accent/8"
                       >
                         <span className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-textMain">
@@ -453,7 +498,26 @@ export const StartScreen = ({
                         <span className="mt-2 block text-[0.72rem] leading-relaxed text-textMain">
                           Pivotal: {report.pivotalDecision}
                         </span>
-                      </button>
+                        <span className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            className="console-button console-button-primary px-3 py-1.5 text-[0.6rem]"
+                            onClick={() => void onOpenReport(report.episodeId)}
+                            disabled={loading}
+                          >
+                            Open Report
+                          </button>
+                          <button
+                            type="button"
+                            className="console-button px-3 py-1.5 text-[0.6rem]"
+                            onClick={() => onRemoveReport(report.episodeId)}
+                            disabled={loading}
+                            aria-label={`Remove completed report ${report.shortId}`}
+                          >
+                            Remove
+                          </button>
+                        </span>
+                      </article>
                     ))}
                   </div>
                 </section>

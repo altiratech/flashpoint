@@ -1042,6 +1042,26 @@ const App = () => {
     }
   };
 
+  const handleRemoveActiveRun = (episodeId: string): void => {
+    setError(null);
+    setActiveRuns((current) => current.filter((entry) => entry.episodeId !== episodeId));
+  };
+
+  const handleClearActiveRuns = (): void => {
+    setError(null);
+    setActiveRuns([]);
+  };
+
+  const handleRemoveReport = (episodeId: string): void => {
+    setError(null);
+    setRecentReports((current) => current.filter((entry) => entry.episodeId !== episodeId));
+  };
+
+  const handleClearReports = (): void => {
+    setError(null);
+    setRecentReports([]);
+  };
+
   const handleResumeRun = async (episodeId: string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -1417,7 +1437,11 @@ const App = () => {
         recentReports={recentReports}
         onStart={handleStart}
         onResumeRun={handleResumeRun}
+        onRemoveActiveRun={handleRemoveActiveRun}
+        onClearActiveRuns={handleClearActiveRuns}
         onOpenReport={handleOpenReport}
+        onRemoveReport={handleRemoveReport}
+        onClearReports={handleClearReports}
       />
     );
   }
