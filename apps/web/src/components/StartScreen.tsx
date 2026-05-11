@@ -21,12 +21,31 @@ export interface ActiveRunRecovery {
   lastSeenAt: string;
 }
 
+export type RunHistoryEventType =
+  | 'run_started'
+  | 'run_resumed'
+  | 'report_saved'
+  | 'active_removed'
+  | 'active_cleared'
+  | 'report_removed'
+  | 'reports_cleared';
+
+export interface RunHistoryEvent {
+  id: string;
+  type: RunHistoryEventType;
+  createdAt: string;
+  scenarioId?: string;
+  episodeId?: string;
+  count?: number;
+}
+
 interface StartScreenProps {
   reference: BootstrapPayload;
   loading: boolean;
   error: string | null;
   activeRuns: ActiveRunRecovery[];
   recentReports: RecentCompletedReport[];
+  runHistory: RunHistoryEvent[];
   onStart: (input: {
     codename: string;
     scenarioId: string;
@@ -59,12 +78,23 @@ const outcomeLabel: Record<OutcomeCategory, string> = {
   economic_collapse: 'Economic Collapse'
 };
 
+const historyLabel: Record<RunHistoryEventType, string> = {
+  run_started: 'Started run',
+  run_resumed: 'Resumed run',
+  report_saved: 'Report saved',
+  active_removed: 'Active run removed',
+  active_cleared: 'Active runs cleared',
+  report_removed: 'Report removed',
+  reports_cleared: 'Reports cleared'
+};
+
 export const StartScreen = ({
   reference,
   loading,
   error,
   activeRuns,
   recentReports,
+  runHistory,
   onStart,
   onResumeRun,
   onRemoveActiveRun,
@@ -129,6 +159,35 @@ export const StartScreen = ({
         }).format(new Date(run.lastSeenAt))
       })),
     [activeRuns, reference.scenarios]
+  );
+  const activityCards = useMemo(
+    () =>
+      runHistory.map((event) => {
+        const shortId = event.episodeId?.slice(0, 8) ?? null;
+        const scenarioName = event.scenarioId
+          ? reference.scenarios.find((scenario) => scenario.id === event.scenarioId)?.name ?? 'Scenario run'
+          : 'Local setup index';
+        const activityDate = new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit'
+        }).format(new Date(event.createdAt));
+        const detail = event.count
+          ? `${event.count} entr${event.count === 1 ? 'y' : 'ies'}`
+          : shortId
+            ? `Episode ${shortId}`
+            : 'Local entry';
+
+        return {
+          ...event,
+          label: historyLabel[event.type],
+          scenarioName,
+          activityDate,
+          detail
+        };
+      }),
+    [reference.scenarios, runHistory]
   );
 
   const runProfile = useMemo(
@@ -386,6 +445,34 @@ export const StartScreen = ({
             </section>
 
             <div className="space-y-4">
+              {activityCards.length > 0 ? (
+                <section className="console-panel p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="label">Recent Activity</p>
+                    <span className="console-chip">
+                      <strong>{activityCards.length}</strong>
+                      <span>Local</span>
+                    </span>
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {activityCards.map((event) => (
+                      <article key={event.id} className="console-subpanel px-3 py-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-textMain">
+                            {event.label}
+                          </p>
+                          <p className="text-[0.56rem] uppercase tracking-[0.14em] text-textMuted">
+                            {event.activityDate}
+                          </p>
+                        </div>
+                        <p className="mt-1 text-[0.72rem] leading-relaxed text-textMuted">{event.scenarioName}</p>
+                        <p className="mt-1 text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{event.detail}</p>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
               {activeRunCards.length > 0 ? (
                 <section className="console-panel p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">

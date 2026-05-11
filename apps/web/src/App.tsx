@@ -33,15 +33,17 @@ import { AdvisorPanel } from './components/AdvisorPanel';
 import { BriefingPanel } from './components/BriefingPanel';
 import { CommandInput, type CommandSubmitResult, type CommandSuggestion } from './components/CommandInput';
 import { ReportView } from './components/ReportView';
-import { StartScreen, type ActiveRunRecovery, type RecentCompletedReport } from './components/StartScreen';
+import { StartScreen, type ActiveRunRecovery, type RecentCompletedReport, type RunHistoryEvent, type RunHistoryEventType } from './components/StartScreen';
 import { getAdvisorActionReads } from './lib/decisionSupport';
 
 const normalizeCommand = (value: string): string => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const normalizeTickerLine = (value: string): string => value.replace(/^(risk|market)\s+ticker:\s*/i, '').trim();
 const activeRunsStorageKey = 'flashpoint.activeRuns.v1';
 const completedReportsStorageKey = 'flashpoint.completedReports.v1';
+const runHistoryStorageKey = 'flashpoint.runHistory.v1';
 const maxActiveRuns = 3;
 const maxRecentCompletedReports = 5;
+const maxRunHistoryEvents = 6;
 
 const isActiveRunRecovery = (value: unknown): value is ActiveRunRecovery => {
   if (!value || typeof value !== 'object') {
@@ -73,6 +75,22 @@ const isRecentCompletedReport = (value: unknown): value is RecentCompletedReport
     typeof candidate.finalPressure === 'number' &&
     typeof candidate.pivotalDecision === 'string' &&
     typeof candidate.completedAt === 'string'
+  );
+};
+
+const isRunHistoryEvent = (value: unknown): value is RunHistoryEvent => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const candidate = value as Partial<RunHistoryEvent>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.type === 'string' &&
+    typeof candidate.createdAt === 'string' &&
+    (typeof candidate.scenarioId === 'undefined' || typeof candidate.scenarioId === 'string') &&
+    (typeof candidate.episodeId === 'undefined' || typeof candidate.episodeId === 'string') &&
+    (typeof candidate.count === 'undefined' || typeof candidate.count === 'number')
   );
 };
 
@@ -108,6 +126,22 @@ const readCompletedReports = (): RecentCompletedReport[] => {
   }
 };
 
+const readRunHistory = (): RunHistoryEvent[] => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(runHistoryStorageKey);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter(isRunHistoryEvent).slice(0, maxRunHistoryEvents)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 const writeActiveRuns = (runs: ActiveRunRecovery[]): void => {
   try {
     window.localStorage.setItem(activeRunsStorageKey, JSON.stringify(runs.slice(0, maxActiveRuns)));
@@ -123,6 +157,30 @@ const writeCompletedReports = (reports: RecentCompletedReport[]): void => {
     // Report history is a convenience index; failed storage should not block play.
   }
 };
+
+const writeRunHistory = (events: RunHistoryEvent[]): void => {
+  try {
+    window.localStorage.setItem(runHistoryStorageKey, JSON.stringify(events.slice(0, maxRunHistoryEvents)));
+  } catch {
+    // Recent activity is a setup hint; failed storage should not block play.
+  }
+};
+
+const buildRunHistoryEvent = (
+  type: RunHistoryEventType,
+  details: {
+    scenarioId?: string;
+    episodeId?: string;
+    count?: number;
+  } = {}
+): RunHistoryEvent => ({
+  id: typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  type,
+  createdAt: new Date().toISOString(),
+  ...details
+});
 
 const buildRecentReport = (report: PostGameReport, episode: EpisodeView): RecentCompletedReport => ({
   episodeId: report.episodeId,
@@ -158,6 +216,14 @@ const mergeRecentReport = (
   nextReport,
   ...reports.filter((report) => report.episodeId !== nextReport.episodeId)
 ].slice(0, maxRecentCompletedReports);
+
+const mergeRunHistoryEvent = (
+  events: RunHistoryEvent[],
+  nextEvent: RunHistoryEvent
+): RunHistoryEvent[] => [
+  nextEvent,
+  ...events
+].slice(0, maxRunHistoryEvents);
 
 const previewImageKinds: ImageAsset['kind'][] = ['scenario_still', 'documentary_still', 'artifact', 'map'];
 
@@ -745,6 +811,7 @@ const App = () => {
   const [profileId, setProfileId] = useState<string | null>(null);
   const [activeRuns, setActiveRuns] = useState<ActiveRunRecovery[]>(readActiveRuns);
   const [recentReports, setRecentReports] = useState<RecentCompletedReport[]>(readCompletedReports);
+  const [runHistory, setRunHistory] = useState<RunHistoryEvent[]>(readRunHistory);
   const [selectedResponse, setSelectedResponse] = useState<SelectedResponseSelection | null>(null);
   const [turnStage, setTurnStage] = useState<TurnStage>('brief');
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -762,6 +829,10 @@ const App = () => {
   useEffect(() => {
     writeCompletedReports(recentReports);
   }, [recentReports]);
+
+  useEffect(() => {
+    writeRunHistory(runHistory);
+  }, [runHistory]);
 
   useEffect(() => {
     const load = async (): Promise<void> => {
@@ -941,6 +1012,10 @@ const App = () => {
     };
   }, [currentBeat, currentCinematics, currentScenario, episode?.recentTurn]);
 
+  const recordRunHistory = useCallback((event: RunHistoryEvent): void => {
+    setRunHistory((current) => mergeRunHistoryEvent(current, event));
+  }, []);
+
   const applyEpisodeUpdate = useCallback(async (nextEpisode: EpisodeView): Promise<void> => {
     setEpisode(nextEpisode);
     setSelectedResponse(null);
@@ -962,12 +1037,17 @@ const App = () => {
         });
       }
       const completedReport = await fetchReport(nextEpisode.episodeId);
+      const recentReport = buildRecentReport(completedReport, nextEpisode);
       setReport(completedReport);
-      setRecentReports((current) => mergeRecentReport(current, buildRecentReport(completedReport, nextEpisode)));
+      setRecentReports((current) => mergeRecentReport(current, recentReport));
+      recordRunHistory(buildRunHistoryEvent('report_saved', {
+        episodeId: recentReport.episodeId,
+        scenarioId: recentReport.scenarioId
+      }));
     } else {
       setActiveRuns((current) => mergeActiveRun(current, buildActiveRun(nextEpisode)));
     }
-  }, []);
+  }, [recordRunHistory]);
 
   const handleStart = async (input: {
     codename: string;
@@ -1012,6 +1092,10 @@ const App = () => {
         }
       });
       await applyEpisodeUpdate(started);
+      recordRunHistory(buildRunHistoryEvent('run_started', {
+        episodeId: started.episodeId,
+        scenarioId: started.scenarioId
+      }));
     } catch (startError) {
       setError(startError instanceof Error ? startError.message : 'Failed to start episode');
     } finally {
@@ -1044,21 +1128,45 @@ const App = () => {
 
   const handleRemoveActiveRun = (episodeId: string): void => {
     setError(null);
+    const removed = activeRuns.find((entry) => entry.episodeId === episodeId);
     setActiveRuns((current) => current.filter((entry) => entry.episodeId !== episodeId));
+    if (removed) {
+      recordRunHistory(buildRunHistoryEvent('active_removed', {
+        episodeId: removed.episodeId,
+        scenarioId: removed.scenarioId
+      }));
+    }
   };
 
   const handleClearActiveRuns = (): void => {
     setError(null);
+    if (activeRuns.length > 0) {
+      recordRunHistory(buildRunHistoryEvent('active_cleared', {
+        count: activeRuns.length
+      }));
+    }
     setActiveRuns([]);
   };
 
   const handleRemoveReport = (episodeId: string): void => {
     setError(null);
+    const removed = recentReports.find((entry) => entry.episodeId === episodeId);
     setRecentReports((current) => current.filter((entry) => entry.episodeId !== episodeId));
+    if (removed) {
+      recordRunHistory(buildRunHistoryEvent('report_removed', {
+        episodeId: removed.episodeId,
+        scenarioId: removed.scenarioId
+      }));
+    }
   };
 
   const handleClearReports = (): void => {
     setError(null);
+    if (recentReports.length > 0) {
+      recordRunHistory(buildRunHistoryEvent('reports_cleared', {
+        count: recentReports.length
+      }));
+    }
     setRecentReports([]);
   };
 
@@ -1071,10 +1179,15 @@ const App = () => {
 
       if (resumedEpisode.status === 'completed') {
         const completedReport = await fetchReport(episodeId);
+        const recentReport = buildRecentReport(completedReport, resumedEpisode);
         setEpisode(resumedEpisode);
         setReport(completedReport);
         setActiveRuns((current) => current.filter((run) => run.episodeId !== episodeId));
-        setRecentReports((current) => mergeRecentReport(current, buildRecentReport(completedReport, resumedEpisode)));
+        setRecentReports((current) => mergeRecentReport(current, recentReport));
+        recordRunHistory(buildRunHistoryEvent('report_saved', {
+          episodeId: recentReport.episodeId,
+          scenarioId: recentReport.scenarioId
+        }));
         return;
       }
 
@@ -1084,6 +1197,10 @@ const App = () => {
       setTurnStage('brief');
       turnStartedAtMs.current = Date.now();
       setActiveRuns((current) => mergeActiveRun(current, buildActiveRun(resumedEpisode)));
+      recordRunHistory(buildRunHistoryEvent('run_resumed', {
+        episodeId: resumedEpisode.episodeId,
+        scenarioId: resumedEpisode.scenarioId
+      }));
     } catch (resumeError) {
       setActiveRuns((current) => current.filter((entry) => entry.episodeId !== episodeId));
       setError(resumeError instanceof Error ? resumeError.message : 'Failed to resume active run');
@@ -1435,6 +1552,7 @@ const App = () => {
         error={error}
         activeRuns={activeRuns}
         recentReports={recentReports}
+        runHistory={runHistory}
         onStart={handleStart}
         onResumeRun={handleResumeRun}
         onRemoveActiveRun={handleRemoveActiveRun}
