@@ -26,6 +26,7 @@ export interface ActiveRunRecovery {
 export type RunHistoryEventType =
   | 'run_started'
   | 'run_resumed'
+  | 'returned_setup'
   | 'report_saved'
   | 'active_removed'
   | 'active_cleared'
@@ -83,6 +84,7 @@ const outcomeLabel: Record<OutcomeCategory, string> = {
 const historyLabel: Record<RunHistoryEventType, string> = {
   run_started: 'Started run',
   run_resumed: 'Resumed run',
+  returned_setup: 'Returned to setup',
   report_saved: 'Report saved',
   active_removed: 'Active run removed',
   active_cleared: 'Active runs cleared',

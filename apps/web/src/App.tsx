@@ -1415,6 +1415,23 @@ const App = () => {
     setTurnStage('brief');
   };
 
+  const handleReturnToSetup = (): void => {
+    setError(null);
+    setReport(null);
+    setSelectedResponse(null);
+    setTurnStage('brief');
+
+    if (episode?.status === 'active') {
+      setActiveRuns((current) => mergeActiveRun(current, buildActiveRun(episode)));
+      recordRunHistory(buildRunHistoryEvent('returned_setup', {
+        episodeId: episode.episodeId,
+        scenarioId: episode.scenarioId
+      }));
+    }
+
+    setEpisode(null);
+  };
+
   const handleCommandSubmit = useCallback(async (commandText: string): Promise<CommandSubmitResult> => {
     if (!episode) {
       return {
@@ -1760,6 +1777,14 @@ const App = () => {
             ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              className="console-button console-button-secondary px-3 py-1.5 text-[0.58rem]"
+              onClick={handleReturnToSetup}
+              disabled={loading}
+            >
+              Return To Setup
+            </button>
             <div className="console-chip">
               <strong>Signal Quality</strong>
               <span>{intelStateLabel}</span>
