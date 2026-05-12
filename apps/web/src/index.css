@@ -57,6 +57,10 @@ body::before {
   z-index: 1;
 }
 
+.view-reset-focus-target:focus {
+  outline: none;
+}
+
 .card {
   @apply border border-borderTone bg-panel shadow-hard;
 }

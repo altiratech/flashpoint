@@ -804,6 +804,23 @@ const buildManualSelection = (action: ActionDefinition, variantId?: string | nul
   };
 };
 
+const resetViewScrollAndFocus = (): void => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+  const primarySurface = document.querySelector('main');
+  if (!(primarySurface instanceof HTMLElement)) {
+    return;
+  }
+
+  primarySurface.setAttribute('tabindex', '-1');
+  primarySurface.classList.add('view-reset-focus-target');
+  primarySurface.focus({ preventScroll: true });
+};
+
 const App = () => {
   const [reference, setReference] = useState<BootstrapPayload | null>(null);
   const [episode, setEpisode] = useState<EpisodeView | null>(null);
@@ -821,6 +838,36 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const viewResetKey = useMemo(() => {
+    if (bootstrapping || !reference) {
+      return 'loading';
+    }
+
+    if (report) {
+      return `report:${report.episodeId}`;
+    }
+
+    if (episode) {
+      return `live:${episode.episodeId}:${episode.turn}:${episode.currentBeatId}:${episode.status}:${turnStage}`;
+    }
+
+    return 'setup';
+  }, [
+    bootstrapping,
+    episode?.currentBeatId,
+    episode?.episodeId,
+    episode?.status,
+    episode?.turn,
+    reference,
+    report?.episodeId,
+    turnStage
+  ]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(resetViewScrollAndFocus);
+    return () => window.cancelAnimationFrame(frame);
+  }, [viewResetKey]);
 
   useEffect(() => {
     writeActiveRuns(activeRuns);
