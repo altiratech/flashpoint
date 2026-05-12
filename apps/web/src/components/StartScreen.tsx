@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 
 import type { BootstrapPayload, OutcomeCategory } from '@wargames/shared-types';
 
+type TimerMode = 'standard' | 'relaxed' | 'off';
+
 export interface RecentCompletedReport {
   episodeId: string;
   scenarioId: string;
@@ -17,7 +19,7 @@ export interface ActiveRunRecovery {
   scenarioId: string;
   turn: number;
   currentBeatId: string;
-  timerMode: 'standard' | 'relaxed' | 'off';
+  timerMode: TimerMode;
   lastSeenAt: string;
 }
 
@@ -50,7 +52,7 @@ interface StartScreenProps {
     codename: string;
     scenarioId: string;
     seed?: string;
-    timerMode: 'standard' | 'relaxed' | 'off';
+    timerMode: TimerMode;
   }) => Promise<void>;
   onResumeRun: (episodeId: string) => Promise<void>;
   onRemoveActiveRun: (episodeId: string) => void;
@@ -88,6 +90,24 @@ const historyLabel: Record<RunHistoryEventType, string> = {
   reports_cleared: 'Reports cleared'
 };
 
+const timerModeOptions: Record<TimerMode, { label: string; detail: string; summary: string }> = {
+  off: {
+    label: 'User-paced',
+    detail: 'No countdown. Best for reading, review, and first-time evaluation.',
+    summary: 'No countdown. Windows advance only when you commit a response or deliberately hold position.'
+  },
+  relaxed: {
+    label: 'Relaxed timed',
+    detail: 'Timed windows with 50% more time and extension support.',
+    summary: 'Timed windows with 50% more time and one extension available while episode extensions remain.'
+  },
+  standard: {
+    label: 'Standard timed',
+    detail: 'Authored pressure clock. Best for a sharper playtest run.',
+    summary: 'Authored pressure clock. Decision windows can expire into an inaction branch.'
+  }
+};
+
 export const StartScreen = ({
   reference,
   loading,
@@ -106,7 +126,8 @@ export const StartScreen = ({
   const [codename] = useState(() => `RUN-${randomSeed()}`);
   const [seed, setSeed] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [timerMode, setTimerMode] = useState<'standard' | 'relaxed' | 'off'>('off');
+  const [timerMode, setTimerMode] = useState<TimerMode>('off');
+  const selectedTimerMode = timerModeOptions[timerMode];
 
   const playableScenarios = useMemo(
     () => reference.scenarios.filter((entry) => !entry.isLegacy),
@@ -145,12 +166,7 @@ export const StartScreen = ({
         ...run,
         scenarioName: reference.scenarios.find((scenario) => scenario.id === run.scenarioId)?.name ?? 'Scenario run',
         shortId: run.episodeId.slice(0, 8),
-        timerLabel:
-          run.timerMode === 'off'
-            ? 'User-paced'
-            : run.timerMode === 'relaxed'
-              ? 'Relaxed timed'
-              : 'Standard timed',
+        timerLabel: timerModeOptions[run.timerMode]?.label ?? 'User-paced',
         lastSeenLabel: new Intl.DateTimeFormat('en-US', {
           month: 'short',
           day: 'numeric',
@@ -293,7 +309,7 @@ export const StartScreen = ({
       codename: string;
       scenarioId: string;
       seed?: string;
-      timerMode: 'standard' | 'relaxed' | 'off';
+      timerMode: TimerMode;
     } = {
       codename,
       scenarioId,
@@ -329,7 +345,9 @@ export const StartScreen = ({
             <div className="space-y-2">
               <div className="console-nav-meta">
                 <p className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">Flow</p>
-                <p className="mt-1 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">User-paced</p>
+                <p className="mt-1 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">
+                  {selectedTimerMode.label}
+                </p>
               </div>
               <div className="console-nav-meta">
                 <p className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">Launch Path</p>
@@ -355,12 +373,12 @@ export const StartScreen = ({
                 </div>
                 <div className="console-chip">
                   <strong>Flow</strong>
-                  <span>User-paced</span>
+                  <span>{selectedTimerMode.label}</span>
                 </div>
               </div>
             </div>
             <p className="mt-3 max-w-4xl text-[0.76rem] leading-relaxed text-textMuted">
-              Choose the scenario, review why this window looks dangerous now, then begin the first briefing window. Flashpoint now defaults to a user-paced flow so the reading surface stays in sync with the choices you are actually making.
+              Choose the scenario, review why this window looks dangerous now, then begin the first briefing window. Current decision clock: {selectedTimerMode.summary}
             </p>
           </header>
 
@@ -403,39 +421,27 @@ export const StartScreen = ({
                   <div>
                     <p className="label">Decision Clock</p>
                     <div className="mt-2 grid gap-2">
-                      {([
-                        {
-                          id: 'off',
-                          label: 'User-paced',
-                          detail: 'No countdown. Best for reading, review, and first-time evaluation.'
-                        },
-                        {
-                          id: 'relaxed',
-                          label: 'Relaxed timed',
-                          detail: 'Timed windows with 50% more time and extension support.'
-                        },
-                        {
-                          id: 'standard',
-                          label: 'Standard timed',
-                          detail: 'Authored pressure clock. Best for a sharper playtest run.'
-                        }
-                      ] as const).map((option) => (
-                        <button
-                          key={option.id}
-                          type="button"
-                          className={`rounded-md border px-3 py-2 text-left transition ${
-                            timerMode === option.id
-                              ? 'border-accent bg-accent/12 text-textMain shadow-[inset_0_-2px_0_rgba(255,177,0,1)]'
-                              : 'border-borderTone/80 bg-panelRaised/45 text-textMuted hover:border-accent/70 hover:text-textMain'
-                          }`}
-                          onClick={() => setTimerMode(option.id)}
-                        >
-                          <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.12em]">
-                            {option.label}
-                          </span>
-                          <span className="mt-1 block text-[0.68rem] leading-relaxed">{option.detail}</span>
-                        </button>
-                      ))}
+                      {(['off', 'relaxed', 'standard'] as const).map((optionId) => {
+                        const option = timerModeOptions[optionId];
+
+                        return (
+                          <button
+                            key={optionId}
+                            type="button"
+                            className={`rounded-md border px-3 py-2 text-left transition ${
+                              timerMode === optionId
+                                ? 'border-accent bg-accent/12 text-textMain shadow-[inset_0_-2px_0_rgba(255,177,0,1)]'
+                                : 'border-borderTone/80 bg-panelRaised/45 text-textMuted hover:border-accent/70 hover:text-textMain'
+                            }`}
+                            onClick={() => setTimerMode(optionId)}
+                          >
+                            <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.12em]">
+                              {option.label}
+                            </span>
+                            <span className="mt-1 block text-[0.68rem] leading-relaxed">{option.detail}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
