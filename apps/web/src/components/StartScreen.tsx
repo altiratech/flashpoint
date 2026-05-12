@@ -339,10 +339,10 @@ export const StartScreen = ({
           <div className="console-sidebar-section">
             <p className="console-sidebar-label">Active Scenario</p>
             <div className="console-nav-meta">
-              <p className="text-[0.74rem] uppercase tracking-[0.08em] text-textMain">
+              <p className="text-[0.72rem] uppercase tracking-[0.08em] text-textMain">
                 {selectedScenario?.name ?? 'No scenario selected'}
               </p>
-              <p className="mt-2 text-[0.62rem] uppercase tracking-[0.14em] text-textMuted">{theaterStamp}</p>
+              <p className="mt-2 text-[0.72rem] uppercase tracking-[0.14em] text-textMuted">{theaterStamp}</p>
             </div>
           </div>
 
@@ -350,13 +350,13 @@ export const StartScreen = ({
             <p className="console-sidebar-label">Run State</p>
             <div className="space-y-2">
               <div className="console-nav-meta">
-                <p className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">Flow</p>
+                <p className="text-[0.68rem] uppercase tracking-[0.14em] text-textMuted">Flow</p>
                 <p className="mt-1 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">
                   {selectedTimerMode.label}
                 </p>
               </div>
               <div className="console-nav-meta">
-                <p className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">Launch Path</p>
+                <p className="text-[0.68rem] uppercase tracking-[0.14em] text-textMuted">Launch Path</p>
                 <p className="mt-1 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">Context-first briefing</p>
               </div>
             </div>
@@ -383,7 +383,7 @@ export const StartScreen = ({
                 </div>
               </div>
             </div>
-            <p className="mt-3 max-w-4xl text-[0.76rem] leading-relaxed text-textMuted">
+            <p className="mt-3 max-w-4xl text-[0.84rem] leading-relaxed text-textMuted">
               Choose the scenario, review why this window looks dangerous now, then begin the first briefing window. Current decision clock: {selectedTimerMode.summary}
             </p>
           </header>
@@ -444,7 +444,7 @@ export const StartScreen = ({
                             <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.12em]">
                               {option.label}
                             </span>
-                            <span className="mt-1 block text-[0.68rem] leading-relaxed">{option.detail}</span>
+                            <span className="mt-1 block text-[0.84rem] leading-relaxed">{option.detail}</span>
                           </button>
                         );
                       })}
@@ -456,7 +456,7 @@ export const StartScreen = ({
                   {setupContextCards.map((card) => (
                     <div key={card.id} className="console-subpanel px-3 py-3">
                       <p className="label">{card.title}</p>
-                      <p className="mt-2 text-[0.76rem] leading-relaxed text-textMuted">{card.body}</p>
+                      <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">{card.body}</p>
                     </div>
                   ))}
                 </div>
@@ -489,7 +489,7 @@ export const StartScreen = ({
                       <p className="mt-2 font-display text-xl uppercase tracking-[0.06em] text-textMain">
                         {latestActiveRun.scenarioName}
                       </p>
-                      <p className="mt-2 text-[0.74rem] uppercase tracking-[0.12em] text-textMuted">
+                      <p className="mt-2 text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">
                         Window {latestActiveRun.turn} / {latestActiveRun.lastSeenLabel} / {latestActiveRun.shortId}
                       </p>
                     </div>
@@ -504,20 +504,20 @@ export const StartScreen = ({
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
                     <div className="console-subpanel px-3 py-2.5">
-                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">Recovery Point</p>
-                      <p className="mt-2 text-[0.78rem] uppercase tracking-[0.08em] text-textMain">
+                      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-textMuted">Recovery Point</p>
+                      <p className="mt-2 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">
                         Window {latestActiveRun.turn}
                       </p>
                     </div>
                     <div className="console-subpanel px-3 py-2.5">
-                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">Clock</p>
-                      <p className="mt-2 text-[0.78rem] uppercase tracking-[0.08em] text-textMain">
+                      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-textMuted">Clock</p>
+                      <p className="mt-2 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">
                         {latestActiveRun.timerLabel}
                       </p>
                     </div>
                     <div className="console-subpanel px-3 py-2.5">
-                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">Current Beat</p>
-                      <p className="mt-2 text-[0.78rem] uppercase tracking-[0.08em] text-textMain">
+                      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-textMuted">Current Beat</p>
+                      <p className="mt-2 text-[0.72rem] uppercase tracking-[0.08em] text-textMain">
                         {latestActiveRun.beatLabel}
                       </p>
                     </div>
@@ -543,20 +543,20 @@ export const StartScreen = ({
                         }`}
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-textMain">
+                          <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-textMain">
                             {event.label}
                           </p>
-                          <p className="text-[0.56rem] uppercase tracking-[0.14em] text-textMuted">
+                          <p className="text-[0.68rem] uppercase tracking-[0.14em] text-textMuted">
                             {event.activityDate}
                           </p>
                         </div>
-                        <p className="mt-1 text-[0.72rem] leading-relaxed text-textMuted">{event.scenarioName}</p>
+                        <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">{event.scenarioName}</p>
                         <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-                          <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{event.detail}</p>
+                          <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{event.detail}</p>
                           {event.action ? (
                             <button
                               type="button"
-                              className="console-button console-button-primary px-3 py-1.5 text-[0.56rem]"
+                              className="console-button console-button-primary px-3 py-1.5 text-[0.68rem]"
                               onClick={() => {
                                 if (event.action?.type === 'open_report') {
                                   void onOpenReport(event.action.episodeId);
@@ -587,7 +587,7 @@ export const StartScreen = ({
                       {activeRunCards.length > 1 ? (
                         <button
                           type="button"
-                          className="console-button px-3 py-1.5 text-[0.58rem]"
+                          className="console-button px-3 py-1.5 text-[0.68rem]"
                           onClick={onClearActiveRuns}
                           disabled={loading}
                         >
@@ -610,21 +610,21 @@ export const StartScreen = ({
                           <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-textMain">
                             Resume Window {run.turn}
                           </span>
-                          <span className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">
+                          <span className="text-[0.68rem] uppercase tracking-[0.14em] text-textMuted">
                             {run.lastSeenLabel} / {run.shortId}
                           </span>
                         </span>
-                        <span className="mt-2 block text-[0.78rem] leading-relaxed text-textMuted">
+                        <span className="mt-2 block text-[0.88rem] leading-relaxed text-textMuted">
                           {run.scenarioName}
                         </span>
-                        <span className="mt-2 grid gap-2 text-[0.66rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
+                        <span className="mt-2 grid gap-2 text-[0.72rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
                           <span>{run.timerLabel}</span>
                           <span>{run.beatLabel}</span>
                         </span>
                         <span className="mt-3 flex flex-wrap gap-2">
                           <button
                             type="button"
-                            className="console-button console-button-primary px-3 py-1.5 text-[0.6rem]"
+                            className="console-button console-button-primary px-3 py-1.5 text-[0.84rem]"
                             onClick={() => void onResumeRun(run.episodeId)}
                             disabled={loading}
                           >
@@ -632,7 +632,7 @@ export const StartScreen = ({
                           </button>
                           <button
                             type="button"
-                            className="console-button px-3 py-1.5 text-[0.6rem]"
+                            className="console-button px-3 py-1.5 text-[0.84rem]"
                             onClick={() => onRemoveActiveRun(run.episodeId)}
                             disabled={loading}
                             aria-label={`Remove active run ${run.shortId}`}
@@ -654,7 +654,7 @@ export const StartScreen = ({
                       {recentReportCards.length > 1 ? (
                         <button
                           type="button"
-                          className="console-button px-3 py-1.5 text-[0.58rem]"
+                          className="console-button px-3 py-1.5 text-[0.68rem]"
                           onClick={onClearReports}
                           disabled={loading}
                         >
@@ -677,24 +677,24 @@ export const StartScreen = ({
                           <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-textMain">
                             {outcomeLabel[report.outcome]}
                           </span>
-                          <span className="text-[0.58rem] uppercase tracking-[0.14em] text-textMuted">
+                          <span className="text-[0.68rem] uppercase tracking-[0.14em] text-textMuted">
                             {report.completedDate} / {report.shortId}
                           </span>
                         </span>
-                        <span className="mt-2 block text-[0.78rem] leading-relaxed text-textMuted">
+                        <span className="mt-2 block text-[0.88rem] leading-relaxed text-textMuted">
                           {report.scenarioName}
                         </span>
-                        <span className="mt-2 grid gap-2 text-[0.66rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
+                        <span className="mt-2 grid gap-2 text-[0.72rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
                           <span>Windows {report.finalTurn}</span>
                           <span>Pressure {report.finalPressure}</span>
                         </span>
-                        <span className="mt-2 block text-[0.72rem] leading-relaxed text-textMain">
+                        <span className="mt-2 block text-[0.84rem] leading-relaxed text-textMain">
                           Pivotal: {report.pivotalDecision}
                         </span>
                         <span className="mt-3 flex flex-wrap gap-2">
                           <button
                             type="button"
-                            className="console-button console-button-primary px-3 py-1.5 text-[0.6rem]"
+                            className="console-button console-button-primary px-3 py-1.5 text-[0.84rem]"
                             onClick={() => void onOpenReport(report.episodeId)}
                             disabled={loading}
                           >
@@ -702,7 +702,7 @@ export const StartScreen = ({
                           </button>
                           <button
                             type="button"
-                            className="console-button px-3 py-1.5 text-[0.6rem]"
+                            className="console-button px-3 py-1.5 text-[0.84rem]"
                             onClick={() => onRemoveReport(report.episodeId)}
                             disabled={loading}
                             aria-label={`Remove completed report ${report.shortId}`}
@@ -721,8 +721,8 @@ export const StartScreen = ({
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {runProfile.map((item) => (
                     <div key={item.label} className="console-subpanel px-3 py-2.5">
-                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">{item.label}</p>
-                      <p className="mt-2 text-[0.8rem] uppercase tracking-[0.06em] text-textMain">{item.value}</p>
+                      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-textMuted">{item.label}</p>
+                      <p className="mt-2 text-[0.84rem] uppercase tracking-[0.06em] text-textMain">{item.value}</p>
                     </div>
                   ))}
                 </div>
@@ -739,7 +739,7 @@ export const StartScreen = ({
                     {showAdvanced ? 'Hide' : 'Open'}
                   </button>
                 </div>
-                <p className="mt-2 text-[0.74rem] leading-relaxed text-textMuted">
+                <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
                   Deterministic seed control is optional and mainly useful for replay and testing.
                 </p>
                 {showAdvanced ? (
@@ -770,7 +770,7 @@ export const StartScreen = ({
                 <p className="label">Operator Notes</p>
                 <div className="mt-3 space-y-2">
                   {systemNotes.map((note) => (
-                    <div key={note} className="console-subpanel px-3 py-2.5 text-[0.74rem] leading-relaxed text-textMuted">
+                    <div key={note} className="console-subpanel px-3 py-2.5 text-[0.84rem] leading-relaxed text-textMuted">
                       {note}
                     </div>
                   ))}

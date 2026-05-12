@@ -64,9 +64,9 @@ const sourceLabel: Record<TurnDebrief['lines'][number]['tag'], string> = {
 };
 
 const sectionLabels: Record<BriefingSectionId, string> = {
-  developments: 'Key Developments',
+  developments: 'What Just Happened',
   context: 'Context',
-  indicators: 'Operational Indicators'
+  indicators: 'Warning Signs'
 };
 
 const normalizeTickerLine = (value: string): string =>
@@ -77,17 +77,17 @@ const imagePanelLabel = (asset: ImageAsset): string => {
     return 'Overhead Read';
   }
   if (asset.kind === 'artifact') {
-    return 'Evidence Board';
+    return "What We're Seeing";
   }
 
   const perspective = String(asset.perspective).toLowerCase();
   if (perspective === 'satellite' || perspective === 'surveillance') {
-    return 'Surveillance Read';
+    return "What We're Seeing";
   }
   if (perspective === 'street') {
-    return 'Ground View';
+    return 'On The Ground';
   }
-  return 'Live Scene';
+  return 'Right Now';
 };
 
 const imagePanelMode = (asset: ImageAsset): string => {
@@ -250,19 +250,19 @@ export const BriefingPanel = ({
     ? ([
         {
           id: 'verified',
-          title: 'Verified Facts',
+          title: 'What We Know',
           items: truthModel.verifiedFacts,
           accent: 'text-positive'
         },
         {
           id: 'theories',
-          title: 'Working Theories',
+          title: 'What We Think',
           items: truthModel.workingTheories,
           accent: 'text-accent'
         },
         {
           id: 'unknowns',
-          title: 'Unknowns',
+          title: "What We Don't Know",
           items: truthModel.unknowns,
           accent: 'text-warning'
         }
@@ -319,13 +319,13 @@ export const BriefingPanel = ({
           onClick={() => setExpandedHeadline(open ? null : sourceIndex)}
         >
           <div>
-            <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{signalSource(sourceIndex)}</p>
-            <p className="mt-1 text-[0.78rem] leading-relaxed text-textMain">{headline}</p>
+            <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{signalSource(sourceIndex)}</p>
+            <p className="mt-1 text-[0.88rem] leading-relaxed text-textMain">{headline}</p>
           </div>
-          <span className="mt-1 text-[0.58rem] uppercase tracking-[0.12em] text-accent">{open ? 'Hide' : 'Open'}</span>
+          <span className="mt-1 text-[0.68rem] uppercase tracking-[0.12em] text-accent">{open ? 'Hide' : 'Open'}</span>
         </button>
         {open ? (
-          <div className="space-y-1 border-t border-borderTone/70 px-3 py-2 text-[0.7rem] leading-relaxed text-textMuted">
+          <div className="space-y-1 border-t border-borderTone/70 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
             {(signalDetails[sourceIndex] ?? []).map((detail) => (
               <p key={`${headline}:${detail}`}>{detail}</p>
             ))}
@@ -350,12 +350,12 @@ export const BriefingPanel = ({
                 {phaseTransition.fromLabel} {'->'} {phaseTransition.toLabel}
               </p>
             </div>
-            <span className="text-[0.58rem] uppercase tracking-[0.12em] text-accent">
+            <span className="text-[0.68rem] uppercase tracking-[0.12em] text-accent">
               {showPhaseTransition ? 'Hide' : 'Open'}
             </span>
           </button>
           {showPhaseTransition ? (
-            <div className="mt-3 space-y-2 border-t border-accent/20 pt-3 text-[0.76rem] leading-relaxed text-textMuted">
+            <div className="mt-3 space-y-2 border-t border-accent/20 pt-3 text-[0.84rem] leading-relaxed text-textMuted">
               {phaseTransition.fragments.map((fragment) => (
                 <p key={fragment}>{fragment}</p>
               ))}
@@ -368,11 +368,11 @@ export const BriefingPanel = ({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="label">Start Here</p>
-            <p className="mt-1 text-[0.68rem] leading-relaxed text-textMuted">
+            <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
               Read the signal picture first: what is confirmed, what analysts think may be happening, and what is still unknown.
             </p>
           </div>
-          <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">
+          <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
             {truthSections.length > 0 ? 'Live read' : 'Open for detail'}
           </p>
         </div>
@@ -380,12 +380,12 @@ export const BriefingPanel = ({
           <div className="grid gap-3 xl:grid-cols-3">
             {truthSections.map((section) => (
               <article key={section.id} className="console-subpanel px-3 py-3">
-                <p className={`text-[0.58rem] uppercase tracking-[0.12em] ${section.accent}`}>{section.title}</p>
+                <p className={`text-[0.68rem] uppercase tracking-[0.12em] ${section.accent}`}>{section.title}</p>
                 <div className="mt-2 space-y-2">
                   {section.items.map((item) => (
                     <div key={item.id} className="rounded-md border border-borderTone/70 bg-panelRaised/35 px-3 py-2.5">
-                      <p className="text-[0.64rem] uppercase tracking-[0.1em] text-textMain">{item.title}</p>
-                      <p className="mt-1 text-[0.7rem] leading-relaxed text-textMuted">{item.body}</p>
+                      <p className="text-[0.72rem] uppercase tracking-[0.1em] text-textMain">{item.title}</p>
+                      <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">{item.body}</p>
                     </div>
                   ))}
                 </div>
@@ -399,14 +399,14 @@ export const BriefingPanel = ({
               <div className="rounded-md border border-borderTone/70 bg-panelRaised/30 px-3 py-2.5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Additional developments</p>
-                    <p className="mt-1 text-[0.7rem] text-textMuted">
+                    <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Additional developments</p>
+                    <p className="mt-1 text-[0.84rem] text-textMuted">
                       Open these only if you want the fuller market and diplomacy picture before deciding.
                     </p>
                   </div>
                   <button
                     type="button"
-                    className="text-[0.58rem] uppercase tracking-[0.12em] text-accent"
+                    className="text-[0.68rem] uppercase tracking-[0.12em] text-accent"
                     onClick={() => setShowAllDevelopments((current) => !current)}
                   >
                     {showAllDevelopments ? 'Hide' : `Open ${secondaryHeadlines.length}`}
@@ -427,19 +427,19 @@ export const BriefingPanel = ({
         <section>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="label">Watch Items</p>
-              <p className="mt-1 text-[0.68rem] leading-relaxed text-textMuted">
+              <p className="label">Keep An Eye On</p>
+              <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
                 Secondary signals that can change how markets, allies, and operators read the situation.
               </p>
             </div>
-            <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Support only</p>
+            <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Support only</p>
           </div>
           <div className="mt-3 grid gap-2 xl:grid-cols-2">
             {visibleSupportingSignals.map((item) => (
               <article key={item.id} className="console-feed-item min-h-[4.5rem]">
-                <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{item.channel}</p>
-                <p className="mt-1 text-[0.72rem] text-textMain">{item.headline}</p>
-                {item.detail ? <p className="mt-1 text-[0.67rem] text-textMuted">{item.detail}</p> : null}
+                <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{item.channel}</p>
+                <p className="mt-1 text-[0.84rem] text-textMain">{item.headline}</p>
+                {item.detail ? <p className="mt-1 text-[0.88rem] text-textMuted">{item.detail}</p> : null}
               </article>
             ))}
           </div>
@@ -447,7 +447,7 @@ export const BriefingPanel = ({
             <div className="mt-3 flex justify-start">
               <button
                 type="button"
-                className="text-[0.58rem] uppercase tracking-[0.12em] text-accent"
+                className="text-[0.68rem] uppercase tracking-[0.12em] text-accent"
                 onClick={() => setShowAllSignals((current) => !current)}
               >
                 {showAllSignals ? 'Show fewer watch items' : `Show ${hiddenSignalCount} more watch items`}
@@ -461,7 +461,7 @@ export const BriefingPanel = ({
         <section className="console-subpanel px-3 py-3">
           <p className="label">Immediate Outcome</p>
           {recentResolvedAction ? (
-            <p className="mt-2 text-[0.68rem] leading-relaxed text-textMuted">
+            <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
               Last move: <span className="text-textMain">{recentResolvedAction.label}</span>
               {recentResolvedAction.summary ? ` // ${recentResolvedAction.summary}` : ''}
             </p>
@@ -470,13 +470,13 @@ export const BriefingPanel = ({
             <div className="mt-3 grid gap-2 xl:grid-cols-3">
               {immediateOutcomeCards.map((card) => (
                 <article key={card.id} className="rounded-md border border-borderTone/70 bg-panelRaised/35 px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{card.label}</p>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">{card.body}</p>
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{card.label}</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{card.body}</p>
                 </article>
               ))}
             </div>
           ) : null}
-          <div className="mt-2 space-y-2 text-[0.76rem] leading-relaxed text-textMuted">
+          <div className="mt-2 space-y-2 text-[0.84rem] leading-relaxed text-textMuted">
             {turnDebrief.lines.map((entry, index) => (
               <p key={`${entry.tag}-${index}`}>
                 <span className="text-accent">{sourceLabel[entry.tag]}</span> {entry.text}
@@ -499,26 +499,26 @@ export const BriefingPanel = ({
                 {recentActionNarrative.actionName} · {recentActionNarrative.phaseLabel}
               </p>
             </div>
-            <span className="text-[0.58rem] uppercase tracking-[0.12em] text-accent">
+            <span className="text-[0.68rem] uppercase tracking-[0.12em] text-accent">
               {showOperationalReadout ? 'Hide' : 'Open'}
             </span>
           </button>
           {showOperationalReadout ? (
             <div className="mt-3 space-y-3 border-t border-borderTone/70 pt-3">
-              <p className="text-[0.72rem] leading-relaxed text-textMuted">
+              <p className="text-[0.84rem] leading-relaxed text-textMuted">
                 <span className="text-textMain">Order frame:</span> {recentActionNarrative.detail.preActionBrief}
               </p>
               <p className="text-[0.82rem] leading-relaxed text-textMain">{recentActionNarrative.detail.executionNarrative}</p>
               <div className="grid gap-2 xl:grid-cols-2">
                 <article className="rounded-md border border-borderTone/70 bg-surface/35 p-2">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Rival Desk</p>
-                  <p className="mt-1 text-[0.7rem] leading-relaxed text-textMuted">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Rival Desk</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
                     {recentActionNarrative.detail.rivalReaction}
                   </p>
                 </article>
                 <article className="rounded-md border border-borderTone/70 bg-surface/35 p-2">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Alliance Desk</p>
-                  <p className="mt-1 text-[0.7rem] leading-relaxed text-textMuted">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Alliance Desk</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
                     {recentActionNarrative.detail.allianceReaction}
                   </p>
                 </article>
@@ -537,14 +537,14 @@ export const BriefingPanel = ({
           {windowContextSections.map((section) => (
             <article key={section.id} className="console-subpanel px-3 py-3">
               <p className="label">{section.title}</p>
-              <p className="mt-2 text-[0.74rem] leading-relaxed text-textMuted">{section.body}</p>
+              <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">{section.body}</p>
             </article>
           ))}
         </section>
       ) : (
         <section className="console-subpanel px-3 py-3">
           <p className="label">Context</p>
-          <p className="mt-2 text-[0.74rem] leading-relaxed text-textMuted">
+          <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
             No additional context is loaded for this window. Use the current situation and key developments to guide the next response.
           </p>
         </section>
@@ -610,9 +610,9 @@ export const BriefingPanel = ({
               >
                 <div>
                   <p className="label">Background</p>
-                  <p className="mt-2 text-[0.78rem] leading-relaxed text-textMuted">{openingBackground.summary}</p>
+                  <p className="mt-2 text-[0.88rem] leading-relaxed text-textMuted">{openingBackground.summary}</p>
                 </div>
-                <span className="text-[0.58rem] uppercase tracking-[0.12em] text-accent">
+                <span className="text-[0.68rem] uppercase tracking-[0.12em] text-accent">
                   {showBackground ? 'Hide' : 'Open'}
                 </span>
               </button>
@@ -627,13 +627,13 @@ export const BriefingPanel = ({
                           className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
                           onClick={() => setExpandedBackgroundSectionId(open ? null : section.id)}
                         >
-                          <span className="text-[0.62rem] uppercase tracking-[0.12em] text-textMain">{section.title}</span>
-                          <span className="text-[0.58rem] uppercase tracking-[0.12em] text-accent">
+                          <span className="text-[0.72rem] uppercase tracking-[0.12em] text-textMain">{section.title}</span>
+                          <span className="text-[0.68rem] uppercase tracking-[0.12em] text-accent">
                             {open ? 'Hide' : 'Open'}
                           </span>
                         </button>
                         {open ? (
-                          <div className="border-t border-borderTone/70 px-3 py-2.5 text-[0.72rem] leading-relaxed text-textMuted">
+                          <div className="border-t border-borderTone/70 px-3 py-2.5 text-[0.84rem] leading-relaxed text-textMuted">
                             {section.body}
                           </div>
                         ) : null}
@@ -652,7 +652,7 @@ export const BriefingPanel = ({
               <figure className="overflow-hidden rounded-md border border-borderTone/80 bg-surface/65">
                 <div className="flex items-center justify-between border-b border-borderTone/80 px-3 py-2">
                   <p className="label">{imagePanelLabel(imageAsset)}</p>
-                  <span className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">
+                  <span className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
                     {imagePanelMode(imageAsset)}
                   </span>
                 </div>
@@ -664,7 +664,7 @@ export const BriefingPanel = ({
                   }`}
                   loading="lazy"
                 />
-                <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.72rem] leading-relaxed text-textMuted">
+                <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
                   {imageCaptionOverride ?? imageAsset.caption}
                 </figcaption>
               </figure>
@@ -675,10 +675,10 @@ export const BriefingPanel = ({
                 {supportingImageAssets.map((asset) => (
                   <figure key={asset.id} className="overflow-hidden rounded-md border border-borderTone/80 bg-surface/65">
                     <div className="flex items-center justify-between border-b border-borderTone/80 px-3 py-2">
-                      <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">
+                      <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
                         {imagePanelLabel(asset)}
                       </p>
-                      <span className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">
+                      <span className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
                         {imagePanelMode(asset)}
                       </span>
                     </div>
@@ -690,7 +690,7 @@ export const BriefingPanel = ({
                       }`}
                       loading="lazy"
                     />
-                    <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.64rem] leading-relaxed text-textMuted">
+                    <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
                       {asset.caption}
                     </figcaption>
                   </figure>
@@ -701,7 +701,7 @@ export const BriefingPanel = ({
               <figure className="overflow-hidden rounded-md border border-borderTone/80 bg-surface/65">
                 <div className="flex items-center justify-between border-b border-borderTone/80 px-3 py-2">
                   <p className="label">Situation Map</p>
-                  <span className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Orientation</span>
+                  <span className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Orientation</span>
                 </div>
                 <img
                   src={scenarioWorld.theaterDiagram.path}
@@ -709,7 +709,7 @@ export const BriefingPanel = ({
                   className="h-[18rem] w-full bg-surface object-contain p-2 sm:h-[20rem]"
                   loading="lazy"
                 />
-                <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.7rem] leading-relaxed text-textMuted">
+                <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
                   {scenarioWorld.theaterDiagram.caption}
                 </figcaption>
               </figure>
@@ -749,7 +749,7 @@ export const BriefingPanel = ({
                   onClick={() => setActiveSection(section)}
                 >
                   <span className="label text-textMain">{sectionLabels[section]}</span>
-                  <span className="text-[0.58rem] uppercase tracking-[0.12em] text-accent">
+                  <span className="text-[0.68rem] uppercase tracking-[0.12em] text-accent">
                     {active ? 'Open' : 'View'}
                   </span>
                 </button>

@@ -288,32 +288,31 @@ export const ActionCards = ({
     <section className="console-subpanel h-full px-3 py-3 sm:px-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="label">Response Options</p>
-          <p className="mt-2 text-[0.74rem] leading-relaxed text-textMuted">
-            Choose a response, review its likely strategic and market effects below, then confirm it when you are ready.
+          <p className="label">What Do You Do?</p>
+          <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
+            Pick a response. The advisors and consequence cards will show what could happen next.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="inline-flex h-7 w-7 items-center justify-center border border-borderTone bg-panelRaised text-[0.72rem] text-textMuted transition hover:border-accent hover:text-textMain"
+            className="inline-flex h-7 w-7 items-center justify-center border border-borderTone bg-panelRaised text-[0.84rem] text-textMuted transition hover:border-accent hover:text-textMain"
             onClick={() => setShowHelp((current) => !current)}
           >
             ?
           </button>
-          <p className="text-[0.62rem] uppercase tracking-[0.12em] text-textMuted">{sorted.length} options</p>
+          <p className="text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">{sorted.length} options</p>
         </div>
       </div>
 
       {showHelp ? (
-        <div className="mt-3 border border-borderTone/80 bg-panelRaised/55 px-3 py-2 text-[0.68rem] leading-relaxed text-textMuted">
-          Workflow: choose a response, review how it is likely to be read, compare advisor views, and then confirm it
-          when you are ready to move the scenario forward.
+        <div className="mt-3 border border-borderTone/80 bg-panelRaised/55 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
+          Pick a response, check the downside, then commit when you are ready to move.
         </div>
       ) : null}
 
       <div className="mt-3">
-        <p className="label">Available Responses</p>
+        <p className="label">Available Moves</p>
       </div>
 
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -339,33 +338,33 @@ export const ActionCards = ({
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-display text-[0.92rem] text-inherit">{action.name}</p>
                     <span
-                      className={`px-1.5 py-0.5 text-[0.55rem] uppercase tracking-[0.12em] ${visibilityTone(action.visibility)}`}
+                      className={`px-1.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] ${visibilityTone(action.visibility)}`}
                     >
                       {action.visibility}
                     </span>
                   </div>
-                  <p className="mt-1 text-[0.62rem] uppercase tracking-[0.12em] text-textMuted">
+                  <p className="mt-1 text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">
                     {action.tags.slice(0, 2).join(' · ') || 'Response option'}
                   </p>
-                  <p className="mt-2 text-[0.69rem] leading-relaxed text-textMain/90">
+                  <p className="mt-2 text-[0.84rem] leading-relaxed text-textMain/90">
                     {defaultVariant?.summary ?? actionOneLiner(action)}
                   </p>
-                  <p className="mt-1 text-[0.65rem] leading-relaxed text-textMuted">
+                  <p className="mt-1 text-[0.88rem] leading-relaxed text-textMuted">
                     {downside ? `${downside.label}: ${downside.detail}` : firstShockLine(action)}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-                    <span className="px-0.5 py-0.5 text-[0.54rem] uppercase tracking-[0.12em] text-positive">
+                    <span className="px-0.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-positive">
                       Supports {summary.supports}
                     </span>
-                    <span className="px-0.5 py-0.5 text-[0.54rem] uppercase tracking-[0.12em] text-warning">
+                    <span className="px-0.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-warning">
                       Cautions {summary.cautions}
                     </span>
-                    <span className="px-0.5 py-0.5 text-[0.54rem] uppercase tracking-[0.12em] text-red-300">
+                    <span className="px-0.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-red-300">
                       Opposes {summary.opposes}
                     </span>
                   </div>
                 </div>
-                <span className="shrink-0 text-[0.58rem] uppercase tracking-[0.12em] text-accent/90">
+                <span className="shrink-0 text-[0.68rem] uppercase tracking-[0.12em] text-accent/90">
                   {active ? 'Selected' : 'Open'}
                 </span>
               </div>
@@ -381,18 +380,18 @@ export const ActionCards = ({
             <div className="space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="label">Selected Response</p>
+                  <p className="label">Your Move</p>
                   {selectedCustomLabel ? (
-                    <p className="mt-2 text-[0.58rem] uppercase tracking-[0.12em] text-accent">Custom framing</p>
+                    <p className="mt-2 text-[0.68rem] uppercase tracking-[0.12em] text-accent">Custom framing</p>
                   ) : null}
                   <h3 className="mt-2 font-display text-xl text-textMain">{selectedCustomLabel ?? selectedAction.name}</h3>
                   {selectedVariantLabel ? (
                     <p className="mt-1 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
-                      Response envelope: {selectedAction.name} · {selectedVariantLabel}
+                      Approach: {selectedAction.name} · {selectedVariantLabel}
                     </p>
                   ) : null}
                 </div>
-              <span className={`px-2 py-1 text-[0.58rem] uppercase tracking-[0.12em] ${visibilityTone(selectedAction.visibility)}`}>
+              <span className={`px-2 py-1 text-[0.68rem] uppercase tracking-[0.12em] ${visibilityTone(selectedAction.visibility)}`}>
                 {selectedAction.visibility}
               </span>
             </div>
@@ -400,7 +399,7 @@ export const ActionCards = ({
             <div className="space-y-2">
               {selectedAction.variants && selectedAction.variants.length > 1 ? (
                 <div>
-                  <p className="label">Response Envelope</p>
+                  <p className="label">Approach</p>
                   <div className="mt-2 grid gap-2 md:grid-cols-2">
                     {selectedAction.variants.map((variant) => {
                       const active = selectedVariant?.id === variant.id;
@@ -416,14 +415,14 @@ export const ActionCards = ({
                           onClick={() => onSelect(selectedAction.id, variant.id)}
                         >
                           <div className="flex items-start justify-between gap-2">
-                            <p className="text-[0.74rem] font-semibold uppercase tracking-[0.08em]">{variant.label}</p>
-                            <span className="text-[0.55rem] uppercase tracking-[0.1em] text-accent">
+                            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.08em]">{variant.label}</p>
+                            <span className="text-[0.68rem] uppercase tracking-[0.1em] text-accent">
                               {active ? 'Selected' : 'Choose'}
                             </span>
                           </div>
-                          <p className="mt-1 text-[0.7rem] leading-relaxed">{variant.summary}</p>
+                          <p className="mt-1 text-[0.84rem] leading-relaxed">{variant.summary}</p>
                           {downside ? (
-                            <p className="mt-1 text-[0.62rem] leading-relaxed text-textMuted">
+                            <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
                               Risk: {downside.label}
                             </p>
                           ) : null}
@@ -434,11 +433,11 @@ export const ActionCards = ({
                 </div>
               ) : null}
 
-              <p className="label">Immediate Move</p>
-              <p className="text-[0.8rem] leading-relaxed text-textMain">
+              <p className="label">What Happens First</p>
+              <p className="text-[0.84rem] leading-relaxed text-textMain">
                 {selectedVariant?.summary ?? actionOneLiner(selectedAction)}
               </p>
-              <p className="text-[0.72rem] leading-relaxed text-textMuted">
+              <p className="text-[0.84rem] leading-relaxed text-textMuted">
                 {selectedAction.summary}
               </p>
             </div>
@@ -447,14 +446,14 @@ export const ActionCards = ({
               <div className="grid gap-2 lg:grid-cols-2">
                 {selectedInterpretationRationale ? (
                   <div className="console-subpanel px-3 py-2.5">
-                    <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Custom Interpretation</p>
-                    <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">{selectedInterpretationRationale}</p>
+                    <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Your Read</p>
+                    <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{selectedInterpretationRationale}</p>
                   </div>
                 ) : null}
                 {selectedNarrativeEmphasis ? (
                   <div className="console-subpanel px-3 py-2.5">
-                    <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Likely Emphasis</p>
-                    <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">{selectedNarrativeEmphasis}</p>
+                    <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">How This Plays Out</p>
+                    <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{selectedNarrativeEmphasis}</p>
                   </div>
                 ) : null}
               </div>
@@ -462,26 +461,26 @@ export const ActionCards = ({
 
               <div className="grid gap-2 lg:grid-cols-2">
                 <div className="console-subpanel px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Counterpart Read</p>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">How Beijing Takes It</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                     {selectedActionNarrativePreview?.rivalReaction ?? postureHint(selectedAction)}
                   </p>
                 </div>
                 <div className="console-subpanel px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Alliance / Market Read</p>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">How Allies And Markets React</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                     {selectedActionNarrativePreview?.allianceReaction ?? visibilityHint(selectedAction.visibility)}
                   </p>
                 </div>
                 <div className="console-subpanel px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">If This Lands</p>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">If This Lands</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                     {selectedActionNarrativePreview?.successOutcome ?? firstImpactHint(selectedAction)}
                   </p>
                 </div>
                 <div className="console-subpanel px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Delayed Risk</p>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">What Could Go Wrong</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                     {selectedActionNarrativePreview?.complicationOutcome ??
                       hiddenDownsideMeta(selectedVariant?.hiddenDownsideCategory)?.detail ??
                       riskHint(selectedAction)}
@@ -491,8 +490,8 @@ export const ActionCards = ({
 
               {selectedVariant?.hiddenDownsideCategory ? (
                 <div className="rounded-md border border-borderTone/80 bg-panelRaised/35 px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Hidden Downside</p>
-                  <p className="mt-1 text-[0.72rem] leading-relaxed text-textMain">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Hidden Downside</p>
+                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                     {hiddenDownsideMeta(selectedVariant.hiddenDownsideCategory)?.label ?? 'Delayed downside'}{' '}
                     <span className="text-textMuted">
                       {hiddenDownsideMeta(selectedVariant.hiddenDownsideCategory)?.detail}
@@ -505,7 +504,7 @@ export const ActionCards = ({
               {selectedAction.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-md border border-borderTone/80 px-1.5 py-0.5 text-[0.58rem] uppercase tracking-[0.1em] text-textMuted"
+                  className="rounded-md border border-borderTone/80 px-1.5 py-0.5 text-[0.68rem] uppercase tracking-[0.1em] text-textMuted"
                 >
                   {tag}
                 </span>
@@ -514,8 +513,8 @@ export const ActionCards = ({
           </div>
         ) : (
           <div>
-            <p className="label">Selected Response</p>
-            <p className="mt-2 text-[0.78rem] leading-relaxed text-textMuted">
+            <p className="label">Your Move</p>
+            <p className="mt-2 text-[0.88rem] leading-relaxed text-textMuted">
               No response selected yet. Choose one option above to load the likely consequences, advisor views, and confirmation path.
             </p>
           </div>

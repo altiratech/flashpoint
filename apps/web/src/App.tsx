@@ -1801,12 +1801,12 @@ const App = () => {
         ? `${selectedAction.name} · ${selectedResponse.variantLabel}`
         : selectedAction.name
       : null);
-  const turnStageLabel = turnStage === 'brief' ? 'Situation Summary' : 'Decision';
+  const turnStageLabel = turnStage === 'brief' ? 'The Situation' : 'Your Call';
   const turnStageActionLabel = turnStage === 'brief'
     ? selectedAction
-      ? 'Return To Selected Response'
-      : 'Proceed To Decision'
-    : 'Back To Summary';
+      ? 'Return To Your Move'
+      : 'Make Your Call'
+    : 'Back To Situation';
 
   return (
     <main className="mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-3 py-3 pb-8 sm:px-4 lg:px-5">
@@ -1820,13 +1820,13 @@ const App = () => {
               <span>{currentScenario?.role ?? 'Decision Simulation'}</span>
             </div>
             {theaterTimeContext ? (
-              <p className="max-w-4xl text-[0.72rem] leading-relaxed text-textMuted">{theaterTimeContext}</p>
+              <p className="max-w-4xl text-[0.84rem] leading-relaxed text-textMuted">{theaterTimeContext}</p>
             ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              className="console-button console-button-secondary px-3 py-1.5 text-[0.58rem]"
+              className="console-button console-button-secondary px-3 py-1.5 text-[0.68rem]"
               onClick={handleReturnToSetup}
               disabled={loading}
             >
@@ -1855,7 +1855,7 @@ const App = () => {
             {showTakeNoAction ? (
               <button
                 type="button"
-                className="rounded-md border border-warning/70 bg-warning/10 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.1em] text-warning transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-45"
+                className="rounded-md border border-warning/70 bg-warning/10 px-2 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.1em] text-warning transition hover:bg-warning/20 disabled:cursor-not-allowed disabled:opacity-45"
                 onClick={() => void handleInaction('explicit')}
                 disabled={loading || episode.status !== 'active'}
               >
@@ -1907,12 +1907,12 @@ const App = () => {
             <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="label text-accent">Situation Summary</p>
+                  <p className="label text-accent">The Situation</p>
                   <span className="action-required-status border-accent/55 bg-accent/10 text-accent">
                     Review Before Deciding
                   </span>
                 </div>
-                <p className="mt-2 text-[0.8rem] leading-relaxed text-textMain">{summaryLead}</p>
+                <p className="mt-2 text-[0.84rem] leading-relaxed text-textMain">{summaryLead}</p>
               </div>
               <div className="flex shrink-0 items-start">
                 <button
@@ -1936,8 +1936,8 @@ const App = () => {
             <div className="mt-2 grid gap-2 lg:grid-cols-3">
               {executiveSummary.map((entry) => (
                 <article key={entry.label} className="console-subpanel px-3 py-2.5">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{entry.label}</p>
-                  <p className="mt-1.5 text-[0.74rem] leading-relaxed text-textMain">{entry.detail}</p>
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{entry.label}</p>
+                  <p className="mt-1.5 text-[0.84rem] leading-relaxed text-textMain">{entry.detail}</p>
                 </article>
               ))}
             </div>
@@ -1971,7 +1971,7 @@ const App = () => {
           <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
             <div className="relative z-[1] min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="label text-accent">Decision Phase</p>
+                <p className="label text-accent">Your Call</p>
                 <span
                   className={`action-required-status ${
                     selectedAction
@@ -1984,30 +1984,16 @@ const App = () => {
               </div>
               <p className="mt-2 text-[0.82rem] leading-relaxed text-textMain">{currentDirective}</p>
               <p className="mt-2 text-sm leading-relaxed text-textMain">
-                Compare the available responses, inspect advisor reasoning, then confirm a selected response to advance the scenario.
+                Pick a response. Check who disagrees. Commit only when you are ready to own the fallout.
               </p>
-              <p className="mt-2 text-[0.72rem] leading-relaxed text-textMuted">
-                Need more context first? Return to the Situation Summary to review the full intelligence and mandate surfaces before you confirm.
+              <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
+                Need more context first? Go back to the situation before you make the call.
               </p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                <div className="action-required-step">
-                  <p className="text-[0.56rem] uppercase tracking-[0.12em] text-accent">1. Select</p>
-                  <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">Choose one response from the available list.</p>
-                </div>
-                <div className="action-required-step">
-                  <p className="text-[0.56rem] uppercase tracking-[0.12em] text-accent">2. Consult</p>
-                  <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">Open advisor cards to review the reasoning behind the selected response.</p>
-                </div>
-                <div className="action-required-step">
-                  <p className="text-[0.56rem] uppercase tracking-[0.12em] text-accent">3. Commit</p>
-                  <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">Advance the scenario only after you are satisfied with the selected response.</p>
-                </div>
-              </div>
               <div className={`mt-3 rounded-md border px-3 py-2 ${timerUrgencyClass}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <p className="text-[0.56rem] font-semibold uppercase tracking-[0.12em]">Decision Clock</p>
-                    <p className="mt-1 text-[0.7rem] leading-relaxed">
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.12em]">Decision Clock</p>
+                    <p className="mt-1 text-[0.84rem] leading-relaxed">
                       {activeCountdown && timerRemainingSeconds !== null
                         ? `${timerModeLabel}: ${timerRemainingSeconds} seconds remain before this window resolves as inaction.`
                         : `${timerModeLabel}: no automatic timeout is active for this window.`}
@@ -2016,7 +2002,7 @@ const App = () => {
                   {activeCountdown ? (
                     <button
                       type="button"
-                      className="rounded-md border border-current/50 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.1em] transition hover:bg-current/10 disabled:cursor-not-allowed disabled:opacity-45"
+                      className="rounded-md border border-current/50 px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.1em] transition hover:bg-current/10 disabled:cursor-not-allowed disabled:opacity-45"
                       onClick={() => void handleCountdownExtend()}
                       disabled={loading || !canExtendCountdown}
                     >
@@ -2057,7 +2043,7 @@ const App = () => {
                 onClick={() => void handleActionCommit()}
                 disabled={!selectedAction || loading || episode.status !== 'active'}
               >
-                {selectedAction ? 'Commit Selected Response' : 'Select A Response'}
+                {selectedAction ? 'Commit Your Move' : 'Pick A Response'}
               </button>
             </div>
           </div>

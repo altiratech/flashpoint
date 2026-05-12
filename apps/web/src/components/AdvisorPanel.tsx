@@ -95,11 +95,11 @@ export const AdvisorPanel = ({ beat, scenarioId, advisorDossiers, selectedAction
         <div>
           <p className="label">Advisor Views</p>
           <h2 className="mt-2 font-display text-lg text-textMain">Advisor Guidance</h2>
-          <p className="mt-1 text-[0.72rem] leading-relaxed text-textMuted">
+          <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
             Open an advisor to inspect their recommendation, reasoning, and main concern around the selected response.
           </p>
         </div>
-        <p className="rounded-md border border-borderTone bg-panelRaised/60 px-2 py-1 text-[0.6rem] uppercase tracking-[0.12em] text-textMuted">
+        <p className="rounded-md border border-borderTone bg-panelRaised/60 px-2 py-1 text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">
           Advisor Read
         </p>
       </div>
@@ -136,24 +136,24 @@ export const AdvisorPanel = ({ beat, scenarioId, advisorDossiers, selectedAction
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-textMain">{dossier.name}</p>
-                      <p className="text-[0.62rem] uppercase tracking-[0.12em] text-textMuted">
+                      <p className="text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">
                         {dossier.title} · {dossier.organization}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       {actionRead ? (
                         <span
-                          className={`rounded-md border px-1.5 py-0.5 text-[0.54rem] uppercase tracking-[0.12em] ${alignmentTone[actionRead.alignment]}`}
+                          className={`rounded-md border px-1.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] ${alignmentTone[actionRead.alignment]}`}
                         >
                           {actionRead.alignment}
                         </span>
                       ) : null}
                       <span
-                        className={`rounded-md border border-borderTone/70 px-2 py-0.5 text-[0.62rem] uppercase tracking-[0.12em] ${tone}`}
+                        className={`rounded-md border border-borderTone/70 px-2 py-0.5 text-[0.72rem] uppercase tracking-[0.12em] ${tone}`}
                       >
                         {dossier.stance}
                       </span>
-                      <span className="text-[0.58rem] uppercase tracking-[0.12em] text-accent">
+                      <span className="text-[0.68rem] uppercase tracking-[0.12em] text-accent">
                         {activeExpandedId === entry.advisorId ? 'Hide' : 'Open'}
                       </span>
                     </div>
@@ -163,41 +163,41 @@ export const AdvisorPanel = ({ beat, scenarioId, advisorDossiers, selectedAction
                   <div className="mt-3 grid gap-2 border-t border-borderTone/70 pt-3">
                     {actionRead ? (
                       <div className="console-subpanel px-3 py-2.5">
-                        <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">
+                        <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
                           Recommendation on {selectedAction?.name ?? 'selected response'}
                         </p>
-                        <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">{actionRead.rationale}</p>
+                        <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{actionRead.rationale}</p>
                       </div>
                     ) : (
                       <div className="console-subpanel px-3 py-2.5">
-                        <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Recommendation</p>
-                        <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">
+                        <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Recommendation</p>
+                        <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                           Select a response to see how this advisor evaluates the available options.
                         </p>
                       </div>
                     )}
                     <div className="grid gap-2 sm:grid-cols-2">
                       <div className="console-subpanel px-3 py-2.5">
-                        <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Main concern</p>
-                        <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">{clipText(mainConcern, 160)}</p>
+                        <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Main concern</p>
+                        <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{clipText(mainConcern, 160)}</p>
                       </div>
                       <div className="console-subpanel px-3 py-2.5">
-                        <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Current read</p>
-                        <p className="mt-1 text-[0.7rem] leading-relaxed text-textMain">
+                        <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Current read</p>
+                        <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
                           {clipText(shortAssessment, 180)}
                         </p>
                       </div>
                     </div>
-                    <p className="text-[0.72rem] leading-relaxed text-textMuted">
+                    <p className="text-[0.84rem] leading-relaxed text-textMuted">
                       <span className="text-textMain">Decision note:</span> {clipText(decisionNote, 220)}
                     </p>
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-[0.62rem] uppercase tracking-[0.12em] text-textMuted">
+                      <p className="text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">
                         More profile context is optional.
                       </p>
                       <button
                         type="button"
-                        className="rounded-md border border-borderTone/70 px-2 py-1 text-[0.58rem] uppercase tracking-[0.12em] text-textMuted transition hover:border-accent/60 hover:text-accent"
+                        className="rounded-md border border-borderTone/70 px-2 py-1 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted transition hover:border-accent/60 hover:text-accent"
                         onClick={() =>
                           setDetailsAdvisorId(activeDetailsId === entry.advisorId ? null : entry.advisorId)
                         }
@@ -207,22 +207,22 @@ export const AdvisorPanel = ({ beat, scenarioId, advisorDossiers, selectedAction
                     </div>
                     {activeDetailsId === entry.advisorId ? (
                       <div className="grid gap-2 border-t border-borderTone/70 pt-3">
-                        <p className="text-[0.7rem] leading-relaxed text-textMuted">
+                        <p className="text-[0.84rem] leading-relaxed text-textMuted">
                           <span className="text-textMain">Background:</span> {clipText(dossier.shortBio, 180)}
                         </p>
-                        <p className="text-[0.7rem] leading-relaxed text-textMuted">
+                        <p className="text-[0.84rem] leading-relaxed text-textMuted">
                           <span className="text-textMain">View:</span> {clipText(dossier.perspective, 220)}
                         </p>
-                        <p className="text-[0.7rem] leading-relaxed text-textMuted">
+                        <p className="text-[0.84rem] leading-relaxed text-textMuted">
                           <span className="text-textMain">Decision logic:</span> {clipText(dossier.decisionFramework, 240)}
                         </p>
                         {scenarioSpecific ? (
                           <>
-                            <p className="text-[0.7rem] leading-relaxed text-textMuted">
+                            <p className="text-[0.84rem] leading-relaxed text-textMuted">
                               <span className="text-textMain">Scenario assessment:</span>{' '}
                               {clipText(scenarioSpecific.openingAssessment, 240)}
                             </p>
-                            <p className="text-[0.7rem] leading-relaxed text-textMuted">
+                            <p className="text-[0.84rem] leading-relaxed text-textMuted">
                               <span className="text-textMain">Known red line:</span> {clipText(scenarioSpecific.redLine, 200)}
                             </p>
                           </>
@@ -232,7 +232,7 @@ export const AdvisorPanel = ({ beat, scenarioId, advisorDossiers, selectedAction
                             {entry.lines.slice(1).map((line, index) => (
                               <p
                                 key={`${entry.advisorId}:detail:${index + 1}`}
-                                className="text-[0.72rem] leading-relaxed text-textMuted"
+                                className="text-[0.84rem] leading-relaxed text-textMuted"
                               >
                                 {line}
                               </p>

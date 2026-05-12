@@ -66,7 +66,7 @@ body::before {
 }
 
 .label {
-  @apply font-mono text-[0.64rem] font-medium uppercase tracking-[0.18em] text-textMuted;
+  @apply font-mono text-[0.72rem] font-medium uppercase tracking-[0.16em] text-textMuted;
 }
 
 .value {
@@ -74,7 +74,7 @@ body::before {
 }
 
 .hud-chip {
-  @apply inline-flex items-center gap-1 border border-borderTone bg-panelRaised px-2 py-1 font-mono text-[0.6rem] uppercase tracking-[0.14em] text-textMuted;
+  @apply inline-flex items-center gap-1 border border-borderTone bg-panelRaised px-2 py-1 font-mono text-[0.72rem] uppercase tracking-[0.12em] text-textMuted;
 }
 
 .hud-separator {
@@ -102,11 +102,11 @@ body::before {
 }
 
 .console-sidebar-label {
-  @apply font-mono text-[0.58rem] uppercase tracking-[0.18em] text-textMuted;
+  @apply font-mono text-[0.68rem] uppercase tracking-[0.18em] text-textMuted;
 }
 
 .console-nav-item {
-  @apply mt-2 flex w-full items-center justify-between border border-transparent px-3 py-2 text-left text-[0.74rem] uppercase tracking-[0.08em] text-textMuted transition;
+  @apply mt-2 flex w-full items-center justify-between border border-transparent px-3 py-2 text-left text-[0.84rem] uppercase tracking-[0.08em] text-textMuted transition;
 }
 
 .console-nav-item:hover {
@@ -193,7 +193,7 @@ body::before {
 }
 
 .action-required-status {
-  @apply inline-flex items-center gap-2 border px-2.5 py-1 font-mono text-[0.6rem] uppercase tracking-[0.14em];
+  @apply inline-flex items-center gap-2 border px-2.5 py-1 font-mono text-[0.72rem] uppercase tracking-[0.12em];
 }
 
 .action-required-step {
@@ -201,11 +201,11 @@ body::before {
 }
 
 .console-kicker {
-  @apply font-mono text-[0.62rem] uppercase tracking-[0.22em] text-accent;
+  @apply font-mono text-[0.72rem] uppercase tracking-[0.16em] text-accent;
 }
 
 .console-chip {
-  @apply inline-flex items-center gap-2 border border-borderTone bg-panelRaised px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-textMuted;
+  @apply inline-flex items-center gap-2 border border-borderTone bg-panelRaised px-2.5 py-1 font-mono text-[0.72rem] uppercase tracking-[0.1em] text-textMuted;
 }
 
 .console-chip strong {
@@ -218,7 +218,7 @@ body::before {
 }
 
 .console-metric-label {
-  @apply font-mono text-[0.56rem] uppercase tracking-[0.16em] text-textMuted;
+  @apply font-mono text-[0.68rem] uppercase tracking-[0.16em] text-textMuted;
 }
 
 .console-metric-value {
@@ -235,7 +235,7 @@ body::before {
 }
 
 .briefing-tab {
-  @apply inline-flex items-center justify-center border border-borderTone bg-panelRaised px-3 py-2 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-textMuted transition;
+  @apply inline-flex items-center justify-center border border-borderTone bg-panelRaised px-3 py-2 font-mono text-[0.72rem] uppercase tracking-[0.1em] text-textMuted transition;
 }
 
 .briefing-tab:hover {

@@ -231,7 +231,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
             <a
               key={href}
               href={href}
-              className="rounded-md border border-borderTone bg-surface/50 px-3 py-1.5 text-[0.62rem] uppercase tracking-[0.12em] text-textMuted transition hover:border-accent/70 hover:text-accent"
+              className="rounded-md border border-borderTone bg-surface/50 px-3 py-1.5 text-[0.72rem] uppercase tracking-[0.12em] text-textMuted transition hover:border-accent/70 hover:text-accent"
             >
               {label}
             </a>
@@ -254,7 +254,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
               <article key={entry.objective.id} className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-sm text-textMain">{entry.objective.label}</p>
-                  <span className={`rounded-md border px-2 py-0.5 text-[0.56rem] uppercase tracking-[0.12em] ${mandateTone[entry.status]}`}>
+                  <span className={`rounded-md border px-2 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] ${mandateTone[entry.status]}`}>
                     {entry.status}
                   </span>
                 </div>
@@ -284,13 +284,13 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
                       Score {entry.score}
                     </p>
                   </div>
-                  <span className={`rounded-md border px-2 py-0.5 text-[0.56rem] uppercase tracking-[0.12em] ${tradeoffTone[entry.status]}`}>
+                  <span className={`rounded-md border px-2 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] ${tradeoffTone[entry.status]}`}>
                     {entry.status}
                   </span>
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-textMuted">{entry.summary}</p>
                 <div className="mt-3 rounded-md border border-borderTone/70 bg-surface/30 p-3">
-                  <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">Primary tradeoff</p>
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Primary tradeoff</p>
                   <p className="mt-1 text-sm leading-relaxed text-textMain">{entry.tradeoff}</p>
                 </div>
               </article>

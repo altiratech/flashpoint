@@ -110,10 +110,10 @@ export const MeterDashboard = ({ meters, previousMeters, meterHistory, embedded 
   return (
     <section className={rootClassName}>
       <div className="flex items-center justify-between gap-3">
-        <p className="label">Operational Indicators</p>
-        <span className="text-[0.62rem] uppercase tracking-[0.12em] text-textMuted">Window trend</span>
+        <p className="label">Warning Signs</p>
+        <span className="text-[0.72rem] uppercase tracking-[0.12em] text-textMuted">Window trend</span>
       </div>
-      <p className="mt-2 text-[0.72rem] leading-relaxed text-textMuted">{interpretIndicatorState(meters)}</p>
+      <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">{interpretIndicatorState(meters)}</p>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
         {orderedMeterKeys.map((key) => {
           const value = meters[key];
@@ -129,7 +129,7 @@ export const MeterDashboard = ({ meters, previousMeters, meterHistory, embedded 
                 <span className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{meterLabels[key]}</span>
                 <span className="font-display text-[0.95rem] text-textMain">
                   {Math.round(value)}
-                  <span className={`ml-1.5 text-[0.58rem] ${deltaToneClass}`}>
+                  <span className={`ml-1.5 text-[0.68rem] ${deltaToneClass}`}>
                     {trendArrow(delta)} {Math.abs(Math.round(delta))}
                   </span>
                 </span>

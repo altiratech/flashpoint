@@ -9,6 +9,7 @@ Current state:
 - Reports open with a `Run Snapshot`; completed reports, active runs, and recent setup activity are indexed locally so users can resume, reopen, remove stale entries, jump from activity rows, and understand recent run state after reload.
 - Setup promotes the latest active run, reflects selected clock mode, and live scenarios can return to setup/recovery shelves without a page reload.
 - New local slice: setup/live/report and turn-stage transitions now reset window scroll to the top and move keyboard focus to the active `<main>` surface, including initial setup after bootstrap.
+- New local audit slice: gameplay text now has a 0.68rem rendered floor with larger body copy, and obvious policy-terminal labels were rewritten to plainer player language (`The Situation`, `Your Call`, `What Do You Do?`, `Your Move`, `Warning Signs`).
 - `docs/UX_MULTIAGENT_REVIEW_2026-05-12.md` captures the multi-agent UX/product review: fix now, prototype next, save for later, do not do, agent assignments, and review criteria.
 - Client telemetry writes explicit ISO timestamps from the API layer, avoiding the prior literal `CURRENT_TIMESTAMP` values in remote D1 rows.
 - `.github/workflows/verify-rate-limit.yml` is a manual production diagnostic for the no-op `POST /api/rate-limit-smoke` limiter path.
@@ -17,9 +18,10 @@ Current state:
 - Dependency-security posture is hardened; production `npm audit --omit=dev` is clean. Remaining full `npm audit` findings are four moderate dev-only `drizzle-kit`/old esbuild-loader advisories; monitor upstream instead of forcing a downgrade.
 
 Validation:
+- Current audit slice passed: `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, and browser checks at desktop plus 390px mobile proving no visible tiny text below the 0.68rem floor and no horizontal overflow.
 - Current scroll/focus slice passed: `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, reviewer approval, and browser verification at desktop plus 390px mobile for setup -> live, summary -> decision, return to setup, report open, and initial setup after bootstrap.
 - Recent app slices passed `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, and local browser completed-report plus active-run reload/resume/remove/clear/recent-activity/clock-mode/live-return/continue-latest flows at desktop and 390px mobile.
 - GitHub Deploy run `25705387122` succeeded for `eb922f0` with artifact `6932923493`; run `25708569214` succeeded for `3ed708c` with artifact `6934047934`; run `25709500869` succeeded for `462933c` with artifact `6934351772`.
 
 Next:
-- Continue app-facing vertical slices. Recommended next: implement the persistent selected-response review strip before commit, then do a focused copy/card-density pass on the decision phase.
+- Continue app-facing vertical slices. Recommended next: implement the persistent selected-response review strip before commit, then continue the briefing density and hero-image promotion slices from `PRODUCT_AUDIT.md`.
