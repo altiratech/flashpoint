@@ -92,6 +92,8 @@ const historyLabel: Record<RunHistoryEventType, string> = {
   reports_cleared: 'Reports cleared'
 };
 
+const formatBeatLabel = (beatId: string): string => beatId.replace(/^ns_/, '').replaceAll('_', ' ');
+
 const timerModeOptions: Record<TimerMode, { label: string; detail: string; summary: string }> = {
   off: {
     label: 'User-paced',
@@ -169,6 +171,7 @@ export const StartScreen = ({
         scenarioName: reference.scenarios.find((scenario) => scenario.id === run.scenarioId)?.name ?? 'Scenario run',
         shortId: run.episodeId.slice(0, 8),
         timerLabel: timerModeOptions[run.timerMode]?.label ?? 'User-paced',
+        beatLabel: formatBeatLabel(run.currentBeatId),
         lastSeenLabel: new Intl.DateTimeFormat('en-US', {
           month: 'short',
           day: 'numeric',
@@ -178,6 +181,7 @@ export const StartScreen = ({
       })),
     [activeRuns, reference.scenarios]
   );
+  const latestActiveRun = activeRunCards[0] ?? null;
   const activeRunLookup = useMemo(
     () => new Map(activeRuns.map((run) => [run.episodeId, run])),
     [activeRuns]
@@ -477,6 +481,50 @@ export const StartScreen = ({
             </section>
 
             <div className="space-y-4">
+              {latestActiveRun ? (
+                <section className="console-panel border-accent/70 bg-accent/8 p-5">
+                  <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="min-w-0">
+                      <p className="label text-accent">Continue Latest Run</p>
+                      <p className="mt-2 font-display text-xl uppercase tracking-[0.06em] text-textMain">
+                        {latestActiveRun.scenarioName}
+                      </p>
+                      <p className="mt-2 text-[0.74rem] uppercase tracking-[0.12em] text-textMuted">
+                        Window {latestActiveRun.turn} / {latestActiveRun.lastSeenLabel} / {latestActiveRun.shortId}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="console-button console-button-primary shrink-0"
+                      onClick={() => void onResumeRun(latestActiveRun.episodeId)}
+                      disabled={loading}
+                    >
+                      {loading ? 'Continuing...' : 'Continue Latest Run'}
+                    </button>
+                  </div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    <div className="console-subpanel px-3 py-2.5">
+                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">Recovery Point</p>
+                      <p className="mt-2 text-[0.78rem] uppercase tracking-[0.08em] text-textMain">
+                        Window {latestActiveRun.turn}
+                      </p>
+                    </div>
+                    <div className="console-subpanel px-3 py-2.5">
+                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">Clock</p>
+                      <p className="mt-2 text-[0.78rem] uppercase tracking-[0.08em] text-textMain">
+                        {latestActiveRun.timerLabel}
+                      </p>
+                    </div>
+                    <div className="console-subpanel px-3 py-2.5">
+                      <p className="text-[0.56rem] uppercase tracking-[0.16em] text-textMuted">Current Beat</p>
+                      <p className="mt-2 text-[0.78rem] uppercase tracking-[0.08em] text-textMain">
+                        {latestActiveRun.beatLabel}
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              ) : null}
+
               {activityCards.length > 0 ? (
                 <section className="console-panel p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -571,7 +619,7 @@ export const StartScreen = ({
                         </span>
                         <span className="mt-2 grid gap-2 text-[0.66rem] uppercase tracking-[0.1em] text-textMuted sm:grid-cols-2">
                           <span>{run.timerLabel}</span>
-                          <span>{run.currentBeatId.replace(/^ns_/, '').replaceAll('_', ' ')}</span>
+                          <span>{run.beatLabel}</span>
                         </span>
                         <span className="mt-3 flex flex-wrap gap-2">
                           <button
