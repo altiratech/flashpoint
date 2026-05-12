@@ -160,10 +160,20 @@ export const StartScreen = ({
       })),
     [activeRuns, reference.scenarios]
   );
+  const activeRunLookup = useMemo(
+    () => new Map(activeRuns.map((run) => [run.episodeId, run])),
+    [activeRuns]
+  );
+  const recentReportLookup = useMemo(
+    () => new Map(recentReports.map((report) => [report.episodeId, report])),
+    [recentReports]
+  );
   const activityCards = useMemo(
     () =>
       runHistory.map((event) => {
         const shortId = event.episodeId?.slice(0, 8) ?? null;
+        const activeRun = event.episodeId ? activeRunLookup.get(event.episodeId) : undefined;
+        const recentReport = event.episodeId ? recentReportLookup.get(event.episodeId) : undefined;
         const scenarioName = event.scenarioId
           ? reference.scenarios.find((scenario) => scenario.id === event.scenarioId)?.name ?? 'Scenario run'
           : 'Local setup index';
@@ -184,10 +194,24 @@ export const StartScreen = ({
           label: historyLabel[event.type],
           scenarioName,
           activityDate,
-          detail
+          detail,
+          action:
+            recentReport && event.episodeId
+              ? {
+                  type: 'open_report' as const,
+                  label: 'Open Report',
+                  episodeId: event.episodeId
+                }
+              : activeRun && event.episodeId
+                ? {
+                    type: 'resume_run' as const,
+                    label: 'Resume',
+                    episodeId: event.episodeId
+                  }
+                : null
         };
       }),
-    [reference.scenarios, runHistory]
+    [activeRunLookup, recentReportLookup, reference.scenarios, runHistory]
   );
 
   const runProfile = useMemo(
@@ -456,7 +480,12 @@ export const StartScreen = ({
                   </div>
                   <div className="mt-3 space-y-2">
                     {activityCards.map((event) => (
-                      <article key={event.id} className="console-subpanel px-3 py-2.5">
+                      <article
+                        key={event.id}
+                        className={`console-subpanel px-3 py-2.5 ${
+                          event.action ? 'transition hover:border-accent/70 hover:bg-accent/8' : ''
+                        }`}
+                      >
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-textMain">
                             {event.label}
@@ -466,7 +495,28 @@ export const StartScreen = ({
                           </p>
                         </div>
                         <p className="mt-1 text-[0.72rem] leading-relaxed text-textMuted">{event.scenarioName}</p>
-                        <p className="mt-1 text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{event.detail}</p>
+                        <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-[0.58rem] uppercase tracking-[0.12em] text-textMuted">{event.detail}</p>
+                          {event.action ? (
+                            <button
+                              type="button"
+                              className="console-button console-button-primary px-3 py-1.5 text-[0.56rem]"
+                              onClick={() => {
+                                if (event.action?.type === 'open_report') {
+                                  void onOpenReport(event.action.episodeId);
+                                  return;
+                                }
+
+                                if (event.action?.type === 'resume_run') {
+                                  void onResumeRun(event.action.episodeId);
+                                }
+                              }}
+                              disabled={loading}
+                            >
+                              {event.action.label}
+                            </button>
+                          ) : null}
+                        </div>
                       </article>
                     ))}
                   </div>
