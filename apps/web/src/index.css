@@ -156,7 +156,7 @@ body::before {
     inset 0 0 0 1px rgba(255, 177, 0, 0.08),
     0 20px 46px rgba(0, 0, 0, 0.32);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .action-required-shell::before {

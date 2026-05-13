@@ -285,7 +285,7 @@ export const ActionCards = ({
   );
 
   return (
-    <section className="console-subpanel h-full px-3 py-3 sm:px-4">
+    <section className="console-subpanel h-full min-w-0 px-3 py-3 sm:px-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="label">What Do You Do?</p>
@@ -333,7 +333,7 @@ export const ActionCards = ({
               disabled={disabled}
               onClick={() => onSelect(action.id)}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-display text-[0.92rem] text-inherit">{action.name}</p>
@@ -364,7 +364,7 @@ export const ActionCards = ({
                     </span>
                   </div>
                 </div>
-                <span className="shrink-0 text-[0.68rem] uppercase tracking-[0.12em] text-accent/90">
+                <span className="shrink-0 self-start text-[0.68rem] uppercase tracking-[0.12em] text-accent/90 sm:self-auto">
                   {active ? 'Selected' : 'Open'}
                 </span>
               </div>

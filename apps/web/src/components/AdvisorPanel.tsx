@@ -90,7 +90,7 @@ export const AdvisorPanel = ({ beat, scenarioId, advisorDossiers, selectedAction
   const activeDetailsId = activeExpandedId === detailsAdvisorId ? detailsAdvisorId : null;
 
   return (
-    <section className="console-subpanel h-full px-3 py-3 sm:px-4">
+    <section className="console-subpanel h-full min-w-0 px-3 py-3 sm:px-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="label">Advisor Views</p>

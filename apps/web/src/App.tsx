@@ -804,6 +804,18 @@ const buildManualSelection = (action: ActionDefinition, variantId?: string | nul
   };
 };
 
+const formatRiskCategory = (category?: string | null): string | null => {
+  if (!category) {
+    return null;
+  }
+
+  return category
+    .split('_')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+};
+
 const resetViewScrollAndFocus = (): void => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return;
@@ -1801,6 +1813,25 @@ const App = () => {
         ? `${selectedAction.name} · ${selectedResponse.variantLabel}`
         : selectedAction.name
       : null);
+  const selectedActionAdvisorSummary = selectedAction
+    ? actionAdvisorSummaries.get(selectedAction.id) ?? { supports: 0, cautions: 0, opposes: 0 }
+    : null;
+  const selectedResponseApproachLabel = selectedResponse?.source === 'custom'
+    ? 'Custom read'
+    : selectedVariant?.label
+      ? `Approach: ${selectedVariant.label}`
+      : selectedAction?.visibility
+        ? selectedAction.visibility
+        : 'Awaiting selection';
+  const selectedResponseReviewLine =
+    selectedVariant?.summary ??
+    selectedAction?.summary ??
+    'Pick a response to keep the choice, advisor split, risk, and commit button in view.';
+  const selectedResponseRiskLine =
+    formatRiskCategory(selectedVariant?.hiddenDownsideCategory) ??
+    selectedResponse?.interpretationRationale ??
+    selectedVariant?.narrativeEmphasis ??
+    'No specific hidden downside selected yet.';
   const turnStageLabel = turnStage === 'brief' ? 'The Situation' : 'Your Call';
   const turnStageActionLabel = turnStage === 'brief'
     ? selectedAction
@@ -2027,14 +2058,14 @@ const App = () => {
                 onClick={() => setTurnStage('brief')}
                 disabled={loading}
               >
-                Back To Summary
+                Back To Situation
               </button>
               <div
                 className={`console-chip ${
                   selectedAction ? 'border-positive/45 bg-positive/8' : 'border-accent/50 bg-accent/8'
                 }`}
               >
-                <strong>Decision</strong>
+                <strong>Your Move</strong>
                 <span>{selectedResponseLabel ?? 'Choose a response'}</span>
               </div>
               <button
@@ -2048,7 +2079,69 @@ const App = () => {
             </div>
           </div>
 
-          <div className="relative z-[1] mt-4 grid min-h-0 gap-4 xl:grid-cols-[1.06fr_0.72fr]">
+          <div className="sticky top-2 z-20 mt-4 rounded-md border border-accent/55 bg-surface/95 px-3 py-3 shadow-hard backdrop-blur sm:px-4">
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="label text-accent">Review Before Commit</p>
+                  <span
+                    className={`action-required-status ${
+                      selectedAction
+                        ? 'border-positive/65 bg-positive/10 text-positive'
+                        : 'border-accent/55 bg-accent/10 text-accent'
+                    }`}
+                  >
+                    {selectedAction ? 'Move Selected' : 'Waiting On Your Move'}
+                  </span>
+                </div>
+                <p className="mt-2 font-display text-lg text-textMain">
+                  {selectedResponseLabel ?? 'No move selected'}
+                </p>
+                <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
+                  {selectedResponseApproachLabel} / {selectedResponseReviewLine}
+                </p>
+                <p className="mt-1 text-[0.84rem] leading-relaxed text-warning">
+                  Risk to watch: {selectedResponseRiskLine}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                <div className="grid grid-cols-3 gap-1.5 text-center sm:min-w-[17rem]">
+                  <div className="rounded-md border border-positive/45 bg-positive/10 px-2 py-1">
+                    <p className="text-[0.68rem] uppercase tracking-[0.1em] text-positive">Support</p>
+                    <p className="font-display text-lg text-textMain">{selectedActionAdvisorSummary?.supports ?? '-'}</p>
+                  </div>
+                  <div className="rounded-md border border-warning/45 bg-warning/10 px-2 py-1">
+                    <p className="text-[0.68rem] uppercase tracking-[0.1em] text-warning">Caution</p>
+                    <p className="font-display text-lg text-textMain">{selectedActionAdvisorSummary?.cautions ?? '-'}</p>
+                  </div>
+                  <div className="rounded-md border border-red-300/45 bg-red-300/10 px-2 py-1">
+                    <p className="text-[0.68rem] uppercase tracking-[0.1em] text-red-300">Oppose</p>
+                    <p className="font-display text-lg text-textMain">{selectedActionAdvisorSummary?.opposes ?? '-'}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="console-button console-button-secondary min-w-[10rem]"
+                    onClick={() => setTurnStage('brief')}
+                    disabled={loading}
+                  >
+                    Back To Situation
+                  </button>
+                  <button
+                    type="button"
+                    className={`console-button ${selectedAction ? 'console-button-primary' : 'console-button-secondary'} min-w-[10rem]`}
+                    onClick={() => void handleActionCommit()}
+                    disabled={!selectedAction || loading || episode.status !== 'active'}
+                  >
+                    {selectedAction ? 'Commit Your Move' : 'Pick A Response'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative z-[1] mt-4 grid min-h-0 min-w-0 gap-4 xl:grid-cols-[1.06fr_0.72fr]">
             <ActionCards
               actions={episode.offeredActions}
               disabled={loading || episode.status !== 'active'}
