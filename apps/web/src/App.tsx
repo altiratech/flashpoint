@@ -400,9 +400,11 @@ const arrangeBriefingVisuals = (
         (left, right) => heroVisualScore(right) - heroVisualScore(left) || left.id.localeCompare(right.id)
       )[0] ??
       null);
+  const evidencePool = deduped.filter((asset) => asset.id !== heroAsset?.id);
+  const nonFallbackEvidencePool = evidencePool.filter((asset) => !asset.id.startsWith('img_'));
+  const selectableEvidencePool = nonFallbackEvidencePool.length > 0 ? nonFallbackEvidencePool : evidencePool;
 
-  const evidenceAssets = deduped
-    .filter((asset) => asset.id !== heroAsset?.id)
+  const evidenceAssets = selectableEvidencePool
     .sort(
       (left, right) =>
         evidenceVisualScore(right, heroAsset) - evidenceVisualScore(left, heroAsset) || left.id.localeCompare(right.id)

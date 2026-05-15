@@ -7,7 +7,7 @@ Current state:
 - ALT-38 deployed API/web verification is complete; no Cloudflare, D1, DNS, workflow-secret, or production-config changes are in the current local slice.
 - The flagship loop is locally playable end-to-end: setup -> first briefing -> decision review -> committed choices -> immediate consequences -> mandate report -> setup return -> active-run/report reopen and local cleanup.
 - Setup is lighter and game-like, with the U.S. household crisis image promoted and admin-style chrome reduced.
-- Briefings are less card-heavy, cap truth reads to the strongest items, keep stronger photographic crisis evidence in the hero slot, carry Homefront pressure, and promote resolved-turn consequence images before generic beat previews.
+- Briefings are less card-heavy, cap truth reads to the strongest items, keep stronger photographic crisis evidence in the hero slot, quarantine generic `img_###` fallback art from support visuals when stronger evidence exists, carry Homefront pressure, and promote resolved-turn consequence images before generic beat previews.
 - Opening Homefront values are now tense without overstating day-one panic; later meter deterioration still escalates ordinary-life pressure.
 - Mobile decision entry now lands on the urgent call surface instead of the global header, with response cards visible in the first viewport.
 - The selected-response review strip owns the primary commit action and appears only after a move is selected, so decision mode no longer shows duplicate or premature commit controls.
@@ -21,7 +21,7 @@ Current state:
 
 Validation:
 - Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.
-- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, and 390px custom-response-through-report smoke.
+- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, no-fallback-art default smoke, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, and 390px custom-response-through-report smoke.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.

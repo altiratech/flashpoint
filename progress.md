@@ -2,6 +2,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Quarantined generic `img_###.svg` fallback art from live briefing support visuals whenever stronger evidence assets are available. The full-run browser smoke now fails if generic fallback art appears in the playable image log.
+- Verification after the fallback-art quarantine: `npm run lint`, targeted image/report tests, full `npm test`, `npm run diagnose:visual-targets`, `git diff --check`, `npm run build`, and default browser smoke with the no-fallback-art assertion all passed.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Closed a custom-response report-completeness gap. `Roads Not Taken` now prefers the player's custom response label over the base action name, and report-causality tests assert custom labels survive into branch summaries without raw debug strings.
 - Verification after the custom-report slice: `npm run lint`, `npm test -- tests/engine/report-causality.test.ts`, full `npm test`, `npm run validate:content`, `git diff --check`, `npm run build`, and 390px browser custom-response-through-report smoke all passed.
 - Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
