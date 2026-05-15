@@ -206,4 +206,51 @@ describe('post-game causality report', () => {
     expect(report.pivotalDecision.actionName).toContain(selectedAction.name);
     expect(report.pivotalDecision.actionName).toContain(selectedVariant.label);
   });
+
+  it('carries custom response labels into report branch summaries', () => {
+    if (!blackSwanScenario || !blackSwanAdversaryProfile) {
+      throw new Error('Black swan scenario/adversaryProfile unavailable');
+    }
+
+    let state = initializeGameState('report-custom-label', 'REPORT-CUSTOM-LABEL', {
+      scenario: blackSwanScenario,
+      adversaryProfile: blackSwanAdversaryProfile,
+      actions,
+      images
+    }, {
+      nowMs: 40_000
+    });
+
+    const selectedActionId = state.offeredActionIds.find((actionId) => actionId === 'backchannel_diplomacy') ?? state.offeredActionIds[0];
+    const selectedAction = actions.find((entry) => entry.id === selectedActionId);
+
+    if (!selectedAction) {
+      throw new Error('No selectable action available for custom label report test');
+    }
+
+    const customLabel = 'Quiet hotline through Tokyo';
+    const { nextState } = resolveTurn(state, selectedAction.id, {
+      scenario: blackSwanScenario,
+      adversaryProfile: blackSwanAdversaryProfile,
+      actions,
+      images
+    }, {
+      nowMs: 40_000,
+      playerActionCustomLabel: customLabel
+    });
+    state = nextState;
+    state.status = 'completed';
+    state.currentBeatId = 'ns_blockade_lock';
+    state.outcome = 'frozen_conflict';
+    state.offeredActionIds = [];
+    state.activeCountdown = null;
+
+    const report = buildPostGameReport(state, buildActionMap(actions), {
+      scenario: blackSwanScenario,
+      adversaryProfile: blackSwanAdversaryProfile
+    });
+
+    expect(report.pivotalDecision.actionName).toContain(customLabel);
+    expect(report.fullCausality.branchesNotTaken[0]?.selectedActionLabel).toBe(customLabel);
+  });
 });

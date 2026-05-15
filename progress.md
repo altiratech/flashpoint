@@ -2,6 +2,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Closed a custom-response report-completeness gap. `Roads Not Taken` now prefers the player's custom response label over the base action name, and report-causality tests assert custom labels survive into branch summaries without raw debug strings.
+- Verification after the custom-report slice: `npm run lint`, `npm test -- tests/engine/report-causality.test.ts`, full `npm test`, `npm run validate:content`, `git diff --check`, `npm run build`, and 390px browser custom-response-through-report smoke all passed.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Shipped a mobile decision/report readability slice. Decision-stage view reset now scrolls directly to the urgent call surface on mobile, the selected-response review strip no longer renders before a move is selected, briefing truth reads are capped to the strongest two items per category, exact audit-copy leftovers were replaced, and the final report's `Roads Not Taken` section now shows readable action/branch labels instead of raw IDs or gate syntax.
 - Verification after the decision/report slice: `npm run lint`, `npm test -- tests/engine/report-causality.test.ts`, full `npm test`, `npm run validate:content`, `git diff --check`, `npm run build`, default full browser smoke, 390px mobile decision-entry/review browser smoke, and rendered-report readability browser smoke all passed.
 - Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.

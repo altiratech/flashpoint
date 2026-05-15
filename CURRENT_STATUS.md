@@ -13,7 +13,7 @@ Current state:
 - The selected-response review strip owns the primary commit action and appears only after a move is selected, so decision mode no longer shows duplicate or premature commit controls.
 - Optional custom-response input now stays collapsed and quiet until opened, keeping the normal response-selection workflow dominant on desktop and mobile.
 - Action cards and selected-response consequence reads now use direct player-facing language; bare ambiguous commands like `sanctions` still route to review instead of accidental execution.
-- The final mandate report preserves selected variant/custom action labels, includes Homefront consequences, promotes a state-derived aftermath image, and renders roads-not-taken branches with readable labels instead of raw IDs/gate syntax.
+- The final mandate report preserves selected variant/custom action labels, including custom-response roads-not-taken labels, includes Homefront consequences, promotes a state-derived aftermath image, and uses readable branch labels instead of raw IDs/gate syntax.
 - Report labels, advisor readouts, and generated causality/detail lines use plainer English in the player-facing surfaces instead of policy-room shorthand.
 - Active-run recovery now resolves expired countdowns on resume instead of reopening stale decisions.
 - The setup `Continue Latest Run` panel now has a direct Remove action for the latest active run.
@@ -21,7 +21,7 @@ Current state:
 
 Validation:
 - Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.
-- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, and 390px custom-response open/review smoke.
+- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, and 390px custom-response-through-report smoke.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.

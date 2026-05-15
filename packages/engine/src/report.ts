@@ -427,7 +427,7 @@ const buildBranchNotTaken = (
         turn: entry.turn,
         beatId: entry.beatIdBefore,
         selectedActionId: entry.playerActionId,
-        selectedActionLabel: selectedAction?.name ?? entry.playerActionCustomLabel ?? null,
+        selectedActionLabel: entry.playerActionCustomLabel ?? selectedAction?.name ?? null,
         selectedBeatId: entry.beatIdAfter,
         selectedBeatLabel: beatDisplayLabel(beatMap.get(entry.beatIdAfter)),
         alternatives: alternatives.slice(0, 3)
