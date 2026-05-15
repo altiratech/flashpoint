@@ -10,7 +10,7 @@ Current state:
 - Briefings are less card-heavy, keep stronger photographic crisis evidence in the hero slot, and carry Homefront pressure through gas, groceries, retirement, and family-text signals.
 - Opening Homefront values are now tense without overstating day-one panic; later meter deterioration still escalates ordinary-life pressure.
 - The selected-response review strip owns the primary commit action so decision mode no longer shows duplicate commit controls.
-- The final mandate report preserves selected variant/custom action labels and includes Homefront consequences.
+- The final mandate report preserves selected variant/custom action labels, includes Homefront consequences, and now promotes a state-derived aftermath image from existing local raster assets.
 - Active-run recovery now resolves expired countdowns on resume instead of reopening stale decisions.
 - The setup `Continue Latest Run` panel now has a direct Remove action for the latest active run.
 - Browser smoke coverage includes default, varied, public-econ, desktop recovery/reopen/cleanup, and 390px mobile recovery/reopen/cleanup paths.
@@ -20,5 +20,5 @@ Validation:
 - Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, and 390px mobile recovery smoke via `PLAYTEST_OUTPUT_DIR=output/playwright-mobile PLAYTEST_VIEWPORT_WIDTH=390 PLAYTEST_VIEWPORT_HEIGHT=900 npm run smoke:browser:recovery`.
 
 Next:
-- Ryan decides whether to approve push/deploy for the latest local hardening commit.
-- Remaining non-blocking product work: decide whether selected-decision/final-report imagery should become a feature, and tune natural-offer image paths for the remaining diagnostic gaps (`tw_us_semiconductor_fab_disruption`, `tw_us_white_house_press_briefing`, `tw_us_market_crash_chip_crisis`).
+- Ryan decides whether to approve push/deploy for the latest local hardening commits.
+- Remaining non-blocking product work: selected-decision imagery is intentionally absent for v1 to keep the review/commit moment focused; tune natural-offer image paths for the remaining diagnostic gaps (`tw_us_semiconductor_fab_disruption`, `tw_us_white_house_press_briefing`, `tw_us_market_crash_chip_crisis`).

@@ -1,6 +1,7 @@
 import type {
   AdvisorDossier,
   CinematicsDefinition,
+  ImageAsset,
   MeterKey,
   MissionObjective,
   PostGameReport,
@@ -9,6 +10,7 @@ import type {
 } from '@wargames/shared-types';
 
 import { buildHomefrontSignals } from '../homefrontSignals';
+import { selectReportVisual } from '../reportVisuals';
 import { TimelineChart } from './TimelineChart';
 
 interface ReportViewProps {
@@ -16,6 +18,7 @@ interface ReportViewProps {
   scenario: ScenarioDefinition | null;
   advisorDossiers: AdvisorDossier[];
   cinematics: CinematicsDefinition | null;
+  images: ImageAsset[];
   onRestart: () => void;
 }
 
@@ -159,7 +162,7 @@ const deriveMandateHeadline = (
   };
 };
 
-export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRestart }: ReportViewProps) => {
+export const ReportView = ({ report, scenario, advisorDossiers, cinematics, images, onRestart }: ReportViewProps) => {
   const advisorNameById = new Map(advisorDossiers.map((entry) => [entry.id, entry.name]));
   const deepDebrief = report.fullCausality.deepDebrief;
   const endingCinematic = (
@@ -181,6 +184,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
     : homefrontWarningCount > 1
       ? 'The country avoided the worst shock, but families still felt the crisis in bills, phones, and retirement accounts.'
       : 'The public felt the scare, but daily life did not fully break during this run.';
+  const reportVisual = selectReportVisual({ report, scenario, images });
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4 lg:px-6">
@@ -196,10 +200,36 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
             Return To Scenario Setup
           </button>
         </div>
-        <p className="mt-3 text-sm leading-relaxed text-textMain">{mandateHeadline.summary}</p>
-        <p className="mt-2 text-sm leading-relaxed text-textMuted">{report.fullCausality.outcomeNarrative.summary}</p>
-        <p className="mt-2 text-sm leading-relaxed text-textMuted">{report.fullCausality.outcomeNarrative.causalNote}</p>
-        <p className="mt-3 text-xs text-textMuted">Baseline outcome model: {report.outcomeExplanation}</p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.88fr)_minmax(22rem,1fr)] lg:items-stretch">
+          <div>
+            <p className="text-sm leading-relaxed text-textMain">{mandateHeadline.summary}</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMuted">{report.fullCausality.outcomeNarrative.summary}</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMuted">{report.fullCausality.outcomeNarrative.causalNote}</p>
+            <p className="mt-3 text-xs text-textMuted">Baseline outcome model: {report.outcomeExplanation}</p>
+          </div>
+          {reportVisual ? (
+            <figure className="overflow-hidden rounded-md border border-accent/45 bg-black/40">
+              <div className="relative min-h-[15rem]">
+                <img
+                  src={reportVisual.path}
+                  alt={reportVisual.alt}
+                  className="h-full min-h-[15rem] w-full object-cover"
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/88 via-black/58 to-transparent p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="label text-accent">Aftermath Image</p>
+                    <p className="rounded-sm border border-borderTone/80 bg-black/45 px-2 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
+                      {reportVisual.domain}
+                    </p>
+                  </div>
+                  <figcaption className="mt-2 text-sm leading-relaxed text-textMain">
+                    {reportVisual.caption}
+                  </figcaption>
+                </div>
+              </div>
+            </figure>
+          ) : null}
+        </div>
       </section>
 
       <section className="card p-5">

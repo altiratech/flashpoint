@@ -1,5 +1,11 @@
 Original prompt: Ok please start working through each Linear task. Keep going until you are finished
 
+## 2026-05-15
+
+- Added state-derived aftermath imagery to the final mandate report using existing local raster assets, with selector logic that avoids maps, artifacts, SVGs, and generated placeholder IDs.
+- Added report visual regression coverage for catastrophic and stabilization endings so the report image is selected from coherent crisis/homefront evidence instead of promoted generic visuals.
+- Verified the slice with content/image diagnostics, balance simulation, lint, full tests, token regression, build, default/varied/public-econ browser smokes, and desktop plus 390px recovery/report screenshot review. Selected-decision imagery remains intentionally absent for v1 so the commit moment stays focused.
+
 ## 2026-05-01
 
 - Starting with the Linear critical path instead of broad visual work: `ALT-27`, `ALT-40`, `ALT-43`, then report/playthrough blockers.

@@ -1632,6 +1632,7 @@ const App = () => {
         scenario={currentScenario}
         advisorDossiers={reference.advisorDossiers}
         cinematics={currentCinematics}
+        images={reference.images}
         onRestart={reset}
       />
     );
