@@ -12,6 +12,8 @@ import type {
   ImageAsset,
   MeterKey,
   MeterState,
+  NarrativeCandidatesPack,
+  PressureTextCandidate,
   ScenarioContextSection,
   PostGameReport
 } from '@wargames/shared-types';
@@ -44,6 +46,56 @@ const runHistoryStorageKey = 'flashpoint.runHistory.v1';
 const maxActiveRuns = 3;
 const maxRecentCompletedReports = 5;
 const maxRunHistoryEvents = 6;
+const narrativeBeatAliases: Record<string, string[]> = {
+  ns_opening_signal: ['ns_abnormal_signal'],
+  ns_strait_pressure: ['ns_deceptive_picture', 'ns_reversible_coercion'],
+  ns_trade_friction: ['ns_bandwidth_stockpiles'],
+  ns_crisis_window: ['ns_first_irreversible_incident', 'ns_false_relief_or_trap'],
+  ns_backchannel_opening: ['ns_false_relief_or_trap'],
+  ns_market_spiral: ['ns_tail_risk_visibility'],
+  ns_carrier_faceoff: ['ns_final_resolution_window'],
+  ns_missile_warning: ['ns_final_resolution_window'],
+  ns_info_war: ['ns_deceptive_picture'],
+  ns_alliance_split: ['ns_tail_risk_visibility'],
+  ns_covert_shadow: ['ns_reversible_coercion'],
+  ns_ceasefire_channel: ['ns_managed_relief'],
+  ns_urban_unrest: ['ns_blockade_lock']
+};
+
+const expandNarrativeBeatIds = (beatId: string): string[] => {
+  const expanded = new Set<string>([beatId, ...(narrativeBeatAliases[beatId] ?? [])]);
+
+  for (const [sourceBeatId, aliases] of Object.entries(narrativeBeatAliases)) {
+    if (aliases.includes(beatId)) {
+      expanded.add(sourceBeatId);
+    }
+  }
+
+  return [...expanded];
+};
+
+const pickPressureText = (entries: PressureTextCandidate[], secondsRemaining: number): string | null => {
+  const sorted = [...entries].sort((left, right) => left.thresholdSeconds - right.thresholdSeconds);
+  const selected = sorted.find((entry) => secondsRemaining <= entry.thresholdSeconds) ?? sorted.at(-1);
+
+  return selected?.text ?? null;
+};
+
+const getPressureTextForBeat = (
+  narrativeCandidates: NarrativeCandidatesPack,
+  beatId: string,
+  secondsRemaining: number
+): string | null => {
+  const category = narrativeCandidates.categories.find((entry) => entry.category === 'pressure_text');
+  if (!category) {
+    return null;
+  }
+
+  const beatIds = new Set(expandNarrativeBeatIds(beatId));
+  const beatEntries = category.entries.filter((entry) => beatIds.has(entry.beatId));
+  const genericEntries = category.entries.filter((entry) => entry.beatId === '_generic');
+  return pickPressureText(beatEntries, secondsRemaining) ?? pickPressureText(genericEntries, secondsRemaining);
+};
 
 const isActiveRunRecovery = (value: unknown): value is ActiveRunRecovery => {
   if (!value || typeof value !== 'object') {
@@ -1676,6 +1728,10 @@ const App = () => {
   const timerRemainingSeconds = activeCountdown
     ? Math.max(0, Math.ceil((activeCountdown.expiresAt - nowMs) / 1000))
     : null;
+  const timerPressureText =
+    activeCountdown && timerRemainingSeconds !== null
+      ? getPressureTextForBeat(reference.narrativeCandidates, episode.currentBeatId, timerRemainingSeconds)
+      : null;
   const timerModeLabel =
     episode.timerMode === 'off'
       ? 'User-paced'
@@ -1943,6 +1999,11 @@ const App = () => {
                   </span>
                 </div>
                 <p className="mt-2 text-[0.84rem] leading-relaxed text-textMain">{summaryLead}</p>
+                {timerPressureText ? (
+                  <p className={`mt-2 text-[0.84rem] leading-relaxed ${timerRemainingSeconds !== null && timerRemainingSeconds <= 30 ? 'text-warning' : 'text-accent'}`}>
+                    {timerPressureText}
+                  </p>
+                ) : null}
               </div>
               <div className="flex shrink-0 items-start">
                 <button
@@ -2012,6 +2073,9 @@ const App = () => {
                         ? `${timerModeLabel}: ${timerRemainingSeconds} seconds remain before this window resolves as inaction.`
                         : `${timerModeLabel}: no automatic timeout is active for this window.`}
                     </p>
+                    {timerPressureText ? (
+                      <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{timerPressureText}</p>
+                    ) : null}
                   </div>
                   {activeCountdown ? (
                     <button

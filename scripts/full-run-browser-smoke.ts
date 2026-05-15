@@ -170,6 +170,8 @@ const verifyTimedBriefingClock = async (page: Page): Promise<string | null> => {
     throw new Error(`Timed mode did not show a running briefing clock. Saw: ${clockText}`);
   }
 
+  await page.getByText(/watch floors, insurers, and allied capitals/i).first().waitFor({ state: 'visible', timeout: 5_000 });
+
   return clockText;
 };
 
@@ -184,6 +186,9 @@ const verifyTimedDecisionClock = async (page: Page, windowIndex: number): Promis
   const clockText = (await clockPanel.innerText()).replace(/\s+/g, ' ').trim();
   if (!/\d+ seconds remain before this window resolves as inaction/i.test(clockText)) {
     throw new Error(`Timed mode decision clock copy was not visible. Saw: ${clockText}`);
+  }
+  if (!/watch floors, insurers, and allied capitals|shipping desks are already guessing/i.test(clockText)) {
+    throw new Error(`Timed mode pressure copy was not visible in the decision clock. Saw: ${clockText}`);
   }
 
   if (windowIndex === 1) {

@@ -318,7 +318,7 @@ export const scenarios = (scenariosData as ScenarioDefinition[]).map((scenario) 
 
 const pickThresholdText = (entries: PressureTextCandidate[], secondsRemaining: number): string | null => {
   const sorted = [...entries].sort((left, right) => left.thresholdSeconds - right.thresholdSeconds);
-  const selected = sorted.find((entry) => secondsRemaining <= entry.thresholdSeconds);
+  const selected = sorted.find((entry) => secondsRemaining <= entry.thresholdSeconds) ?? sorted.at(-1);
   return selected?.text ?? null;
 };
 

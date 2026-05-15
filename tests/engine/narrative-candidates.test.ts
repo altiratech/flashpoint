@@ -6,11 +6,16 @@ describe('narrative candidate helpers', () => {
   it('selects beat-specific pressure text by threshold and falls back to generic', () => {
     const crisisLine = getPressureText('ns_crisis_window', 14);
     const activeCrisisLine = getPressureText('ns_first_irreversible_incident', 14);
+    const activeOpeningLine = getPressureText('ns_abnormal_signal', 90);
+    const extendedOpeningLine = getPressureText('ns_abnormal_signal', 105);
     const fallbackLine = getPressureText('unknown_future_beat', 9);
 
     expect(crisisLine).toBeTruthy();
     expect(crisisLine?.toLowerCase()).toContain('fifteen seconds');
     expect(activeCrisisLine).toBe(crisisLine);
+    expect(activeOpeningLine).toBeTruthy();
+    expect(activeOpeningLine?.toLowerCase()).toContain('watch floors');
+    expect(extendedOpeningLine).toBe(activeOpeningLine);
     expect(fallbackLine).toBeTruthy();
     expect(fallbackLine?.toLowerCase()).toContain('ten seconds');
   });

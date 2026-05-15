@@ -173,6 +173,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Added beat-specific timed pressure copy to the flagship opening. Standard timed mode now shows authored urgency text in the briefing and selected-decision clock, including after the first clock extension, so the countdown feels like pressure instead of a passive timer.
+- Hardened the pressure-text contract in shared content selection and browser smoke coverage. Verification after this slice: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`, `npm run smoke:browser:timed`, 390px timed smoke, and default `npm run smoke:browser`.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Shipped a timed-pressure playable-v1 slice. The flagship scenario now opens Standard timed mode with an authored 90-second countdown and an inaction branch into the deceptive-picture beat, the first decision clock is verified as visible and extendable, and browser timeout resolution now applies across briefing and decision views rather than only after entering the decision pane.
 - Hardened the browser smoke harness with `PLAYTEST_TIMER_MODE`, timer summaries, and `npm run smoke:browser:timed`; desktop and 390px timed smokes now prove the opening clock, first decision extension, normal decision loop, final report, image log, and absence of console/page errors.
 - Verification after the timed-pressure slice: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`, default/varied/public-econ/timed browser smokes, 390px timed smoke, and recovery browser smoke all passed.

@@ -168,6 +168,10 @@
     {
       "name": "pressure_text",
       "candidates": [
+        { "id": "v2_pt_abnormal_90", "beatId": "ns_abnormal_signal", "thresholdSeconds": 90, "text": "Watch floors, insurers, and allied capitals are waiting to see whether Washington treats the dirty screen as noise or warning." },
+        { "id": "v2_pt_abnormal_45", "beatId": "ns_abnormal_signal", "thresholdSeconds": 45, "text": "Shipping desks are already guessing. The first public story is forming without you." },
+        { "id": "v2_pt_abnormal_15", "beatId": "ns_abnormal_signal", "thresholdSeconds": 15, "text": "Silence is becoming the signal. Someone else will decide what the anomaly means." },
+
         { "id": "v2_pt_crisis_90", "beatId": "ns_crisis_window", "thresholdSeconds": 90, "text": "The crisis window is open. Every second without direction allows the rival to consolidate." },
         { "id": "v2_pt_crisis_75", "beatId": "ns_crisis_window", "thresholdSeconds": 75, "text": "Seventy-five seconds. Forward commands are requesting confirmation." },
         { "id": "v2_pt_crisis_60", "beatId": "ns_crisis_window", "thresholdSeconds": 60, "text": "One minute remains. The operational window is narrowing." },
