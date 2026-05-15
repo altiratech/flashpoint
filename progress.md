@@ -2,6 +2,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Reduced decision-surface clutter by keeping the optional custom-response input collapsed and quiet until opened. The closed state no longer shows a default system log or explanatory paragraph, while the opened state still accepts typed commands and shows review-suggestion buttons for ambiguous input.
+- Verification after the custom-response cleanup: `npm run lint`, `npm test -- tests/api/interpret-command.test.ts`, full `npm test`, `git diff --check`, `npm run build`, 390px mobile recovery smoke, and 390px browser custom-response open/review smoke all passed.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Rewrote player action and variant summaries in `actions.json` so decision cards say what the player is actually doing in plain English. The selected-response detail panel now uses concise action-specific reads for Beijing, allies/markets, upside, and risk instead of the longer policy-room narrative preview.
 - Fixed a command-interpretation regression exposed by the copy pass: a bare ambiguous keyword such as `sanctions` now returns review suggestions instead of executing `Broad Sanctions`.
 - Verification after the action-copy slice: `npm run validate:content`, `npm run lint`, targeted and full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`, default browser smoke, varied browser smoke, 390px mobile recovery smoke, and desktop/mobile selected-decision screenshot review all passed.

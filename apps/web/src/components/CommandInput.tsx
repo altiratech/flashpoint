@@ -56,14 +56,14 @@ export const CommandInput = ({ turn, disabled, onSubmitCommand, onSelectAction }
     }
     lastTurnRef.current = turn;
     setPendingSuggestions([]);
-    appendLine('system', `Decision window ${turn}: custom response channel ready.`);
+    setLines([]);
   }, [turn]);
 
   useEffect(() => {
-    if (pendingSuggestions.length > 0 || lines.length > 1) {
+    if (pendingSuggestions.length > 0) {
       setIsOpen(true);
     }
-  }, [lines.length, pendingSuggestions.length]);
+  }, [pendingSuggestions.length]);
 
   const submit = async (): Promise<void> => {
     const commandText = draft.trim();
@@ -113,12 +113,12 @@ export const CommandInput = ({ turn, disabled, onSubmitCommand, onSelectAction }
   };
 
   return (
-    <section className="console-subpanel px-3 py-3 sm:px-4">
+    <section className="console-subpanel px-3 py-2.5 sm:px-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="label">Custom Response (Advanced)</p>
-          <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
-            Optional advanced input. Use this only if you want custom phrasing or help matching your intent to an available response.
+          <p className="label">Custom Response</p>
+          <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
+            Optional. The main path is still picking one of the moves above.
           </p>
         </div>
         <button
@@ -130,7 +130,7 @@ export const CommandInput = ({ turn, disabled, onSubmitCommand, onSelectAction }
         </button>
       </div>
 
-      {lines.length > 0 ? (
+      {isOpen && lines.length > 0 ? (
         <div className={`console-scroll mt-2 max-h-24 space-y-1 overflow-y-auto rounded-md border border-borderTone/70 bg-panelRaised/45 p-2 text-[0.68rem] ${isOpen ? '' : 'opacity-80'}`}>
           {lines.map((line) => (
             <p key={line.id} className={line.role === 'player' ? 'text-textMain' : 'text-textMuted'}>
@@ -139,12 +139,6 @@ export const CommandInput = ({ turn, disabled, onSubmitCommand, onSelectAction }
             </p>
           ))}
         </div>
-      ) : null}
-
-      {!isOpen && pendingSuggestions.length === 0 ? (
-        <p className="mt-2 text-[0.88rem] text-textMuted">
-          The main workflow is response-based. Open this field only if you want help translating a custom instruction into a suggested response.
-        </p>
       ) : null}
 
       {isOpen && pendingSuggestions.length > 0 ? (
@@ -197,8 +191,8 @@ export const CommandInput = ({ turn, disabled, onSubmitCommand, onSelectAction }
         </button>
       </div>
 
-      <p className="mt-2 text-[0.88rem] text-textMuted">
-        Typed instructions are translated into a suggested response and, when relevant, a more specific response variant. Review the selected response on this page before committing the decision window.
+      <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
+        Type only if none of the listed moves matches what you mean. The result still has to be reviewed before commit.
       </p>
         </>
       ) : null}

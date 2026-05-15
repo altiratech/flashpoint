@@ -10,6 +10,7 @@ Current state:
 - Briefings are less card-heavy, keep stronger photographic crisis evidence in the hero slot, carry Homefront pressure through gas/groceries/retirement/family-text signals, and now promote the resolved turn's consequence images before generic beat previews.
 - Opening Homefront values are now tense without overstating day-one panic; later meter deterioration still escalates ordinary-life pressure.
 - The selected-response review strip owns the primary commit action so decision mode no longer shows duplicate commit controls.
+- Optional custom-response input now stays collapsed and quiet until opened, keeping the normal response-selection workflow dominant on desktop and mobile.
 - Action cards and selected-response consequence reads now use direct player-facing language; bare ambiguous commands like `sanctions` still route to review instead of accidental execution.
 - The final mandate report preserves selected variant/custom action labels, includes Homefront consequences, and now promotes a state-derived aftermath image from existing local raster assets.
 - Report labels, advisor readouts, and generated causality/detail lines use plainer English in the player-facing surfaces instead of policy-room shorthand.
@@ -19,7 +20,7 @@ Current state:
 
 Validation:
 - Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.
-- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, and 390px mobile recovery smoke.
+- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, 390px mobile recovery smoke, and a 390px custom-response open/review smoke.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
