@@ -390,6 +390,7 @@ const arrangeBriefingVisuals = (
   const primaryIsStrongScene =
     primaryAsset &&
     !primaryAsset.id.startsWith('img_') &&
+    isPhotorealAsset(primaryAsset) &&
     primaryAsset.kind !== 'map' &&
     primaryAsset.kind !== 'artifact';
 

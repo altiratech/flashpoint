@@ -65,13 +65,12 @@ interface StartScreenProps {
 
 const randomSeed = (): string => Math.random().toString(36).slice(2, 10).toUpperCase();
 
-const environmentLabel: Record<string, string> = {
-  coastal: 'Maritime region',
-  arctic: 'Arctic region',
-  dense_city: 'Urban region',
-  industrial: 'Industrial region',
-  generic: 'Global setting'
-};
+const setupEvidenceImageIds = [
+  'tw_us_family_cable_news_crisis',
+  'tw_us_gas_lines_freight_shock',
+  'tw_us_supermarket_panic',
+  'tw_bs_023'
+];
 
 const outcomeLabel: Record<OutcomeCategory, string> = {
   stabilization: 'Stabilized',
@@ -236,51 +235,6 @@ export const StartScreen = ({
     [activeRunLookup, recentReportLookup, reference.scenarios, runHistory]
   );
 
-  const runProfile = useMemo(
-    () => [
-      {
-        label: 'Scenario',
-        value: selectedScenario?.name ?? 'No scenario selected'
-      },
-      {
-        label: 'Role',
-        value: selectedScenario?.role ?? 'N/A'
-      },
-      {
-        label: 'Region',
-        value:
-          selectedScenarioWorld?.region.name ??
-          (selectedScenario?.environment
-            ? environmentLabel[selectedScenario.environment] ?? 'Global theater'
-            : 'N/A')
-      },
-      {
-        label: 'Windows',
-        value: `${selectedScenario?.maxTurns ?? 0} staged briefing windows`
-      },
-      {
-        label: 'Date Anchor',
-        value: selectedScenarioWorld
-          ? `${selectedScenarioWorld.dateAnchor.month} ${selectedScenarioWorld.dateAnchor.year}`
-          : 'Current scenario timing'
-      }
-    ],
-    [selectedScenario, selectedScenarioWorld]
-  );
-
-  const systemNotes = useMemo(
-    () => [
-      timerMode === 'off'
-        ? 'This run is user-paced. Windows advance only when you commit a response or deliberately hold position.'
-        : 'Timed mode is active. Decision windows can expire into an inaction branch if you do not commit or hold in time.',
-      timerMode === 'relaxed'
-        ? 'Relaxed timing gives each decision window 50% more time and keeps one extension available per beat while episode extensions remain.'
-        : 'Standard timing uses the authored clock for each decision window; user-paced mode keeps the clock off.',
-      'Markets, shipping behavior, and alliance interpretation can move long before anyone uses the language of open war.'
-    ],
-    [timerMode]
-  );
-
   const setupContextCards = useMemo(() => {
     const sections = selectedScenarioWorld?.openingBackground?.sections ?? [];
     if (sections.length > 0) {
@@ -305,6 +259,11 @@ export const StartScreen = ({
       }
     ];
   }, [selectedScenarioWorld]);
+
+  const setupEvidenceAsset = useMemo(
+    () => setupEvidenceImageIds.map((id) => reference.images.find((image) => image.id === id)).find(Boolean) ?? null,
+    [reference.images]
+  );
 
   const theaterStamp = selectedScenarioWorld
     ? `${selectedScenarioWorld.region.name} / ${selectedScenarioWorld.dateAnchor.month} ${selectedScenarioWorld.dateAnchor.year} / ${selectedScenarioWorld.dateAnchor.dayRange}`
@@ -332,7 +291,7 @@ export const StartScreen = ({
 
   return (
     <main className="console-shell">
-      <section className="grid min-h-[calc(100vh-1.5rem)] gap-4 xl:grid-cols-[240px_minmax(0,1fr)]">
+      <section className="grid min-h-[calc(100vh-1.5rem)] min-w-0 gap-4 xl:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="console-sidebar flex flex-col">
           <div className="console-sidebar-brand">Altira Flashpoint</div>
 
@@ -388,8 +347,8 @@ export const StartScreen = ({
             </p>
           </header>
 
-          <section className="grid gap-4 2xl:grid-cols-[1.08fr_0.92fr]">
-            <section className="console-panel p-5 sm:p-6">
+          <section className="grid min-w-0 gap-4 2xl:grid-cols-[1.08fr_0.92fr]">
+            <section className="console-panel min-w-0 p-5 sm:p-6">
               <p className="label">Scenario Brief</p>
               <div className="mt-3 console-subpanel px-4 py-4">
                 <div className="flex flex-wrap items-center gap-2">
@@ -453,6 +412,23 @@ export const StartScreen = ({
                 </div>
 
                 <div className="space-y-3">
+                  {setupEvidenceAsset ? (
+                    <figure className="console-subpanel overflow-hidden p-0">
+                      <div className="relative aspect-[16/9] min-h-[190px] overflow-hidden">
+                        <img
+                          src={setupEvidenceAsset.path}
+                          alt={setupEvidenceAsset.alt}
+                          className="h-full w-full object-cover"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent p-3">
+                          <p className="label text-accent">First Public Read</p>
+                          <p className="mt-2 text-[0.84rem] leading-relaxed text-textMain">
+                            {setupEvidenceAsset.caption}
+                          </p>
+                        </div>
+                      </div>
+                    </figure>
+                  ) : null}
                   {setupContextCards.map((card) => (
                     <div key={card.id} className="console-subpanel px-3 py-3">
                       <p className="label">{card.title}</p>
@@ -480,7 +456,7 @@ export const StartScreen = ({
               </div>
             </section>
 
-            <div className="space-y-4">
+            <div className="min-w-0 space-y-4">
               {latestActiveRun ? (
                 <section className="console-panel border-accent/70 bg-accent/8 p-5">
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
@@ -579,12 +555,12 @@ export const StartScreen = ({
                 </section>
               ) : null}
 
-              {activeRunCards.length > 0 ? (
+              {activeRunCards.length > 1 ? (
                 <section className="console-panel p-5">
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="label">Active Runs</p>
+                    <p className="label">Other Active Runs</p>
                     <div className="flex flex-wrap items-center gap-2">
-                      {activeRunCards.length > 1 ? (
+                      {activeRunCards.length > 2 ? (
                         <button
                           type="button"
                           className="console-button px-3 py-1.5 text-[0.68rem]"
@@ -595,13 +571,13 @@ export const StartScreen = ({
                         </button>
                       ) : null}
                       <span className="console-chip">
-                        <strong>{activeRunCards.length}</strong>
+                        <strong>{activeRunCards.length - 1}</strong>
                         <span>Recoverable</span>
                       </span>
                     </div>
                   </div>
                   <div className="mt-3 space-y-2">
-                    {activeRunCards.map((run) => (
+                    {activeRunCards.slice(1).map((run) => (
                       <article
                         key={run.episodeId}
                         className="console-subpanel px-3 py-3 transition hover:border-accent/70 hover:bg-accent/8"
@@ -717,20 +693,8 @@ export const StartScreen = ({
               ) : null}
 
               <section className="console-panel p-5">
-                <p className="label">Run Profile</p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {runProfile.map((item) => (
-                    <div key={item.label} className="console-subpanel px-3 py-2.5">
-                      <p className="text-[0.68rem] uppercase tracking-[0.16em] text-textMuted">{item.label}</p>
-                      <p className="mt-2 text-[0.84rem] uppercase tracking-[0.06em] text-textMain">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="console-panel p-5">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="label">Advanced Options</p>
+                  <p className="label">Replay Settings</p>
                   <button
                     type="button"
                     className="console-button console-button-ghost"
@@ -764,17 +728,6 @@ export const StartScreen = ({
                     </label>
                   </div>
                 ) : null}
-              </section>
-
-              <section className="console-panel p-5">
-                <p className="label">Operator Notes</p>
-                <div className="mt-3 space-y-2">
-                  {systemNotes.map((note) => (
-                    <div key={note} className="console-subpanel px-3 py-2.5 text-[0.84rem] leading-relaxed text-textMuted">
-                      {note}
-                    </div>
-                  ))}
-                </div>
               </section>
             </div>
           </section>

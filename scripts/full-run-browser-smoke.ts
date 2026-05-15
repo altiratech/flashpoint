@@ -31,6 +31,14 @@ const clickByRole = async (page: Page, name: RegExp, timeout = 10_000): Promise<
   }
 };
 
+const waitForBriefing = async (page: Page, timeout = 20_000): Promise<void> => {
+  await page.getByText(/The Situation|Situation Summary/i).first().waitFor({ timeout });
+};
+
+const waitForDecisionView = async (page: Page, timeout = 10_000): Promise<void> => {
+  await page.getByText(/What Do You Do\?|Response Options|Available Moves/i).first().waitFor({ timeout });
+};
+
 interface ResponsePreference {
   name: RegExp;
   variantName?: RegExp;
@@ -75,10 +83,19 @@ const publicEconomicResponsePreferences: ResponsePreference[] = [
   { name: /Military Posture Decrease/i, variantName: /Public Decompression/i }
 ];
 
-const publicEconomicRequiredImages = [
-  '/assets/images/tw_us_white_house_press_briefing.png',
-  '/assets/images/tw_us_market_crash_chip_crisis.png',
-  '/assets/images/tw_us_semiconductor_fab_disruption.png'
+const publicEconomicCoverageRequirements = [
+  {
+    label: 'public-facing U.S. crisis scene',
+    pattern: /\/assets\/images\/tw_us_(family_cable_news_crisis|white_house_press_briefing|congress_chip_hearing)\.png/
+  },
+  {
+    label: 'economic or household shock scene',
+    pattern: /\/assets\/images\/tw_us_(electronics_store_shortage|gas_lines_freight_shock|market_crash_chip_crisis|semiconductor_fab_disruption)\.png/
+  },
+  {
+    label: 'hard-risk U.S. command or force signal',
+    pattern: /\/assets\/images\/tw_us_(nuclear_risk_command|deployment_pier_families|thermal_boarding_heat)\.png/
+  }
 ];
 
 const preferencesForWindow = (windowIndex: number): ResponsePreference[] => {
@@ -118,7 +135,7 @@ const configureDeterministicSeed = async (page: Page): Promise<void> => {
 };
 
 const chooseFirstAvailableResponse = async (page: Page, windowIndex: number): Promise<string> => {
-  const responsePanel = page.locator('section.console-subpanel', { hasText: /Response Options/i }).first();
+  const responsePanel = page.locator('section', { hasText: /What Do You Do\?|Response Options|Available Moves/i }).first();
   await responsePanel.waitFor({ state: 'visible', timeout: 10_000 });
 
   let responseButton = responsePanel.getByRole('button').filter({ hasText: /\bOpen\b/i }).first();
@@ -136,7 +153,7 @@ const chooseFirstAvailableResponse = async (page: Page, windowIndex: number): Pr
 
   const label = (await responseButton.innerText()).split('\n')[0]?.trim() ?? 'unknown-response';
   await responseButton.click();
-  await page.getByText(/Selected Response/i).last().waitFor({ state: 'visible', timeout: 5_000 });
+  await page.getByText(/Review Before Commit|Selected Response|Your Move/i).last().waitFor({ state: 'visible', timeout: 5_000 });
 
   if (selectedPreference?.variantName) {
     const variantButton = responsePanel.getByRole('button', { name: selectedPreference.variantName }).last();
@@ -145,13 +162,13 @@ const chooseFirstAvailableResponse = async (page: Page, windowIndex: number): Pr
     }
   }
 
-  await page.getByRole('button', { name: /Commit Selected Response/i }).waitFor({ state: 'visible', timeout: 5_000 });
+  await page.getByRole('button', { name: /Commit Your Move|Commit Selected Response/i }).first().waitFor({ state: 'visible', timeout: 5_000 });
   const selectedLine = await responsePanel
-    .getByText(/Response envelope:/i)
+    .getByText(/How hard to push:|Response envelope:/i)
     .last()
     .innerText()
     .catch(() => '');
-  return selectedLine ? `${label} · ${selectedLine.replace(/^Response envelope:\s*/i, '').trim()}` : label;
+  return selectedLine ? `${label} · ${selectedLine.replace(/^(How hard to push|Response envelope):\s*/i, '').trim()}` : label;
 };
 
 const readVisibleImages = async (page: Page): Promise<VisibleImageRead[]> => {
@@ -243,7 +260,7 @@ const writeSmokeSummary = async (input: {
 const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
   const deadline = Date.now() + 30_000;
   const reportHeading = page.getByText(/Mandate Assessment/i).first();
-  const nextDecisionButton = page.getByRole('button', { name: /Proceed To Decision|Return To Selected Response/i }).first();
+  const nextDecisionButton = page.getByRole('button', { name: /Make Your Call|Proceed To Decision|Return To Selected Response/i }).first();
 
   while (Date.now() < deadline) {
     const reachedReport = await reportHeading.isVisible().catch(() => false);
@@ -295,7 +312,7 @@ const run = async (): Promise<void> => {
       throw new Error('Could not find the Begin Scenario button.');
     }
 
-    await page.getByText(/Situation Summary/i).first().waitFor({ timeout: 20_000 });
+    await waitForBriefing(page, 20_000);
     imageLog.push(
       `01-first-briefing: ${(await captureStep(page, '01-first-briefing')).map((entry) => entry.src).join(', ') || 'no images'}`
     );
@@ -305,11 +322,11 @@ const run = async (): Promise<void> => {
         break;
       }
 
-      if (!(await clickByRole(page, /Proceed To Decision|Return To Selected Response/i))) {
+      if (!(await clickByRole(page, /Make Your Call|Proceed To Decision|Return To Selected Response/i))) {
         throw new Error(`Could not enter decision mode for window ${index}.`);
       }
 
-      await page.getByText(/Response Options/i).first().waitFor({ timeout: 10_000 });
+      await waitForDecisionView(page, 10_000);
       const responseLabel = await chooseFirstAvailableResponse(page, index);
       decisionLog.push(`${index}: ${responseLabel}`);
       imageLog.push(
@@ -320,7 +337,7 @@ const run = async (): Promise<void> => {
         }`
       );
 
-      if (!(await clickByRole(page, /Commit Selected Response/i))) {
+      if (!(await clickByRole(page, /Commit Your Move|Commit Selected Response/i))) {
         throw new Error(`Could not commit selected response for window ${index}.`);
       }
 
@@ -332,7 +349,7 @@ const run = async (): Promise<void> => {
         break;
       }
 
-      await page.getByText(/Situation Summary/i).first().waitFor({ timeout: 15_000 });
+      await waitForBriefing(page, 15_000);
       imageLog.push(
         `${String(index + 1).padStart(2, '0')}-briefing: ${
           (await captureStep(page, `${String(index + 1).padStart(2, '0')}-briefing`))
@@ -362,11 +379,22 @@ const run = async (): Promise<void> => {
     }
 
     if (responseStrategy === 'public-econ') {
-      const visibleImages = new Set(imageLog.flatMap((entry) => entry.match(usFocusedImagePattern) ?? []));
-      const missingImages = publicEconomicRequiredImages.filter((image) => !visibleImages.has(image));
+      const visibleImages = imageLog.flatMap((entry) => entry.match(usFocusedImagePattern) ?? []);
+      const uniqueVisibleImages = new Set(visibleImages);
+      const missingRequirements = publicEconomicCoverageRequirements.filter((requirement) =>
+        visibleImages.every((image) => !requirement.pattern.test(image))
+      );
 
-      if (missingImages.length > 0) {
-        throw new Error(`Public/economic smoke missed required image(s): ${missingImages.join(', ')}`);
+      if (uniqueVisibleImages.size < 3) {
+        throw new Error(`Public/economic smoke only surfaced ${uniqueVisibleImages.size} US-focused image(s).`);
+      }
+
+      if (missingRequirements.length > 0) {
+        throw new Error(
+          `Public/economic smoke missed required coverage: ${missingRequirements
+            .map((requirement) => requirement.label)
+            .join(', ')}`
+        );
       }
     }
 

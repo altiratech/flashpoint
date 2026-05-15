@@ -3,27 +3,19 @@
 Product: Flashpoint / ESCALATION scenario and response simulation.
 
 Current state:
-- `main` is pushed to `origin/main`; latest pushed app/runtime commits include `eb922f0` (setup clock chrome sync), `3ed708c` (live scenario return-to-setup), and `462933c` (primary continue latest run).
-- Linear `ALT-38` is implemented through deployed API/web verification: D1-backed rate limits, ordered remote D1 migrations, retry/idempotency tests, bootstrap ETag caching, Pages + Worker smoke coverage, production 429 proof, and bounded expired-bucket retention.
-- Deployed Pages bakes `VITE_API_BASE_URL=https://escalation-api.rjameson.workers.dev`; `scripts/verify-deploy.sh` fails if the deployed JS bundle does not reference the expected Worker API origin.
-- Reports open with a `Run Snapshot`; completed reports, active runs, and recent setup activity are indexed locally so users can resume, reopen, remove stale entries, jump from activity rows, and understand recent run state after reload.
-- Setup promotes the latest active run, reflects selected clock mode, and live scenarios can return to setup/recovery shelves without a page reload.
-- New local slice: setup/live/report and turn-stage transitions now reset window scroll to the top and move keyboard focus to the active `<main>` surface, including initial setup after bootstrap.
-- Recent UX slices: gameplay text has a 0.68rem rendered floor, policy-terminal labels use plainer player language, and the decision screen keeps selected-move review/commit controls visible while players inspect response cards.
-- New local gameplay slice: the first live briefing now removes the duplicate Executive Summary card row, opens with the authored crisis image as a visual anchor, and adds a compact Homefront strip for gas, groceries, 401k, and family-text pressure.
-- `docs/UX_MULTIAGENT_REVIEW_2026-05-12.md` captures the multi-agent UX/product review: fix now, prototype next, save for later, do not do, agent assignments, and review criteria.
-- Client telemetry writes explicit ISO timestamps from the API layer, avoiding the prior literal `CURRENT_TIMESTAMP` values in remote D1 rows.
-- `.github/workflows/verify-rate-limit.yml` is a manual production diagnostic for the no-op `POST /api/rate-limit-smoke` limiter path.
-- Browser smoke has default, varied, public-econ, and deployed-output paths; `.github/workflows/deployed-browser-smoke.yml` runs manually/weekly, verifies fresh remote D1 telemetry, and uploads screenshots plus context/log/summary diagnostics.
-- Deploy verifies remote D1 schema before Worker deploy, writes a compact GitHub run summary, and uploads 14-day `flashpoint-deploy-verification-*` artifacts.
-- Dependency-security posture is hardened; production `npm audit --omit=dev` is clean. Remaining full `npm audit` findings are four moderate dev-only `drizzle-kit`/old esbuild-loader advisories; monitor upstream instead of forcing a downgrade.
+- `main` has a local v1 gameplay hardening slice ready to commit; do not push without deployment approval because `main` pushes trigger the live site pipeline.
+- ALT-38 deployed API/web verification is complete: Pages uses `VITE_API_BASE_URL=https://escalation-api.rjameson.workers.dev`, deploy verification checks the bundled API origin, and recent production smoke/telemetry/rate-limit paths are proven.
+- The core playable loop works locally: setup -> live briefing -> decision windows -> committed choices -> mandate report.
+- Setup is lighter and more game-like: duplicate admin-style Run Profile/Operator Notes surfaces are gone, Replay Settings is collapsed, and the first screen now shows a local U.S. household crisis image.
+- Live briefings keep the stronger scene image in the hero slot, demote maps/SVGs to supporting evidence, and carry Homefront pressure through gas, groceries, 401k, and family-text signals.
+- The final report now includes a Homefront section so ordinary-life consequences remain visible at the end of the run.
+- Browser smoke has default, varied, public-econ, and deployed-output paths; the local harness accepts current UI labels and checks public/economic coverage categories instead of unreachable exact-image assertions.
 
 Validation:
-- Current gameplay slice passed: `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, and browser checks at desktop plus 390px mobile for setup/resume -> live briefing, hero/Homefront rendering, decision view, console errors, and no horizontal overflow.
-- Recent audit slice passed: `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, and browser checks at desktop plus 390px mobile proving no visible tiny text below the 0.68rem floor and no horizontal overflow.
-- Current scroll/focus slice passed: `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, reviewer approval, and browser verification at desktop plus 390px mobile for setup -> live, summary -> decision, return to setup, report open, and initial setup after bootstrap.
-- Recent app slices passed `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, and local browser completed-report plus active-run reload/resume/remove/clear/recent-activity/clock-mode/live-return/continue-latest flows at desktop and 390px mobile.
-- GitHub Deploy run `25705387122` succeeded for `eb922f0` with artifact `6932923493`; run `25708569214` succeeded for `3ed708c` with artifact `6934047934`; run `25709500869` succeeded for `462933c` with artifact `6934351772`.
+- Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run lint`, full `npm test`, `git diff --check`, `npm run build`.
+- Passed browser checks: default full-run smoke, varied full-run smoke, public-econ full-run smoke, desktop screenshots, and 390px mobile setup -> first briefing -> decision view.
+- Mobile verification confirmed no horizontal overflow at 390px; refreshed local console output had no app runtime errors after the favicon fix.
 
 Next:
-- Continue app-facing vertical slices. Recommended next: tune Homefront thresholds and authored copy across later turns, then continue placeholder-art/image QA from `PRODUCT_AUDIT.md`.
+- Recommended next slice: reduce lower briefing density (`Start Here`, `Keep An Eye On`, and immediate-outcome panels) so the first live briefing scans faster without losing uncertainty.
+- After that, continue image QA on non-default paths and tune Homefront thresholds/copy across later turns.

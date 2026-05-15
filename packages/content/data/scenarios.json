@@ -4091,10 +4091,10 @@
           "branchStage": "coercion",
           "caption": "The notices look administrative on paper. In the lane, they are already changing how captains move.",
           "heroImageIds": [
-            "tw_bs_004"
+            "tw_bs_023"
           ],
           "evidenceImageIds": [
-            "tw_bs_005"
+            "tw_bs_004"
           ]
         }
       },
@@ -4635,9 +4635,10 @@
           "branchStage": "false_relief",
           "caption": "A few ships are moving again, but the enforcement hulls, route authorities, and suspicious network traffic never actually left.",
           "heroImageIds": [
-            "tw_bs_007"
+            "tw_bs_023"
           ],
           "evidenceImageIds": [
+            "tw_bs_007",
             "tw_bs_032"
           ]
         }

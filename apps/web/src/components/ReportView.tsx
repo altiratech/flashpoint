@@ -8,6 +8,7 @@ import type {
   TradeoffScorecardStatus
 } from '@wargames/shared-types';
 
+import { buildHomefrontSignals } from '../homefrontSignals';
 import { TimelineChart } from './TimelineChart';
 
 interface ReportViewProps {
@@ -53,6 +54,7 @@ const tradeoffTone: Record<TradeoffScorecardStatus, string> = {
 
 const reportSectionLinks = [
   ['Mandate', '#mandate-scorecards'],
+  ['Homefront', '#homefront-impact'],
   ['Tradeoffs', '#tradeoff-scorecards'],
   ['Timeline', '#scenario-timeline'],
   ['Debrief', '#strategic-debrief'],
@@ -171,6 +173,14 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
   const strategicRead = deepDebrief
     ? `${deepDebrief.grade.title} (${deepDebrief.grade.score})`
     : report.outcomeExplanation;
+  const homefrontSignals = buildHomefrontSignals(report.finalMeters);
+  const homefrontDangerCount = homefrontSignals.filter((signal) => signal.tone === 'danger').length;
+  const homefrontWarningCount = homefrontSignals.filter((signal) => signal.tone === 'warning').length;
+  const homefrontSummary = homefrontDangerCount > 0
+    ? 'Ordinary life is visibly strained. The crisis is showing up in prices, savings, shelves, and family group chats.'
+    : homefrontWarningCount > 1
+      ? 'The country avoided the worst shock, but families still felt the crisis in bills, phones, and retirement accounts.'
+      : 'The public felt the scare, but daily life did not fully break during this run.';
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4 lg:px-6">
@@ -237,6 +247,39 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, onRe
             </a>
           ))}
         </nav>
+      </section>
+
+      <section id="homefront-impact" className="card scroll-mt-4 p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="label text-warning">What America Woke Up To</p>
+            <h2 className="mt-2 font-display text-2xl text-textMain">The crisis outside the briefing room</h2>
+          </div>
+          <p className="rounded-md border border-warning/50 bg-warning/10 px-3 py-1 text-[0.68rem] uppercase tracking-[0.12em] text-warning">
+            Homefront Read
+          </p>
+        </div>
+        <p className="mt-3 text-sm leading-relaxed text-textMain">{homefrontSummary}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {homefrontSignals.map((signal) => (
+            <article
+              key={signal.id}
+              className={`rounded-md border p-3 ${
+                signal.tone === 'danger'
+                  ? 'border-red-300/45 bg-red-300/10'
+                  : signal.tone === 'warning'
+                    ? 'border-warning/45 bg-warning/10'
+                    : 'border-borderTone/70 bg-panelRaised/40'
+              }`}
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{signal.label}</p>
+                <p className="font-display text-lg text-textMain">{signal.value}</p>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-textMuted">{signal.detail}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       {objectiveAssessments.length > 0 ? (

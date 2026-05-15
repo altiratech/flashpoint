@@ -13,6 +13,7 @@ import type {
   TurnDebrief
 } from '@wargames/shared-types';
 
+import { buildHomefrontSignals } from '../homefrontSignals';
 import { MeterDashboard } from './MeterDashboard';
 
 interface BriefingSignalItem {
@@ -172,54 +173,6 @@ const describeShiftInScene = (key: MeterKey, delta: number): string => {
   return delta > 0
     ? 'Hotlines sound busier, pilots and captains sound jumpier, and nobody is trusting the next clean picture.'
     : 'The pace slackens for the moment, but nobody in the room thinks the danger is gone.';
-};
-
-const buildHomefrontSignals = (
-  meters: MeterState,
-  previousMeters?: MeterState
-): Array<{ id: string; label: string; value: string; detail: string; tone: 'danger' | 'warning' | 'steady' }> => {
-  const marketComposite = Math.round((meters.economicStability + meters.energySecurity) / 2);
-  const marketDelta = previousMeters
-    ? Math.round(((meters.economicStability + meters.energySecurity) - (previousMeters.economicStability + previousMeters.energySecurity)) / 2)
-    : 0;
-  const stress = Math.max(0, 100 - marketComposite);
-  const gasPrice = (3.65 + stress * 0.035 + Math.max(0, meters.escalationIndex - 55) * 0.012).toFixed(2);
-  const groceryIndex = 100 + Math.round(Math.max(0, 70 - meters.economicStability) * 0.7 + Math.max(0, 60 - meters.energySecurity) * 0.45);
-  const savingsMove = Math.min(14, Math.round((100 - meters.economicStability) * 0.12 + meters.escalationIndex * 0.03));
-  const domesticDelta = previousMeters ? meters.domesticCohesion - previousMeters.domesticCohesion : 0;
-
-  return [
-    {
-      id: 'fuel',
-      label: 'Gas',
-      value: `$${gasPrice}`,
-      detail: marketDelta < 0 ? 'Fuel desks are repricing before officials settle on language.' : 'Prices are jumpy even before the first public warning.',
-      tone: meters.energySecurity < 45 ? 'danger' : meters.energySecurity < 62 ? 'warning' : 'steady'
-    },
-    {
-      id: 'groceries',
-      label: 'Groceries',
-      value: `${groceryIndex}`,
-      detail: meters.economicStability < 55 ? 'Stores are ordering early and warning suppliers about empty shelves.' : 'Retailers are watching freight and chip-linked inventory.',
-      tone: meters.economicStability < 45 ? 'danger' : meters.economicStability < 62 ? 'warning' : 'steady'
-    },
-    {
-      id: 'savings',
-      label: '401k',
-      value: `-${savingsMove}%`,
-      detail: savingsMove >= 8 ? 'People are opening retirement apps and seeing the crisis in red.' : 'Markets are nervous enough for normal families to notice.',
-      tone: savingsMove >= 8 ? 'danger' : savingsMove >= 5 ? 'warning' : 'steady'
-    },
-    {
-      id: 'family',
-      label: 'Family Text',
-      value: domesticDelta < 0 || meters.domesticCohesion < 55 ? 'Are we okay?' : 'Should we fill up?',
-      detail: meters.domesticCohesion < 55
-        ? 'The crisis has left the briefing room and entered group chats.'
-        : 'People are not panicking yet, but they are asking practical questions.',
-      tone: meters.domesticCohesion < 45 ? 'danger' : meters.domesticCohesion < 62 ? 'warning' : 'steady'
-    }
-  ];
 };
 
 export const BriefingPanel = ({
