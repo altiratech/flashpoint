@@ -245,7 +245,7 @@ export const BriefingPanel = ({
   const openingBackground = turn === 1 ? scenarioWorld?.openingBackground ?? null : null;
   const primaryHeadlines = briefing.headlines.slice(0, 2);
   const secondaryHeadlines = briefing.headlines.slice(2);
-  const visibleSupportingSignals = showAllSignals ? supportingSignals : supportingSignals.slice(0, 2);
+  const visibleSupportingSignals = showAllSignals ? supportingSignals : supportingSignals.slice(0, 1);
   const hiddenSignalCount = Math.max(0, supportingSignals.length - visibleSupportingSignals.length);
   const truthSections = truthModel
     ? ([
@@ -370,7 +370,7 @@ export const BriefingPanel = ({
           <div>
             <p className="label">Start Here</p>
             <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
-              Read the signal picture first: what is confirmed, what analysts think may be happening, and what is still unknown.
+              Here is what matters before you make the call.
             </p>
           </div>
           <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
@@ -382,9 +382,9 @@ export const BriefingPanel = ({
             {truthSections.map((section) => (
               <article key={section.id} className="console-subpanel px-3 py-3">
                 <p className={`text-[0.68rem] uppercase tracking-[0.12em] ${section.accent}`}>{section.title}</p>
-                <div className="mt-2 space-y-2">
+                <div className="mt-3 space-y-3">
                   {section.items.map((item) => (
-                    <div key={item.id} className="rounded-md border border-borderTone/70 bg-panelRaised/35 px-3 py-2.5">
+                    <div key={item.id} className="border-l border-borderTone/90 pl-3">
                       <p className="text-[0.72rem] uppercase tracking-[0.1em] text-textMain">{item.title}</p>
                       <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">{item.body}</p>
                     </div>
@@ -430,17 +430,21 @@ export const BriefingPanel = ({
             <div>
               <p className="label">Keep An Eye On</p>
               <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
-                Secondary signals that can change how markets, allies, and operators read the situation.
+                One outside signal that could move the room.
               </p>
             </div>
             <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Support only</p>
           </div>
           <div className="mt-3 grid gap-2 xl:grid-cols-2">
             {visibleSupportingSignals.map((item) => (
-              <article key={item.id} className="console-feed-item min-h-[4.5rem]">
-                <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{item.channel}</p>
-                <p className="mt-1 text-[0.84rem] text-textMain">{item.headline}</p>
-                {item.detail ? <p className="mt-1 text-[0.88rem] text-textMuted">{item.detail}</p> : null}
+              <article key={item.id} className="console-feed-item">
+                <p className="text-[0.84rem] leading-relaxed text-textMain">
+                  <span className="mr-2 font-mono text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
+                    {item.channel}
+                  </span>
+                  {item.headline}
+                </p>
+                {showAllSignals && item.detail ? <p className="mt-1 text-[0.88rem] text-textMuted">{item.detail}</p> : null}
               </article>
             ))}
           </div>
@@ -468,11 +472,11 @@ export const BriefingPanel = ({
             </p>
           ) : null}
           {immediateOutcomeCards.length > 0 ? (
-            <div className="mt-3 grid gap-2 xl:grid-cols-3">
+            <div className="mt-3 divide-y divide-borderTone/70 rounded-md border border-borderTone/70 bg-panelRaised/30">
               {immediateOutcomeCards.map((card) => (
-                <article key={card.id} className="rounded-md border border-borderTone/70 bg-panelRaised/35 px-3 py-2.5">
+                <article key={card.id} className="grid gap-2 px-3 py-2.5 lg:grid-cols-[11rem_minmax(0,1fr)]">
                   <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{card.label}</p>
-                  <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">{card.body}</p>
+                  <p className="text-[0.84rem] leading-relaxed text-textMain">{card.body}</p>
                 </article>
               ))}
             </div>
