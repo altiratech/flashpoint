@@ -355,6 +355,8 @@ const applyDecision = (
   const best = ranked[0] ?? null;
   const second = ranked[1] ?? null;
   const fallbackSuggestions = ranked.slice(0, 3).map((entry) => asSuggestion(entry.action, entry.variant));
+  const query = cleanCommand(rawCommandText);
+  const queryTokens = tokenize(query);
 
   if (!best) {
     return {
@@ -376,6 +378,27 @@ const applyDecision = (
   const enriched = buildInterpretationRationale(best, rawCommandText, context);
 
   const strongVariantMatch = best.variantScore >= 0.3 && best.score >= 0.24 && margin >= 0.06;
+  const ambiguousSingleKeyword =
+    queryTokens.length === 1 &&
+    queryTokens[0] &&
+    queryTokens[0].length >= 4 &&
+    ranked.filter((entry) => tokenize(entry.action.name).includes(queryTokens[0] as string)).length >= 2 &&
+    !best.exact;
+
+  if (ambiguousSingleKeyword) {
+    return {
+      confidence,
+      decision: 'review',
+      interpretedActionId: null,
+      interpretedActionName: null,
+      variantId: null,
+      variantLabel: null,
+      customLabel: null,
+      interpretationRationale: null,
+      narrativeEmphasis: null,
+      suggestions: fallbackSuggestions
+    };
+  }
 
   if (best.exact || (best.score >= 0.72 && margin >= 0.14) || strongVariantMatch) {
     return {

@@ -58,17 +58,17 @@ const postureHint = (action: ActionDefinition): string => {
     return 'Beijing is likely to read this as a firmer show of resolve. Allies and markets will quickly judge whether it looks controlled or reckless.';
   }
   if (netEscalation <= -0.5) {
-    return 'Beijing is likely to read this as controlled restraint. Allies will test whether it preserves leverage or looks like a step back.';
+    return 'Beijing is likely to read this as restraint. Allies will watch closely to see whether it buys time or looks like a step back.';
   }
-  return 'Beijing is likely to read this as a mixed signal. It preserves room to maneuver, but it may delay allied commitment and market stabilization.';
+  return 'Beijing is likely to read this as a mixed signal. It keeps choices open, but allies and markets may wait before they trust it.';
 };
 
 const visibilityHint = (visibility: ActionDefinition['visibility']): string => {
   if (visibility === 'public') {
-    return 'Governments, the counterpart, media channels, insurers, and market participants can react within minutes.';
+    return 'Governments, newsrooms, insurers, and traders can react within minutes.';
   }
   if (visibility === 'semi-public') {
-    return 'Allied governments, counterpart officials, and industry channels are likely to react first. Broader market awareness can follow quickly on leaks.';
+    return 'Allied governments, Beijing officials, and industry channels are likely to react first. If it leaks, markets may follow quickly.';
   }
   return 'Initial reaction should stay inside closed channels, but execution problems or leaks can still push the move into public view.';
 };
@@ -83,9 +83,9 @@ const riskHint = (action: ActionDefinition): string => {
     return 'Principal risk: Beijing may answer with a sharper move rather than appear to yield under pressure.';
   }
   if (dominant === action.signal.economicStressSignal) {
-    return 'Principal risk: shipping, inventory, insurance, and market confidence could deteriorate faster than the coalition can stabilize them.';
+    return 'Principal risk: shipping, inventory, insurance, and market confidence could deteriorate faster than governments can calm them.';
   }
-  return 'Principal risk: allies may interpret the move differently, weakening joint leverage and broader market confidence.';
+  return 'Principal risk: allies may read the move differently, weakening the joint line and shaking market confidence.';
 };
 
 const firstImpactHint = (action: ActionDefinition): string => {
@@ -93,7 +93,7 @@ const firstImpactHint = (action: ActionDefinition): string => {
     return 'Likely first impact: shipping rates, insurance pricing, semiconductor-sensitive names, and broad risk sentiment are the first places to move.';
   }
   if (action.signal.allianceStressSignal >= 0.55) {
-    return 'Likely first impact: allied messaging and coalition discipline may wobble, which quickly feeds uncertainty into commercial planning and markets.';
+    return 'Likely first impact: allies may wobble in public, which quickly feeds uncertainty into business planning and markets.';
   }
   const netEscalation = action.signal.escalatory - action.signal.deescalatory;
   if (netEscalation >= 0.5) {
@@ -102,26 +102,26 @@ const firstImpactHint = (action: ActionDefinition): string => {
   if (netEscalation <= -0.5) {
     return 'Likely first impact: sentiment and freight expectations may stabilize briefly, provided the move is not read as concession.';
   }
-  return 'Likely first impact: most stakeholders will wait for follow-through before repricing risk or changing posture.';
+  return 'Likely first impact: most people with money or ships at risk will wait to see what happens next.';
 };
 
 const actionOneLiner = (action: ActionDefinition): string => {
   const loweredTags = action.tags.map((tag) => tag.toLowerCase());
 
   if (loweredTags.includes('diplomacy') && action.visibility === 'secret') {
-    return 'Use private channels to test an off-ramp without changing the public posture yet.';
+    return 'Call privately and find out whether there is still a way to stop this before it gets worse.';
   }
   if (loweredTags.includes('diplomacy') && action.visibility !== 'secret') {
-    return 'Put terms on the table publicly and test whether the counterpart wants a visible offramp.';
+    return 'Put a way out on the table publicly and see whether Beijing rejects it.';
   }
   if (loweredTags.includes('military')) {
-    return 'Change visible military posture to raise the cost of another coercive move.';
+    return 'Move forces so the next hostile step looks more dangerous to take.';
   }
   if (loweredTags.includes('intel')) {
-    return 'Strengthen surveillance, attribution, and defensive readiness before making a larger move.';
+    return 'Get a clearer picture before making a larger move.';
   }
   if (loweredTags.includes('economic')) {
-    return 'Use commercial and financial pressure to impose cost beyond the military channel.';
+    return 'Use money, shipping, and trade pressure instead of a military move.';
   }
 
   return action.summary;
@@ -243,16 +243,116 @@ const firstShockLine = (action: ActionDefinition): string => {
     return 'First effect lands in the picture itself: attribution, confidence, and warning time.';
   }
   if (loweredTags.includes('military')) {
-    return 'First effect lands in operational tempo and how seriously the counterpart takes the coalition posture.';
+    return 'First effect lands in how fast forces move and how seriously Beijing takes the line.';
   }
   if (loweredTags.includes('diplomacy')) {
-    return 'First effect lands in signaling and whether allies see room for a controlled offramp.';
+    return 'First effect lands in whether allies see a real way out or just more delay.';
   }
   if (loweredTags.includes('messaging')) {
     return 'First effect lands in public interpretation, coalition messaging, and market sentiment.';
   }
 
-  return 'First effect lands in how the counterpart, allies, and commercial operators interpret the next move.';
+  return 'First effect lands in how Beijing, allies, and businesses interpret the next move.';
+};
+
+interface PlainActionRead {
+  beijing: string;
+  alliesMarkets: string;
+  lands: string;
+  risk: string;
+}
+
+const plainActionRead = (action: ActionDefinition, variant?: ActionVariantDefinition | null): PlainActionRead | null => {
+  const variantLabel = variant?.label ? ` (${variant.label})` : '';
+
+  switch (action.id) {
+    case 'backchannel_diplomacy':
+      return {
+        beijing: `Beijing will hear a private call${variantLabel} as proof Washington still wants a way out. It may use that opening, or it may treat the silence as weakness.`,
+        alliesMarkets: 'Allies can live with quiet talks if they see proof the United States is not bargaining Taiwan away. Markets will wait for movement, not words.',
+        lands: 'If it works, ships and insurers get one real sign that the crisis is not locked into the worst path.',
+        risk: 'If it leaks or stalls, the story becomes Washington asking for time while Beijing keeps pressure on the water.'
+      };
+    case 'public_signaling_speech':
+      return {
+        beijing: 'Beijing will parse every line for a red line, a bluff, or a place to split the coalition.',
+        alliesMarkets: 'Allies and markets get a clearer public line, but the words can also trap everyone if the next move does not match them.',
+        lands: 'If it works, the public hears one steady message and allies stop sounding like nervous separate governments.',
+        risk: 'If it goes too far, both sides may be locked into public promises they cannot easily walk back.'
+      };
+    case 'targeted_sanctions':
+      return {
+        beijing: 'Beijing will call it economic warfare, then look for the fastest way to make U.S. and allied firms feel pain back.',
+        alliesMarkets: 'Allies usually tolerate a narrow package better than a broad shock. Compliance desks and exposed firms will still move fast.',
+        lands: 'If it works, the pressure campaign gets more expensive without breaking the whole market at once.',
+        risk: 'If firms overreact, cargoes pause, legal desks freeze, and the market shock outruns the policy memo.'
+      };
+    case 'broad_sanctions':
+      return {
+        beijing: 'Beijing will see this as a major escalation beyond the Strait and may answer wherever the coalition is weakest.',
+        alliesMarkets: 'Committed allies may praise the resolve. Others will immediately calculate how much market pain they can survive.',
+        lands: 'If it works, Beijing learns the next squeeze will not stay cheap.',
+        risk: 'The same shock hits everyone else: banks, shipping, chip supply, factories, and retirement accounts.'
+      };
+    case 'resource_stockpiling':
+      return {
+        beijing: 'Beijing will see a country preparing to endure a longer crisis instead of folding under short-term pain.',
+        alliesMarkets: 'Allies like practical preparation. The public may see guarded depots and early orders and wonder what the government knows.',
+        lands: 'If it works, one more supply shock does not immediately become empty shelves, empty tanks, and panic calls.',
+        risk: 'If the move looks too visible, buyers may start hoarding before the reserves can calm anyone.'
+      };
+    case 'cyber_intrusion':
+      return {
+        beijing: 'If Beijing catches the access, it will assume Washington is preparing to expose or disrupt the next move.',
+        alliesMarkets: 'Partners like the cleaner picture as long as the operation stays invisible. A leak makes the cyber fight feel like it has already reached ports and firms.',
+        lands: 'If it works, the room gets more warning time and a better read on what is real.',
+        risk: 'If alarms trip, Beijing can wipe routes, set decoys, and accuse Washington while the evidence is still classified.'
+      };
+    case 'cyber_disruption':
+      return {
+        beijing: 'Beijing will treat disruption as a step beyond watching and into active interference.',
+        alliesMarkets: 'Allies may accept a non-shooting move, but only if civilian systems stay untouched.',
+        lands: 'If it works, the pressure ring slows down without missiles in the air.',
+        risk: 'If it splashes into civilian systems, bookings, payments, and port operations can become the next front.'
+      };
+    case 'covert_sabotage':
+      return {
+        beijing: 'If Beijing links the move back to Washington, it will treat the deniability as insult, not restraint.',
+        alliesMarkets: 'Allies want the pressure slowed, but they will not want to defend a covert mess in public.',
+        lands: 'If it works, the next pressure move arrives late, broken, or confused.',
+        risk: 'If it is exposed, the crisis becomes less about Beijing pressure and more about who started hidden attacks.'
+      };
+    case 'military_posture_increase':
+      return {
+        beijing: 'Beijing will see more ships and aircraft as proof the United States may take real risk.',
+        alliesMarkets: 'Allies may feel protected, while markets price the chance that one mistake turns into a collision.',
+        lands: 'If it works, the next hostile step looks more dangerous to take.',
+        risk: 'If commanders misread each other, the military move meant to prevent a war can become the thing that starts one.'
+      };
+    case 'military_posture_decrease':
+      return {
+        beijing: 'Beijing may see restraint, or it may see a chance to press harder while the line looks softer.',
+        alliesMarkets: 'Markets may breathe for a moment. Allies will ask whether the pullback still leaves enough protection in place.',
+        lands: 'If it works, heat comes down and the other side has room to match the step.',
+        risk: 'If it looks like a blink, Beijing may test the gap before the coalition can reset.'
+      };
+    case 'intelligence_surge':
+      return {
+        beijing: 'Beijing will notice if allied collection tightens and may start hiding, spoofing, or rushing its next move.',
+        alliesMarkets: 'Allies like shared evidence because it makes later public claims easier to defend.',
+        lands: 'If it works, the room stops guessing through the next window.',
+        risk: 'If the surge gets noisy, the picture can look more certain than it really is.'
+      };
+    case 'limited_concession':
+      return {
+        beijing: 'Beijing will test whether the offer is a real way out or proof that pressure works.',
+        alliesMarkets: 'Allies and markets may welcome a pause, but only if it comes with proof the pressure stops.',
+        lands: 'If it works, carriers and traders get a reason to stop pricing the worst case for a few hours.',
+        risk: 'If Beijing pockets the concession and keeps moving, the coalition looks weaker and the next demand gets easier.'
+      };
+    default:
+      return null;
+  }
 };
 
 export const ActionCards = ({
@@ -282,6 +382,10 @@ export const ActionCards = ({
   const selectedVariant = useMemo(
     () => (selectedAction ? getSelectedVariant(selectedAction, selectedVariantId) : null),
     [selectedAction, selectedVariantId]
+  );
+  const selectedPlainRead = useMemo(
+    () => (selectedAction ? plainActionRead(selectedAction, selectedVariant) : null),
+    [selectedAction, selectedVariant]
   );
 
   return (
@@ -463,25 +567,26 @@ export const ActionCards = ({
                 <div className="console-subpanel px-3 py-2.5">
                   <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">How Beijing Takes It</p>
                   <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
-                    {selectedActionNarrativePreview?.rivalReaction ?? postureHint(selectedAction)}
+                    {selectedPlainRead?.beijing ?? selectedActionNarrativePreview?.rivalReaction ?? postureHint(selectedAction)}
                   </p>
                 </div>
                 <div className="console-subpanel px-3 py-2.5">
                   <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">How Allies And Markets React</p>
                   <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
-                    {selectedActionNarrativePreview?.allianceReaction ?? visibilityHint(selectedAction.visibility)}
+                    {selectedPlainRead?.alliesMarkets ?? selectedActionNarrativePreview?.allianceReaction ?? visibilityHint(selectedAction.visibility)}
                   </p>
                 </div>
                 <div className="console-subpanel px-3 py-2.5">
                   <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">If This Lands</p>
                   <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
-                    {selectedActionNarrativePreview?.successOutcome ?? firstImpactHint(selectedAction)}
+                    {selectedPlainRead?.lands ?? selectedActionNarrativePreview?.successOutcome ?? firstImpactHint(selectedAction)}
                   </p>
                 </div>
                 <div className="console-subpanel px-3 py-2.5">
                   <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">What Could Go Wrong</p>
                   <p className="mt-1 text-[0.84rem] leading-relaxed text-textMain">
-                    {selectedActionNarrativePreview?.complicationOutcome ??
+                    {selectedPlainRead?.risk ??
+                      selectedActionNarrativePreview?.complicationOutcome ??
                       hiddenDownsideMeta(selectedVariant?.hiddenDownsideCategory)?.detail ??
                       riskHint(selectedAction)}
                   </p>

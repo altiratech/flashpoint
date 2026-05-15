@@ -10,6 +10,7 @@ Current state:
 - Briefings are less card-heavy, keep stronger photographic crisis evidence in the hero slot, carry Homefront pressure through gas/groceries/retirement/family-text signals, and now promote the resolved turn's consequence images before generic beat previews.
 - Opening Homefront values are now tense without overstating day-one panic; later meter deterioration still escalates ordinary-life pressure.
 - The selected-response review strip owns the primary commit action so decision mode no longer shows duplicate commit controls.
+- Action cards and selected-response consequence reads now use direct player-facing language; bare ambiguous commands like `sanctions` still route to review instead of accidental execution.
 - The final mandate report preserves selected variant/custom action labels, includes Homefront consequences, and now promotes a state-derived aftermath image from existing local raster assets.
 - Report labels, advisor readouts, and generated causality/detail lines use plainer English in the player-facing surfaces instead of policy-room shorthand.
 - Active-run recovery now resolves expired countdowns on resume instead of reopening stale decisions.
@@ -22,4 +23,4 @@ Validation:
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
-- Remaining non-blocking product work: selected-decision imagery is intentionally absent for v1 to keep the review/commit moment focused; deeper authored debrief text can still be tuned if Ryan wants a more civilian voice throughout.
+- Remaining non-blocking product work: selected-decision imagery is intentionally absent for v1 to keep the review/commit moment focused; deeper authored debrief/report text can still be tuned if Ryan wants a more civilian voice throughout.

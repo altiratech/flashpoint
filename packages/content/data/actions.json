@@ -3,7 +3,7 @@
     "id": "backchannel_diplomacy",
     "actor": "player",
     "name": "Backchannel Diplomacy",
-    "summary": "Quietly probe off-ramp terms through trusted intermediaries.",
+    "summary": "Call privately and find out whether there is still a way to stop this before it gets worse.",
     "visibility": "secret",
     "tags": [
       "diplomacy",
@@ -58,7 +58,7 @@
       {
         "id": "quiet_probe",
         "label": "Quiet Probe",
-        "summary": "Use deniable intermediaries to test whether the anomaly can be ring-fenced before it hardens into formal coercion.",
+        "summary": "Send a quiet message through trusted intermediaries and ask what would make the pressure stop.",
         "interpretationHints": [
           "quiet",
           "private",
@@ -103,7 +103,7 @@
       {
         "id": "firm_channel",
         "label": "Firm Channel",
-        "summary": "Use private channels, but attach clear conditions and consequences so the message lands harder.",
+        "summary": "Use the private channel, but make the conditions and consequences unmistakable.",
         "interpretationHints": [
           "firm",
           "hard message",
@@ -152,7 +152,7 @@
     "id": "public_signaling_speech",
     "actor": "player",
     "name": "Public Strategic Address",
-    "summary": "Address the nation and allies with calibrated deterrence language.",
+    "summary": "Go on camera, tell the public what is happening, and make the line clear.",
     "visibility": "public",
     "tags": [
       "messaging",
@@ -196,7 +196,7 @@
       {
         "id": "calibrated_address",
         "label": "Calibrated Address",
-        "summary": "Set a public line without declaring a final red line or forcing immediate military follow-through.",
+        "summary": "Tell the public and allies where the line is without promising the next military step.",
         "interpretationHints": [
           "calibrated",
           "measured",
@@ -236,7 +236,7 @@
       {
         "id": "hard_red_line",
         "label": "Hard Red Line",
-        "summary": "Go public with explicit warning language intended to force Beijing to choose whether to back down or challenge the line.",
+        "summary": "Make a hard public warning and force Beijing to decide whether to back down or test it.",
         "interpretationHints": [
           "hard",
           "red line",
@@ -284,7 +284,7 @@
     "id": "targeted_sanctions",
     "actor": "player",
     "name": "Targeted Sanctions",
-    "summary": "Sanction rival-linked strategic entities and individuals.",
+    "summary": "Freeze and punish the firms and people helping keep the pressure campaign alive.",
     "visibility": "public",
     "tags": [
       "economic",
@@ -338,7 +338,7 @@
       {
         "id": "signaling_tranche",
         "label": "Signaling Tranche",
-        "summary": "Open with a limited, targeted package that signals cost without detonating the full financial channel.",
+        "summary": "Start narrow: hit the clearest targets without shocking the whole financial system.",
         "interpretationHints": [
           "targeted",
           "limited sanctions",
@@ -379,7 +379,7 @@
       {
         "id": "enforcement_wave",
         "label": "Enforcement Wave",
-        "summary": "Lean harder into enforcement so Beijing feels immediate commercial and reputational pain.",
+        "summary": "Move harder so the companies behind the pressure feel pain fast.",
         "interpretationHints": [
           "enforce",
           "strong sanctions",
@@ -428,7 +428,7 @@
     "id": "broad_sanctions",
     "actor": "player",
     "name": "Broad Sanctions",
-    "summary": "Impose cross-sector restrictions with coalition backing.",
+    "summary": "Launch the big sanctions package and accept that markets and supply chains will feel it immediately.",
     "visibility": "public",
     "tags": [
       "economic",
@@ -482,7 +482,7 @@
       {
         "id": "prepared_package",
         "label": "Prepared Package",
-        "summary": "Signal that a full-sector package is ready while phasing implementation to avoid immediate market rupture.",
+        "summary": "Show that the full package is ready, but phase it in to avoid a market break tonight.",
         "interpretationHints": [
           "prepare sanctions",
           "ready package",
@@ -524,7 +524,7 @@
       {
         "id": "maximal_package",
         "label": "Maximal Package",
-        "summary": "Push a broad coalition package immediately and accept the near-term commercial shock as the price of coercive clarity.",
+        "summary": "Push the full package now and accept the immediate hit to shipping, banks, and chip supply.",
         "interpretationHints": [
           "maximal",
           "all in",
@@ -574,7 +574,7 @@
     "id": "resource_stockpiling",
     "actor": "player",
     "name": "Resource Stockpiling",
-    "summary": "Expand strategic fuel and commodity reserves ahead of shocks.",
+    "summary": "Build fuel, medical, chip, and shipping reserves before the crisis reaches shelves and gas stations.",
     "visibility": "semi-public",
     "tags": [
       "energy",
@@ -624,7 +624,7 @@
       {
         "id": "preposition_reserves",
         "label": "Preposition Reserves",
-        "summary": "Quietly build strategic buffers while trying not to scream panic to the market.",
+        "summary": "Build reserves quietly so the country has more time without setting off panic buying.",
         "interpretationHints": [
           "stockpile",
           "reserves",
@@ -667,7 +667,7 @@
       {
         "id": "emergency_buffer",
         "label": "Emergency Buffer",
-        "summary": "Move visibly and fast to build reserves before the corridor deteriorates further.",
+        "summary": "Move fast and visibly to build reserves before the lane gets worse.",
         "interpretationHints": [
           "emergency",
           "build buffer now",
@@ -716,7 +716,7 @@
     "id": "cyber_intrusion",
     "actor": "player",
     "name": "Cyber Intrusion",
-    "summary": "Penetrate rival systems for intelligence without disruption.",
+    "summary": "Get inside the other side's systems to see what they are preparing, without breaking anything.",
     "visibility": "secret",
     "tags": [
       "cyber",
@@ -767,7 +767,7 @@
       {
         "id": "forensic_pull",
         "label": "Forensic Pull",
-        "summary": "Use cyber access to improve attribution and map the architecture behind the anomaly without disrupting it.",
+        "summary": "Use cyber access to find who is directing the pressure and what they may do next.",
         "interpretationHints": [
           "cyber intel",
           "forensic",
@@ -809,7 +809,7 @@
       {
         "id": "deep_mapping",
         "label": "Deep Mapping",
-        "summary": "Push deeper into networks to expose the full coercive architecture before it fires again.",
+        "summary": "Push deeper to map the whole setup before it produces another shock.",
         "interpretationHints": [
           "deep",
           "aggressive intrusion",
@@ -858,7 +858,7 @@
     "id": "cyber_disruption",
     "actor": "player",
     "name": "Cyber Disruption",
-    "summary": "Disrupt rival logistics and command connectivity.",
+    "summary": "Interrupt the systems helping the other side move, cue, and coordinate pressure.",
     "visibility": "secret",
     "tags": [
       "cyber",
@@ -899,7 +899,7 @@
       {
         "id": "reversible_nuisance",
         "label": "Reversible Nuisance",
-        "summary": "Cause reversible disruption in the coercive architecture without making the strike path the main story.",
+        "summary": "Create a limited cyber disruption that slows them down without making cyber war the headline.",
         "interpretationHints": [
           "reversible",
           "light disruption",
@@ -940,7 +940,7 @@
       {
         "id": "hard_disruption",
         "label": "Hard Disruption",
-        "summary": "Hit the logistics and command layer hard enough to interrupt the next move immediately.",
+        "summary": "Hit hard enough to interrupt the next move, knowing retaliation becomes more likely.",
         "interpretationHints": [
           "hard cyber",
           "full disruption",
@@ -989,7 +989,7 @@
     "id": "covert_sabotage",
     "actor": "player",
     "name": "Covert Sabotage",
-    "summary": "Support deniable disruption of rival logistics nodes.",
+    "summary": "Quietly help slow the other side's logistics while keeping U.S. fingerprints off the move.",
     "visibility": "secret",
     "tags": [
       "covert",
@@ -1034,7 +1034,7 @@
       {
         "id": "deniable_cutout",
         "label": "Deniable Cutout",
-        "summary": "Use cutouts and deniable disruption to slow the coercive architecture without owning it publicly.",
+        "summary": "Use cutouts to slow the pressure network without owning the move in public.",
         "interpretationHints": [
           "deniable",
           "covert",
@@ -1076,7 +1076,7 @@
       {
         "id": "high_tempo_cutout",
         "label": "High-Tempo Cutout",
-        "summary": "Accelerate covert disruption so the next coercive step arrives late or broken.",
+        "summary": "Move faster in the shadows so the next pressure move arrives late or broken.",
         "interpretationHints": [
           "high tempo",
           "more aggressive covert",
@@ -1125,7 +1125,7 @@
     "id": "military_posture_increase",
     "actor": "player",
     "name": "Military Posture Increase",
-    "summary": "Forward deploy high-readiness forces and publicize readiness.",
+    "summary": "Move more forces into position and make clear the United States is ready to take risk.",
     "visibility": "public",
     "tags": [
       "military",
@@ -1176,7 +1176,7 @@
       {
         "id": "shadow_surge",
         "label": "Shadow Surge",
-        "summary": "Move more capability into place than you advertise so deterrence improves before the headlines do.",
+        "summary": "Move more capability into place than you announce, so the room gets stronger before the headlines catch up.",
         "interpretationHints": [
           "shadow",
           "quiet surge",
@@ -1219,7 +1219,7 @@
       {
         "id": "broadcast_deterrence",
         "label": "Broadcast Deterrence",
-        "summary": "Make the posture shift visible enough that everyone understands the coalition is willing to take risk.",
+        "summary": "Make the military move visible enough that everyone knows the coalition is willing to take risk.",
         "interpretationHints": [
           "visible",
           "broadcast",
@@ -1272,7 +1272,7 @@
     "id": "military_posture_decrease",
     "actor": "player",
     "name": "Military Posture Decrease",
-    "summary": "Pull back visible deployments to signal de-escalatory intent.",
+    "summary": "Pull back the most visible military pressure and see if the other side will step down too.",
     "visibility": "public",
     "tags": [
       "military",
@@ -1316,7 +1316,7 @@
       {
         "id": "quiet_reposition",
         "label": "Quiet Reposition",
-        "summary": "Reduce the most visible edge of the posture while keeping enough hidden capability to avoid looking absent.",
+        "summary": "Lower the visible edge while keeping enough hidden capability to avoid looking absent.",
         "interpretationHints": [
           "quiet pullback",
           "reposition",
@@ -1358,7 +1358,7 @@
       {
         "id": "public_decompression",
         "label": "Public Decompression",
-        "summary": "Announce a visible pullback to advertise restraint and invite a reciprocal step.",
+        "summary": "Announce a visible pullback and invite Beijing to match it.",
         "interpretationHints": [
           "public pullback",
           "announce deescalation",
@@ -1409,7 +1409,7 @@
     "id": "intelligence_surge",
     "actor": "player",
     "name": "Intelligence Surge",
-    "summary": "Reallocate assets to improve detection and attribution confidence.",
+    "summary": "Shift more eyes and analysts onto the crisis so the room is not guessing through the next move.",
     "visibility": "secret",
     "tags": [
       "intel",
@@ -1456,7 +1456,7 @@
       {
         "id": "fusion_cell",
         "label": "Fusion Cell",
-        "summary": "Surge allied collection and fusion to cut through the anomaly before the next move lands.",
+        "summary": "Pull allied intelligence into one cell and cut through the noise before the next move lands.",
         "interpretationHints": [
           "fusion",
           "surge intel",
@@ -1499,7 +1499,7 @@
       {
         "id": "allied_attribution_cell",
         "label": "Allied Attribution Cell",
-        "summary": "Build a visibly allied attribution effort so any later accusation or reassurance rests on a broader base.",
+        "summary": "Make the evidence effort visibly allied so any later accusation rests on more than Washington's word.",
         "interpretationHints": [
           "allied",
           "joint intel",
@@ -1548,7 +1548,7 @@
     "id": "limited_concession",
     "actor": "player",
     "name": "Offer Limited Concession",
-    "summary": "Offer narrow compromise with strict verification terms.",
+    "summary": "Offer a narrow compromise and demand proof that the pressure stops.",
     "visibility": "public",
     "tags": [
       "diplomacy",
@@ -1603,7 +1603,7 @@
       {
         "id": "technical_pause",
         "label": "Technical Pause",
-        "summary": "Offer a narrow, reversible procedural concession that tests whether Beijing wants a quieter branch or just a better story.",
+        "summary": "Offer a small reversible pause and see whether Beijing wants a way out or just a better story.",
         "interpretationHints": [
           "technical pause",
           "limited concession",
@@ -1645,7 +1645,7 @@
       {
         "id": "public_offramp",
         "label": "Public Offramp",
-        "summary": "Offer a visible path to de-escalation and dare Beijing to reject it in front of the coalition and the market.",
+        "summary": "Put a public way out on the table and make Beijing choose whether to reject it in front of everyone.",
         "interpretationHints": [
           "public offramp",
           "visible concession",
