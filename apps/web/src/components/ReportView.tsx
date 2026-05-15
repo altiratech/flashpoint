@@ -58,9 +58,9 @@ const tradeoffTone: Record<TradeoffScorecardStatus, string> = {
 const reportSectionLinks = [
   ['Mandate', '#mandate-scorecards'],
   ['Homefront', '#homefront-impact'],
-  ['Tradeoffs', '#tradeoff-scorecards'],
+  ['Costs', '#tradeoff-scorecards'],
   ['Timeline', '#scenario-timeline'],
-  ['Debrief', '#strategic-debrief'],
+  ['Why', '#strategic-debrief'],
   ['Hidden Effects', '#hidden-effects']
 ] as const;
 
@@ -173,7 +173,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
   const objectiveAssessments = deriveObjectiveAssessments(scenario, report);
   const mandateHeadline = deriveMandateHeadline(report, objectiveAssessments);
   const finalTurn = report.timeline[report.timeline.length - 1]?.turn ?? report.pivotalDecision.turn;
-  const strategicRead = deepDebrief
+  const endStateRead = deepDebrief
     ? `${deepDebrief.grade.title} (${deepDebrief.grade.score})`
     : report.outcomeExplanation;
   const homefrontSignals = buildHomefrontSignals(report.finalMeters);
@@ -246,8 +246,8 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
-            <p className="label">Strategic Read</p>
-            <p className="mt-2 text-sm leading-relaxed text-textMain">{strategicRead}</p>
+            <p className="label">End State</p>
+            <p className="mt-2 text-sm leading-relaxed text-textMain">{endStateRead}</p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
             <p className="label">Pivotal Decision</p>
@@ -256,7 +256,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             </p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
-            <p className="label">Alternative Line</p>
+            <p className="label">Road Not Taken</p>
             <p className="mt-2 text-sm leading-relaxed text-textMain">
               Window {report.alternativeLine.turn}: {report.alternativeLine.suggestedActionName}
             </p>
@@ -331,7 +331,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
                     {entry.status}
                   </span>
                 </div>
-                <p className="mt-2 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Mandate score {entry.score}</p>
+                <p className="mt-2 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Score {entry.score}</p>
                 <p className="mt-3 text-sm leading-relaxed text-textMuted">{entry.summary}</p>
               </article>
             ))}
@@ -342,9 +342,9 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
       {report.fullCausality.tradeoffScorecards.length > 0 ? (
         <section id="tradeoff-scorecards" className="card scroll-mt-4 p-5">
           <div>
-            <p className="label">Tradeoff Scorecards</p>
+            <p className="label">What It Cost</p>
             <p className="mt-2 text-sm text-textMuted">
-              These cards show what the run preserved, where it paid a price, and which strategic line broke first.
+              These cards show what held, what got damaged, and where the run ran out of room.
             </p>
           </div>
           <div className="mt-4 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
@@ -363,7 +363,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
                 </div>
                 <p className="mt-3 text-sm leading-relaxed text-textMuted">{entry.summary}</p>
                 <div className="mt-3 rounded-md border border-borderTone/70 bg-surface/30 p-3">
-                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Primary tradeoff</p>
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">Cost paid</p>
                   <p className="mt-1 text-sm leading-relaxed text-textMain">{entry.tradeoff}</p>
                 </div>
               </article>
@@ -403,24 +403,24 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
 
       <section className="grid gap-4 lg:grid-cols-2">
           <article className="card p-5">
-            <p className="label">Pivotal Decision</p>
+            <p className="label">Biggest Turn</p>
             <p className="mt-3 text-sm text-textMain">
             Decision window {report.pivotalDecision.turn}: <span className="font-semibold">{report.pivotalDecision.actionName}</span>
             </p>
           <p className="mt-2 text-sm text-textMuted">{report.pivotalDecision.reason}</p>
 
-          <p className="label mt-4">Alternative Line</p>
+          <p className="label mt-4">What Else You Could Have Tried</p>
           <p className="mt-2 text-sm text-textMain">
             Suggested action in decision window {report.alternativeLine.turn}: <span className="font-semibold">{report.alternativeLine.suggestedActionName}</span>
           </p>
           <p className="mt-2 text-sm text-textMuted">{report.alternativeLine.predictedImpact}</p>
 
-          <p className="label mt-4">Observed Counterpart Logic</p>
+          <p className="label mt-4">How Beijing Read The Run</p>
           <p className="mt-2 text-sm text-textMuted">{report.fullCausality.adversaryLogicSummary}</p>
         </article>
 
         <article className="card p-5">
-          <p className="label">Decision Blind Spots</p>
+          <p className="label">What The Room Missed</p>
           <ul className="mt-3 list-disc space-y-2 pl-4 text-sm text-textMuted">
             {report.misjudgments.map((item, index) => (
               <li key={`${index}:${item}`}>{item}</li>
@@ -433,18 +433,18 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
         <section id="strategic-debrief" className="card scroll-mt-4 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="label">Strategic Debrief</p>
+              <p className="label">What Happened And Why</p>
               <h2 className="mt-2 font-display text-2xl text-textMain">{deepDebrief.grade.title}</h2>
             </div>
             <p className="rounded-md border border-borderTone bg-panelRaised/70 px-3 py-1 text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
-              Strategic Read {deepDebrief.grade.score}
+              Run Read {deepDebrief.grade.score}
             </p>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-textMuted">{deepDebrief.grade.description}</p>
 
           {deepDebrief.strategyArc ? (
             <div className="mt-5 rounded-lg border border-borderTone/70 bg-panelRaised/40 p-4">
-              <p className="label">Strategic Arc</p>
+              <p className="label">Shape Of The Run</p>
               <h3 className="mt-2 text-lg text-textMain">{deepDebrief.strategyArc.headline}</h3>
               <p className="mt-3 text-sm leading-relaxed text-textMuted">{deepDebrief.strategyArc.narrative}</p>
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
@@ -453,7 +453,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
                   <p className="mt-2 text-sm leading-relaxed text-textMuted">{deepDebrief.strategyArc.keyTurningPoint}</p>
                 </article>
                 <article className="rounded-md border border-borderTone/70 bg-surface/30 p-3">
-                  <p className="label">Counterfactual</p>
+                  <p className="label">Different Path</p>
                   <p className="mt-2 text-sm leading-relaxed text-textMuted">{deepDebrief.strategyArc.whatIfNote}</p>
                 </article>
               </div>
@@ -463,15 +463,15 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
           {deepDebrief.rivalPerspective ? (
             <div className="mt-5 grid gap-4 lg:grid-cols-3">
               <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-4">
-                <p className="label">Counterpart Internal View</p>
+                <p className="label">How Beijing Saw It</p>
                 <p className="mt-2 text-sm leading-relaxed text-textMuted">{deepDebrief.rivalPerspective.internalNarrative}</p>
               </article>
               <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-4">
-                <p className="label">Regime Assessment</p>
+                <p className="label">Pressure Inside Beijing</p>
                 <p className="mt-2 text-sm leading-relaxed text-textMuted">{deepDebrief.rivalPerspective.regimeAssessment}</p>
               </article>
               <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-4">
-                <p className="label">Public Narrative</p>
+                <p className="label">Public Story</p>
                 <p className="mt-2 text-sm leading-relaxed text-textMuted">{deepDebrief.rivalPerspective.publicNarrative}</p>
               </article>
             </div>
@@ -481,7 +481,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
 
       {report.fullCausality.rivalLeaderReveal ? (
         <section className="card p-5">
-          <p className="label">Counterpart Assessment</p>
+          <p className="label">Beijing Decision-Maker Read</p>
           <h2 className="mt-2 font-display text-2xl text-textMain">
             {report.fullCausality.rivalLeaderReveal.publicName}
           </h2>
@@ -531,7 +531,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
       {deepDebrief && (deepDebrief.advisorReflections.length > 0 || deepDebrief.historicalParallels.length > 0 || deepDebrief.lessonsLearned.length > 0) ? (
         <section className="grid gap-4 lg:grid-cols-2">
           <article className="card p-5">
-            <p className="label">Advisor Post-Mortems</p>
+            <p className="label">Advisor After-Action Notes</p>
             {deepDebrief.advisorReflections.length > 0 ? (
               <div className="mt-3 space-y-3">
                 {deepDebrief.advisorReflections.map((entry) => (
@@ -618,7 +618,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="card p-5">
-          <p className="label">Unseen System Events</p>
+          <p className="label">Events You Did Not See</p>
           {report.fullCausality.unseenSystemEvents.length > 0 ? (
             <ul className="mt-3 space-y-2 text-sm text-textMuted">
               {report.fullCausality.unseenSystemEvents.map((event, index) => (
@@ -633,7 +633,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
         </article>
 
         <article className="card p-5">
-          <p className="label">Advisor Retrospectives</p>
+          <p className="label">Advisor Closing Notes</p>
           {report.fullCausality.advisorRetrospectives.length > 0 ? (
             <ul className="mt-3 space-y-2 text-sm text-textMuted">
               {report.fullCausality.advisorRetrospectives.map((entry, index) => (
@@ -649,8 +649,8 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
       </section>
 
       <section className="card p-5">
-        <p className="label">Branches Not Taken</p>
-        <p className="mt-2 text-xs text-textMuted">Top counterfactual branches by stress impact and pivot relevance (max 6).</p>
+        <p className="label">Roads Not Taken</p>
+        <p className="mt-2 text-xs text-textMuted">Other branches that could have changed the run the most.</p>
         {report.fullCausality.branchesNotTaken.length > 0 ? (
           <div className="mt-3 space-y-3">
             {report.fullCausality.branchesNotTaken.map((entry, entryIndex) => (
@@ -674,14 +674,14 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
       </section>
 
       <section className="card p-5">
-        <p className="label">Counterpart Assessment Path</p>
+        <p className="label">How Beijing's Read Changed</p>
         <div className="mt-3 overflow-x-auto">
           <table className="min-w-full border-collapse text-sm">
             <thead>
               <tr className="text-left text-textMuted">
                 <th className="border-b border-borderTone py-2 pr-4">Window</th>
-                <th className="border-b border-borderTone py-2 pr-4">Perceived bluff risk</th>
-                <th className="border-b border-borderTone py-2 pr-4">Perceived escalation threshold</th>
+                <th className="border-b border-borderTone py-2 pr-4">Bluff risk</th>
+                <th className="border-b border-borderTone py-2 pr-4">Trigger risk</th>
                 <th className="border-b border-borderTone py-2">Humiliation pressure</th>
               </tr>
             </thead>

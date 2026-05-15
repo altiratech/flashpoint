@@ -53,7 +53,7 @@ const waitForPostCommit = async (page: Page): Promise<'briefing' | 'report'> => 
   while (Date.now() < deadline) {
     const reachedReport =
       (await report.isVisible().catch(() => false)) ||
-      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|Strategic Debrief/i.test(text)).catch(() => false));
+      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
     if (reachedReport) {
       return 'report';
     }
@@ -61,7 +61,7 @@ const waitForPostCommit = async (page: Page): Promise<'briefing' | 'report'> => 
       await page.waitForTimeout(750);
       const reachedReportAfterSettling =
         (await report.isVisible().catch(() => false)) ||
-        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|Strategic Debrief/i.test(text)).catch(() => false));
+        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
       if (reachedReportAfterSettling) {
         return 'report';
       }

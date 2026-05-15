@@ -250,7 +250,7 @@ export const StartScreen = ({
       {
         id: 'market_first',
         title: 'Why The Market Moves First',
-        body: 'Commercial actors usually react before governments settle on language, which is why insurance, freight, and chip supply can break before policy does.'
+        body: 'Businesses usually react before governments settle on language, which is why insurance, freight, and chip supply can break before policy does.'
       },
       {
         id: 'what_you_control',

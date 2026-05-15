@@ -183,7 +183,7 @@ const hiddenDownsideMeta = (category?: string | null): { label: string; detail: 
     },
     panic_buying: {
       label: 'Panic buying',
-      detail: 'Commercial actors may rush to secure inventory and routing, worsening shortages and price shock.'
+      detail: 'Businesses may rush to secure inventory and shipping routes, worsening shortages and price shock.'
     },
     panic_signal: {
       label: 'Panic signal',
@@ -210,11 +210,11 @@ const hiddenDownsideMeta = (category?: string | null): { label: string; detail: 
       detail: 'The move may be too gradual to shape expectations before the next shock arrives.'
     },
     strategic_retreat: {
-      label: 'Strategic retreat signal',
+      label: 'Retreat signal',
       detail: 'The move can be read as preparing to step back rather than preparing to hold the line.'
     },
     systemic_spillover: {
-      label: 'Systemic spillover',
+      label: 'Spillover',
       detail: 'The damage can escape the immediate theater and begin stressing the wider financial and operating system.'
     },
     underreaction: {

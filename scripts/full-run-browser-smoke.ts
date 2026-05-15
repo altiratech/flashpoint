@@ -194,14 +194,15 @@ const readVisibleImages = async (page: Page): Promise<VisibleImageRead[]> => {
 
 const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]> => {
   const file = path.join(outputDir, `${safeName(name)}.png`);
+  if (name === '99-report') {
+    await page.screenshot({ path: file, fullPage: false, timeout: 10_000 });
+    return readVisibleImages(page);
+  }
+
   try {
     await page.screenshot({ path: file, fullPage: true, timeout: 20_000 });
   } catch (error) {
-    if (name === '99-report') {
-      await page.screenshot({ path: file, fullPage: false, timeout: 10_000 });
-    } else {
-      throw error;
-    }
+    throw error;
   }
   return readVisibleImages(page);
 };
@@ -280,7 +281,7 @@ const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promis
   while (Date.now() < deadline) {
     const reachedReport =
       (await reportHeading.isVisible().catch(() => false)) ||
-      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|Strategic Debrief/i.test(text)).catch(() => false));
+      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
     if (reachedReport) {
       return;
     }
@@ -291,7 +292,7 @@ const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promis
       await sleep(750);
       const reachedReportAfterSettling =
         (await reportHeading.isVisible().catch(() => false)) ||
-        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|Strategic Debrief/i.test(text)).catch(() => false));
+        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
       if (reachedReportAfterSettling) {
         return;
       }
@@ -368,7 +369,7 @@ const run = async (): Promise<void> => {
       await waitForPostCommitAdvance(page, index);
 
       if (await page.getByText(/Mandate Assessment/i).first().isVisible().catch(() => false)) {
-        await page.getByText(/Strategic Debrief/i).first().waitFor({ timeout: 10_000 });
+        await page.getByText(/What Happened And Why/i).first().waitFor({ timeout: 10_000 });
         imageLog.push(`99-report: ${(await captureStep(page, '99-report')).map((entry) => entry.src).join(', ') || 'no images'}`);
         break;
       }

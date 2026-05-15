@@ -134,8 +134,8 @@ const hiddenDownsideLabel = (category?: string | null): string => {
     retaliatory_cyber: 'Retaliatory cyber',
     retaliatory_pressure: 'Retaliatory pressure',
     slow_rollout: 'Slow rollout',
-    strategic_retreat: 'Strategic retreat signal',
-    systemic_spillover: 'Systemic spillover',
+    strategic_retreat: 'Retreat signal',
+    systemic_spillover: 'Spillover',
     underreaction: 'Underreaction',
     visible_blink: 'Visible blink'
   };

@@ -2,6 +2,9 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Shipped a bounded plain-English report/detail copy pass. Final report labels now say things like `End State`, `What It Cost`, `What Happened And Why`, `Roads Not Taken`, and `How Beijing's Read Changed`; generated report alternatives, misjudgment lines, adversary summaries, dynamic briefing context, hidden-downside labels, and advisor rationale copy were tightened toward direct player-facing English.
+- Repaired the browser smoke harness after the label changes: report detection now waits on `What Happened And Why`, and the default smoke captures the final report viewport directly so the tall report page cannot stall the run after reaching the end state.
+- Verification after the copy/harness slice: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`, default/varied/public-econ browser smokes, 390px mobile recovery smoke, and desktop/mobile report screenshot review all passed.
 - Fixed briefing image priority so the consequence images selected by the engine/API become the next briefing's main visual evidence instead of being displaced by generic beat preview art.
 - Tightened the public/economic browser smoke path to choose Calibrated Address and Signaling Tranche, then fail unless the White House briefing, semiconductor-fab disruption, and market-crash/chip-crisis images appear in real screenshots. Added viewport controls to the full-run smoke and verified the path at 390px.
 - Added state-derived aftermath imagery to the final mandate report using existing local raster assets, with selector logic that avoids maps, artifacts, SVGs, and generated placeholder IDs.

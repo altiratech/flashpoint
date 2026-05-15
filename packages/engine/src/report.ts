@@ -130,20 +130,20 @@ const pickAlternative = (
   if (diff > 4) {
     return {
       actionId: best.actionId,
-      predictedImpact: `Projected to reduce immediate system stress by ~${diff.toFixed(1)} points with lower escalation carryover.`
+      predictedImpact: `Would likely have lowered immediate pressure by about ${diff.toFixed(1)} points and left less danger for the next window.`
     };
   }
 
   if (diff > 0) {
     return {
       actionId: best.actionId,
-      predictedImpact: `Projected to modestly improve turn-level stability by ~${diff.toFixed(1)} points.`
+      predictedImpact: `Would likely have made this turn slightly steadier by about ${diff.toFixed(1)} points.`
     };
   }
 
   return {
     actionId: best.actionId,
-    predictedImpact: 'Likely similar near-term outcome, but with different alliance and signaling profile.'
+    predictedImpact: 'Likely a similar near-term result, but allies and markets would have read it differently.'
   };
 };
 
@@ -151,9 +151,9 @@ const buildMisjudgments = (state: GameState): string[] => {
   const latest = state.history.slice(-3);
   if (latest.length === 0) {
     return [
-      'Intel confidence was insufficient for robust misjudgment analysis.',
+      'The picture was too blurry to say what the room misread.',
       'No completed turns were logged for post-game comparison.',
-      'Run another episode to unlock comparative diagnostics.'
+      'Run another episode to compare decisions more clearly.'
     ];
   }
 
@@ -165,7 +165,7 @@ const buildMisjudgments = (state: GameState): string[] => {
       const midpoint = (range.low + range.high) / 2;
       const error = Math.abs(trueValue - midpoint);
       if (error >= 7) {
-        mistakes.push(`Turn ${entry.turn}: ${meter} was misread by about ${error.toFixed(1)} points under noisy intel.`);
+        mistakes.push(`Window ${entry.turn}: the room misread ${meterDisplayName[meter as MeterKey]} by about ${error.toFixed(1)} points because the picture was noisy.`);
       }
       if (mistakes.length >= 3) {
         break;
@@ -178,9 +178,9 @@ const buildMisjudgments = (state: GameState): string[] => {
 
   if (mistakes.length < 3) {
     const fill = [
-      'Rival humiliation accumulated faster than visible indicators suggested.',
-      'Alliance resilience appeared stronger than it was under repeated public signaling shocks.',
-      'Escalation velocity from combined public and covert moves was underestimated.'
+      'Beijing felt more humiliated than the visible signals suggested.',
+      'Allied unity looked stronger than it really was after repeated public shocks.',
+      'The room underestimated how fast public and hidden moves could push the crisis.'
     ];
     for (const line of fill) {
       if (mistakes.length >= 3) {
@@ -468,7 +468,7 @@ const derivePrimaryDriver = (hiddenDeltas: PostGameReport['fullCausality']['hidd
   const ranked = [...hiddenDeltas].sort((left, right) => Math.abs(right.totalDelta) - Math.abs(left.totalDelta));
   const top = ranked[0];
   if (!top) {
-    return 'cumulative multi-domain pressure';
+    return 'pressure building from several directions';
   }
 
   if (top.meter === 'escalationIndex' && top.totalDelta > 0) {
@@ -489,7 +489,7 @@ const buildAdversaryLogicSummary = (
     .filter((action): action is ActionDefinition => Boolean(action && action.actor === 'rival'));
 
   if (rivalActions.length === 0) {
-    return 'Insufficient rival-action history to reconstruct adversary logic for this run.';
+    return 'There was not enough Beijing response history to explain how the other side was reading the run.';
   }
 
   const escalatoryTurns = rivalActions.filter((action) => action.signal.escalatory >= action.signal.deescalatory).length;
@@ -500,13 +500,13 @@ const buildAdversaryLogicSummary = (
 
   const stance =
     escalatoryTurns > deescalatoryTurns
-      ? 'favored coercive signaling'
+      ? 'kept choosing pressure'
       : deescalatoryTurns > escalatoryTurns
-        ? 'favored controlled de-escalation windows'
-        : 'oscillated between escalation and restraint';
+        ? 'kept looking for chances to cool things down'
+        : 'swung between pressure and restraint';
 
   const profileLabel = adversaryProfile?.name ?? 'Scenario-embedded adversary model';
-  return `${profileLabel} ${stance}. Rival action mix was ${escalatoryTurns}/${rivalActions.length} escalatory-coded turns, with mean threshold belief ${avgThreshold.toFixed(2)}, bluff belief ${avgBluff.toFixed(2)}, and humiliation pressure ${avgHumiliation.toFixed(2)}.`;
+  return `${profileLabel} ${stance}. It chose pressure on ${escalatoryTurns} of ${rivalActions.length} turns. By the end of the run, its trigger-risk read averaged ${avgThreshold.toFixed(2)}, its bluff read averaged ${avgBluff.toFixed(2)}, and humiliation pressure averaged ${avgHumiliation.toFixed(2)}.`;
 };
 
 const buildRivalLeaderReveal = (
@@ -801,7 +801,7 @@ export const buildPostGameReport = (
   const pivotalActionName = describeHistoryAction(pivotal, actionMap);
   const unseenCritical = unseenSystemEvents.find((entry) => entry.turn === pivotal.turn) ?? unseenSystemEvents[0];
   const cascadeTurn = state.history.find((entry) => entry.meterAfter.economicStability < 38);
-  const cascadeActionName = cascadeTurn ? describeHistoryAction(cascadeTurn, actionMap) : 'compounded policy friction';
+  const cascadeActionName = cascadeTurn ? describeHistoryAction(cascadeTurn, actionMap) : 'pressure piling up across the run';
   const finalTurn = state.history[state.history.length - 1]?.turn ?? state.turn;
 
   const templateValues: Record<string, string> = {
@@ -828,7 +828,7 @@ export const buildPostGameReport = (
     ?? terminalBeat?.sceneFragments[0]
     ?? options.causalityNarrative?.summary
     ?? describeOutcome(outcome);
-  const causalTemplate = options.causalityNarrative?.causalNote ?? 'Primary driver: {primary_driver}. Critical turn: {critical_turn} via {critical_action}.';
+  const causalTemplate = options.causalityNarrative?.causalNote ?? 'Main driver: {primary_driver}. The key turn was window {critical_turn}: {critical_action}.';
   const causalNote = applyTemplate(causalTemplate, templateValues);
 
   const advisorRetrospectives = (options.advisorRetrospectives ?? []).map((entry) => ({
@@ -847,7 +847,7 @@ export const buildPostGameReport = (
       turn: pivotal.turn,
       actionId: pivotal.playerActionId,
       actionName: pivotalActionName,
-      reason: `This turn created the largest stress shift (${Math.abs(stressScore(pivotal.meterAfter) - stressScore(pivotal.meterBefore)).toFixed(1)} points).`
+      reason: `This was the turn that moved the run the most (${Math.abs(stressScore(pivotal.meterAfter) - stressScore(pivotal.meterBefore)).toFixed(1)} points).`
     },
     beliefEvolution: state.history.map((entry) => ({
       turn: entry.turn,

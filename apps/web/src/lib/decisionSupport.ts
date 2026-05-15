@@ -146,15 +146,15 @@ const rationaleForAdvisor = (advisorId: string, alignment: AdvisorAlignment): st
   switch (advisorId) {
     case 'cross':
       if (alignment === 'supports') {
-        return 'Sees this as visible resolve that can raise the cost of the next PLA move without conceding initiative.';
+        return 'Sees this as a visible move that can make the next PLA step more costly without giving up the initiative.';
       }
       if (alignment === 'opposes') {
-        return 'Views this as signaling restraint too early or relying on tools that do not visibly reset deterrence.';
+        return 'Thinks this shows restraint too early or leans on tools Beijing may not fear.';
       }
-      return 'Sees some signaling value here, but questions whether it shows enough force to change Beijing’s calculus.';
+      return 'Sees some value here, but questions whether Beijing will see enough force to change course.';
     case 'chen':
       if (alignment === 'supports') {
-        return 'Sees this as preserving coalition discipline while leaving room for an off-ramp that does not legitimize coercion.';
+        return 'Sees this as keeping allies together while leaving a way out that does not reward coercion.';
       }
       if (alignment === 'opposes') {
         return 'Thinks this hardens positions faster than it buys leverage and may close the diplomatic exit.';
@@ -162,7 +162,7 @@ const rationaleForAdvisor = (advisorId: string, alignment: AdvisorAlignment): st
       return 'Accepts parts of the move, but worries execution or framing could split allies or narrow the exit ramp.';
     case 'okonkwo':
       if (alignment === 'supports') {
-        return 'Likes the coalition and market-management profile and sees this as pressure the alliance can sustain.';
+        return 'Likes the market and alliance shape of this move and thinks it is pressure the coalition can carry.';
       }
       if (alignment === 'opposes') {
         return 'Thinks the commercial blowback or coalition cost outweighs the immediate pressure value.';
@@ -170,12 +170,12 @@ const rationaleForAdvisor = (advisorId: string, alignment: AdvisorAlignment): st
       return 'Sees leverage here, but worries about shipping, chip, and market spillover if the move is mishandled.';
     case 'reed':
       if (alignment === 'supports') {
-        return 'Prefers the optionality and ambiguity here; it applies pressure without forcing an overt commitment.';
+        return 'Likes that this keeps choices open and applies pressure without a public commitment.';
       }
       if (alignment === 'opposes') {
-        return 'Views this as closing off covert options and forcing the crisis into an overt response channel.';
+        return 'Thinks this closes off hidden options and forces the crisis into a public answer.';
       }
-      return 'Sees utility, but worries the move either telegraphs too much or leaves too little deniable leverage.';
+      return 'Sees use in it, but worries the move either reveals too much or leaves too little hidden leverage.';
     default:
       if (alignment === 'supports') {
         return 'Current read is favorable.';

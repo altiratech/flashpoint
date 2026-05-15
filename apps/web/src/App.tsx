@@ -635,7 +635,7 @@ const buildDynamicContextSections = (
             .map((entry) => {
               if (entry.key === 'economicStability') {
                 return entry.delta < 0
-                  ? 'Commercial actors stopped treating the disruption like a bluff and started planning around real delay, reroute, and inventory pain.'
+                  ? 'Businesses stopped treating the disruption like a bluff and started planning for real delays, reroutes, and inventory pain.'
                   : 'Commercial stress eased slightly, which buys the room a little time before panic starts writing the script.';
               }
               if (entry.key === 'energySecurity') {
@@ -645,18 +645,18 @@ const buildDynamicContextSections = (
               }
               if (entry.key === 'domesticCohesion') {
                 return entry.delta < 0
-                  ? 'Domestic tolerance weakened, which means the next visible shock could leave the secure room and land in ordinary life.'
+                  ? 'People at home have less patience now, so the next visible shock could spill out of the secure room and into ordinary life.'
                   : 'Domestic nerves held for another window, which matters because panic at home can wreck strategy abroad.';
               }
               if (entry.key === 'militaryReadiness') {
                 return entry.delta > 0
-                  ? 'Military posture became more visible, which can steady deterrence or make the next misread far more dangerous.'
-                  : 'Military posture softened slightly, preserving reversibility but inviting a harder test if the other side reads caution as hesitation.';
+                  ? 'More ships, aircraft, and warning systems are visible now, which can steady the room or make the next misread more dangerous.'
+                  : 'The visible military footprint softened slightly, keeping a way back open but inviting a harder test if the other side reads caution as hesitation.';
               }
               if (entry.key === 'allianceTrust') {
                 return entry.delta < 0
-                  ? 'Coalition discipline weakened, so the same event may now be landing as caution in one capital and alarm in another.'
-                  : 'Coalition messaging tightened, which helps because markets and commanders punish mixed signals fast.';
+                  ? 'Allies are less aligned now, so the same event may land as caution in one capital and alarm in another.'
+                  : 'Allied messaging tightened, which helps because markets and commanders punish mixed signals fast.';
               }
               return entry.delta > 0
                 ? 'Hotlines, pilots, insurers, and political staffs are all feeling a tighter clock now.'
@@ -684,7 +684,7 @@ const buildDynamicContextSections = (
     currentPressureSentences.push('Commercial and market channels are already repricing risk before any formal blockade, which raises the cost of drift.');
   }
   if (meters.militaryReadiness >= 65) {
-    currentPressureSentences.push('Military posture is becoming more operationally relevant, which can stabilize deterrence or accelerate a collision if misread.');
+    currentPressureSentences.push('Ships, aircraft, and warning systems matter more now; they can steady deterrence or make a collision happen faster if misread.');
   }
   if (currentPressureSentences.length === 0) {
     currentPressureSentences.push('The room is still holding together, but one badly framed move could change how allies, shippers, and markets read the whole crisis.');
