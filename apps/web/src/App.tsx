@@ -1461,14 +1461,14 @@ const App = () => {
   }, [episode?.activeCountdown?.expiresAt, episode?.episodeId, episode?.status, episode?.turn]);
 
   useEffect(() => {
-    if (!episode?.activeCountdown || episode.status !== 'active' || loading || turnStage !== 'decision') {
+    if (!episode?.activeCountdown || episode.status !== 'active' || loading) {
       return;
     }
 
     if (nowMs >= episode.activeCountdown.expiresAt) {
       void handleInaction('timeout');
     }
-  }, [episode?.activeCountdown, episode?.status, handleInaction, loading, nowMs, turnStage]);
+  }, [episode?.activeCountdown, episode?.status, handleInaction, loading, nowMs]);
 
   useEffect(() => {
     if (!episode || episode.status !== 'active') {

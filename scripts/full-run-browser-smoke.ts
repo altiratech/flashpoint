@@ -8,6 +8,7 @@ const outputDir = process.env.PLAYTEST_OUTPUT_DIR ?? 'output/playwright';
 const maxDecisionWindows = Number.parseInt(process.env.PLAYTEST_MAX_WINDOWS ?? '10', 10);
 const headed = process.env.PLAYTEST_HEADED === '1';
 const responseStrategy = process.env.PLAYTEST_RESPONSE_STRATEGY ?? 'default';
+const timerMode = process.env.PLAYTEST_TIMER_MODE ?? 'off';
 const deterministicSeed = process.env.PLAYTEST_SEED?.trim() ?? '';
 const viewportWidth = Number.parseInt(process.env.PLAYTEST_VIEWPORT_WIDTH ?? '1440', 10);
 const viewportHeight = Number.parseInt(process.env.PLAYTEST_VIEWPORT_HEIGHT ?? '1100', 10);
@@ -137,6 +138,67 @@ const configureDeterministicSeed = async (page: Page): Promise<void> => {
   await seedInput.fill(deterministicSeed);
 };
 
+const configureTimerMode = async (page: Page): Promise<void> => {
+  if (timerMode === 'off') {
+    return;
+  }
+
+  if (!['standard', 'relaxed'].includes(timerMode)) {
+    throw new Error(`Unsupported PLAYTEST_TIMER_MODE: ${timerMode}`);
+  }
+
+  const label = timerMode === 'standard' ? /Standard timed/i : /Relaxed timed/i;
+  const timerButton = page.getByRole('button', { name: label }).first();
+  await timerButton.waitFor({ state: 'visible', timeout: 5_000 });
+  await timerButton.click();
+};
+
+const readClockChip = async (page: Page): Promise<string> =>
+  page
+    .locator('.console-chip', { hasText: /Clock/i })
+    .first()
+    .innerText({ timeout: 5_000 })
+    .then((text) => text.replace(/\s+/g, ' ').trim());
+
+const verifyTimedBriefingClock = async (page: Page): Promise<string | null> => {
+  if (timerMode === 'off') {
+    return null;
+  }
+
+  const clockText = await readClockChip(page);
+  if (!/\bClock\s+\d+s\b/i.test(clockText)) {
+    throw new Error(`Timed mode did not show a running briefing clock. Saw: ${clockText}`);
+  }
+
+  return clockText;
+};
+
+const verifyTimedDecisionClock = async (page: Page, windowIndex: number): Promise<string | null> => {
+  if (timerMode === 'off') {
+    return null;
+  }
+
+  const expectedLabel = timerMode === 'standard' ? /Standard timed/i : /Relaxed timed/i;
+  const clockPanel = page.locator('div', { hasText: /Decision Clock/ }).filter({ hasText: expectedLabel }).first();
+  await clockPanel.waitFor({ state: 'visible', timeout: 5_000 });
+  const clockText = (await clockPanel.innerText()).replace(/\s+/g, ' ').trim();
+  if (!/\d+ seconds remain before this window resolves as inaction/i.test(clockText)) {
+    throw new Error(`Timed mode decision clock copy was not visible. Saw: ${clockText}`);
+  }
+
+  if (windowIndex === 1) {
+    const extendButton = page.getByRole('button', { name: /Extend Clock/i }).first();
+    await extendButton.waitFor({ state: 'visible', timeout: 5_000 });
+    if (!(await extendButton.isEnabled())) {
+      throw new Error('Timed mode first decision did not expose an enabled Extend Clock control.');
+    }
+    await extendButton.click();
+    await sleep(500);
+  }
+
+  return clockText;
+};
+
 const chooseFirstAvailableResponse = async (page: Page, windowIndex: number): Promise<string> => {
   const responsePanel = page.locator('section', { hasText: /What Do You Do\?|Response Options|Available Moves/i }).first();
   await responsePanel.waitFor({ state: 'visible', timeout: 10_000 });
@@ -215,6 +277,7 @@ const writeSmokeSummary = async (input: {
   failureScreenshot?: string;
   screenshotError?: string;
   decisionLog: string[];
+  timerLog: string[];
   imageLog: string[];
   consoleErrors: string[];
   pageErrors: string[];
@@ -224,6 +287,7 @@ const writeSmokeSummary = async (input: {
     webUrl,
     currentUrl: input.currentUrl ?? null,
     responseStrategy,
+    timerMode,
     seed: deterministicSeed || null,
     viewport: {
       width: viewportWidth,
@@ -235,6 +299,7 @@ const writeSmokeSummary = async (input: {
     error: input.error ?? null,
     decisionWindows: input.decisionLog.length,
     decisions: input.decisionLog,
+    timers: input.timerLog,
     visibleImages: input.imageLog,
     consoleErrors: input.consoleErrors,
     pageErrors: input.pageErrors,
@@ -250,6 +315,7 @@ const writeSmokeSummary = async (input: {
       `- URL: ${webUrl}`,
       `- Current URL: ${input.currentUrl ?? 'n/a'}`,
       `- Response strategy: ${responseStrategy}`,
+      `- Timer mode: ${timerMode}`,
       `- Seed: ${deterministicSeed || 'n/a'}`,
       `- Viewport: ${viewportWidth}x${viewportHeight}`,
       `- Decision windows: ${input.decisionLog.length}`,
@@ -259,6 +325,9 @@ const writeSmokeSummary = async (input: {
       '',
       '## Decisions',
       input.decisionLog.length > 0 ? input.decisionLog.map((entry) => `- ${entry}`).join('\n') : '- n/a',
+      '',
+      '## Timers',
+      input.timerLog.length > 0 ? input.timerLog.map((entry) => `- ${entry}`).join('\n') : '- n/a',
       '',
       '## Visible Images',
       input.imageLog.length > 0 ? input.imageLog.map((entry) => `- ${entry}`).join('\n') : '- n/a',
@@ -314,6 +383,7 @@ const run = async (): Promise<void> => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
   const decisionLog: string[] = [];
+  const timerLog: string[] = [];
   const imageLog: string[] = [];
 
   try {
@@ -331,6 +401,7 @@ const run = async (): Promise<void> => {
 
     await page.goto(webUrl, { waitUntil: 'domcontentloaded' });
     await waitForAppReady(page);
+    await configureTimerMode(page);
     await configureDeterministicSeed(page);
     imageLog.push(`00-setup: ${(await captureStep(page, '00-setup')).map((entry) => entry.src).join(', ') || 'no images'}`);
 
@@ -339,6 +410,10 @@ const run = async (): Promise<void> => {
     }
 
     await waitForBriefing(page, 20_000);
+    const briefingClock = await verifyTimedBriefingClock(page);
+    if (briefingClock) {
+      timerLog.push(`first briefing: ${briefingClock}`);
+    }
     imageLog.push(
       `01-first-briefing: ${(await captureStep(page, '01-first-briefing')).map((entry) => entry.src).join(', ') || 'no images'}`
     );
@@ -353,6 +428,10 @@ const run = async (): Promise<void> => {
       }
 
       await waitForDecisionView(page, 10_000);
+      const decisionClock = index === 1 ? await verifyTimedDecisionClock(page, index) : null;
+      if (decisionClock && index === 1) {
+        timerLog.push(`first decision: visible and extendable`);
+      }
       const responseLabel = await chooseFirstAvailableResponse(page, index);
       decisionLog.push(`${index}: ${responseLabel}`);
       imageLog.push(
@@ -454,6 +533,7 @@ const run = async (): Promise<void> => {
       status: 'passed',
       currentUrl: page.url(),
       decisionLog,
+      timerLog,
       imageLog,
       consoleErrors,
       pageErrors
@@ -479,6 +559,7 @@ const run = async (): Promise<void> => {
       failureScreenshot,
       screenshotError,
       decisionLog,
+      timerLog,
       imageLog,
       consoleErrors,
       pageErrors

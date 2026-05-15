@@ -3276,8 +3276,19 @@
         "terminalOutcome": null,
         "meterOverrides": null,
         "advisorUnlock": null,
-        "musicCue": null,
-        "decisionWindow": null,
+        "musicCue": "tense_low",
+        "decisionWindow": {
+          "seconds": 90,
+          "inactionBeatId": "ns_deceptive_picture",
+          "inactionDeltas": {
+            "escalationIndex": 5,
+            "economicStability": -4,
+            "militaryReadiness": -3,
+            "allianceTrust": -4,
+            "domesticCohesion": -2
+          },
+          "inactionNarrative": "Situation flash: no clear directive went out while the false tracks were still fresh. Insurers, allied watchfloors, and cable-news desks filled the silence, and the dirty picture became the first public version of the crisis."
+        },
         "visualCue": {
           "preferredKinds": [
             "documentary_still",

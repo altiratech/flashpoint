@@ -22,6 +22,7 @@
     "smoke:browser": "node --import tsx scripts/full-run-browser-smoke.ts",
     "smoke:browser:varied": "PLAYTEST_RESPONSE_STRATEGY=varied PLAYTEST_OUTPUT_DIR=output/playwright-varied node --import tsx scripts/full-run-browser-smoke.ts",
     "smoke:browser:public-econ": "PLAYTEST_RESPONSE_STRATEGY=public-econ PLAYTEST_SEED=public-econ-2 PLAYTEST_OUTPUT_DIR=output/playwright-public-econ node --import tsx scripts/full-run-browser-smoke.ts",
+    "smoke:browser:timed": "PLAYTEST_TIMER_MODE=standard PLAYTEST_OUTPUT_DIR=output/playwright-timed node --import tsx scripts/full-run-browser-smoke.ts",
     "smoke:browser:recovery": "node --import tsx scripts/recovery-browser-smoke.ts",
     "simulate:balance": "node --import tsx scripts/monte-carlo.ts",
     "test:token-regression": "node --import tsx scripts/token-regression.ts",

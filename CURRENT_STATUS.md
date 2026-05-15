@@ -15,13 +15,13 @@ Current state:
 - Action cards and selected-response consequence reads now use direct player-facing language; bare ambiguous commands like `sanctions` still route to review instead of accidental execution.
 - The final mandate report preserves selected variant/custom action labels, including custom-response roads-not-taken labels, includes Homefront consequences, promotes a state-derived aftermath image, and uses readable branch labels instead of raw IDs/gate syntax.
 - Report labels, advisor readouts, and generated causality/detail lines use plainer English in the player-facing surfaces instead of policy-room shorthand.
-- Active-run recovery now resolves expired countdowns on resume instead of reopening stale decisions.
+- Timed mode is now real from the flagship opening: Standard timed starts with an authored 90-second clock, the first decision exposes an extendable clock, and expired active countdowns resolve across briefing/decision views and on resume.
 - The setup `Continue Latest Run` panel now has a direct Remove action for the latest active run.
-- Browser smoke coverage includes default, varied, strict public-econ, desktop recovery/reopen/cleanup, 390px mobile recovery/reopen/cleanup, and 390px public-econ image coverage; the smoke harness now waits on current report labels and avoids hanging on the tall report screenshot.
+- Browser smoke coverage includes default, varied, strict public-econ, timed desktop/mobile, desktop recovery/reopen/cleanup, 390px mobile recovery/reopen/cleanup, and 390px public-econ image coverage; the smoke harness now waits on current report labels and avoids hanging on the tall report screenshot.
 
 Validation:
 - Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.
-- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, no-fallback-art default smoke, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, and 390px custom-response-through-report smoke.
+- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:timed`, 390px timed smoke, `npm run smoke:browser:recovery`, no-fallback-art default smoke, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, and 390px custom-response-through-report smoke.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
