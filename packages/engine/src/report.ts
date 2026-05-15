@@ -74,6 +74,15 @@ const findPivotalTurn = (history: TurnHistoryEntry[]): TurnHistoryEntry => {
   return ranked[0] as TurnHistoryEntry;
 };
 
+const describeHistoryAction = (
+  entry: TurnHistoryEntry,
+  actionMap: Map<string, ActionDefinition>
+): string => {
+  const baseName = actionMap.get(entry.playerActionId)?.name ?? entry.playerActionId;
+  const detail = entry.playerActionCustomLabel ?? entry.playerActionVariantLabel;
+  return detail ? `${baseName} (${detail})` : baseName;
+};
+
 const pickAlternative = (
   pivotal: TurnHistoryEntry,
   actionMap: Map<string, ActionDefinition>
@@ -789,10 +798,10 @@ export const buildPostGameReport = (
   const peakEscalationTurn = [...state.history].sort(
     (left, right) => right.meterAfter.escalationIndex - left.meterAfter.escalationIndex
   )[0];
-  const pivotalActionName = actionMap.get(pivotal.playerActionId)?.name ?? pivotal.playerActionId;
+  const pivotalActionName = describeHistoryAction(pivotal, actionMap);
   const unseenCritical = unseenSystemEvents.find((entry) => entry.turn === pivotal.turn) ?? unseenSystemEvents[0];
   const cascadeTurn = state.history.find((entry) => entry.meterAfter.economicStability < 38);
-  const cascadeActionName = cascadeTurn ? actionMap.get(cascadeTurn.playerActionId)?.name ?? cascadeTurn.playerActionId : 'compounded policy friction';
+  const cascadeActionName = cascadeTurn ? describeHistoryAction(cascadeTurn, actionMap) : 'compounded policy friction';
   const finalTurn = state.history[state.history.length - 1]?.turn ?? state.turn;
 
   const templateValues: Record<string, string> = {

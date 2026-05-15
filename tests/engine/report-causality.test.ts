@@ -148,4 +148,54 @@ describe('post-game causality report', () => {
       deepDebrief?.terminalBeatTradeoffCommentary?.ns_blockade_lock?.economic_containment?.tradeoff
     );
   });
+
+  it('includes selected variant labels in report decision names', () => {
+    if (!blackSwanScenario || !blackSwanAdversaryProfile) {
+      throw new Error('Black swan scenario/adversaryProfile unavailable');
+    }
+
+    let state = initializeGameState('report-variant-label', 'REPORT-VARIANT-LABEL', {
+      scenario: blackSwanScenario,
+      adversaryProfile: blackSwanAdversaryProfile,
+      actions,
+      images
+    }, {
+      nowMs: 30_000
+    });
+
+    const selectedActionId = state.offeredActionIds.find((actionId) => {
+      const action = actions.find((entry) => entry.id === actionId);
+      return Boolean(action?.variants?.length);
+    });
+    const selectedAction = actions.find((entry) => entry.id === selectedActionId);
+    const selectedVariant = selectedAction?.variants?.[0] ?? null;
+
+    if (!selectedAction || !selectedVariant) {
+      throw new Error('No variant-bearing action available for report test');
+    }
+
+    const { nextState } = resolveTurn(state, selectedAction.id, {
+      scenario: blackSwanScenario,
+      adversaryProfile: blackSwanAdversaryProfile,
+      actions,
+      images
+    }, {
+      nowMs: 30_000,
+      playerVariantId: selectedVariant.id
+    });
+    state = nextState;
+    state.status = 'completed';
+    state.currentBeatId = 'ns_blockade_lock';
+    state.outcome = 'frozen_conflict';
+    state.offeredActionIds = [];
+    state.activeCountdown = null;
+
+    const report = buildPostGameReport(state, buildActionMap(actions), {
+      scenario: blackSwanScenario,
+      adversaryProfile: blackSwanAdversaryProfile
+    });
+
+    expect(report.pivotalDecision.actionName).toContain(selectedAction.name);
+    expect(report.pivotalDecision.actionName).toContain(selectedVariant.label);
+  });
 });

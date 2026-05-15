@@ -469,14 +469,25 @@ export const StartScreen = ({
                         Window {latestActiveRun.turn} / {latestActiveRun.lastSeenLabel} / {latestActiveRun.shortId}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="console-button console-button-primary shrink-0"
-                      onClick={() => void onResumeRun(latestActiveRun.episodeId)}
-                      disabled={loading}
-                    >
-                      {loading ? 'Continuing...' : 'Continue Latest Run'}
-                    </button>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="console-button console-button-primary"
+                        onClick={() => void onResumeRun(latestActiveRun.episodeId)}
+                        disabled={loading}
+                      >
+                        {loading ? 'Continuing...' : 'Continue Latest Run'}
+                      </button>
+                      <button
+                        type="button"
+                        className="console-button"
+                        onClick={() => onRemoveActiveRun(latestActiveRun.episodeId)}
+                        disabled={loading}
+                        aria-label={`Remove active run ${latestActiveRun.shortId}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-3">
                     <div className="console-subpanel px-3 py-2.5">

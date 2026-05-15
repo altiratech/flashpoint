@@ -4,6 +4,14 @@ Date: 2026-05-12
 
 ---
 
+## 2026-05-15 Implementation Status
+
+High-priority audit issues are materially reduced, not erased. The setup screen is less admin-heavy, first briefing density is lower, Homefront signals now make ordinary-life pressure visible without day-one panic inflation, and the selected-response state has one primary commit control. Final reports now carry Homefront consequences and preserve selected variant/custom decision labels.
+
+Still open or intentionally deferred: selected-decision and final-report screens do not promote imagery; remaining natural-offer image gaps are diagnostic rather than selector metadata failures; some report/detail copy still has policy-room language. These are not blocking the current playable-v1 loop, but they remain the next product-quality frontier before a broader public demo.
+
+---
+
 ## 1. Current Experience Diagnosis
 
 Flashpoint currently plays like a well-structured policy simulation built for someone who already thinks in terms of "escalation indices" and "alliance trust." The design system is strong — the dark console aesthetic, CRT scanlines, amber accents, and IBM Plex type all feel purposeful. The game engine is solid: seeded RNG, beat graph traversal, Monte Carlo balance testing, and a working timer system.

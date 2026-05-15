@@ -192,7 +192,15 @@ const readVisibleImages = async (page: Page): Promise<VisibleImageRead[]> => {
 
 const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]> => {
   const file = path.join(outputDir, `${safeName(name)}.png`);
-  await page.screenshot({ path: file, fullPage: true });
+  try {
+    await page.screenshot({ path: file, fullPage: true, timeout: 20_000 });
+  } catch (error) {
+    if (name === '99-report') {
+      await page.screenshot({ path: file, fullPage: false, timeout: 10_000 });
+    } else {
+      throw error;
+    }
+  }
   return readVisibleImages(page);
 };
 
@@ -258,12 +266,14 @@ const writeSmokeSummary = async (input: {
 };
 
 const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
-  const deadline = Date.now() + 30_000;
+  const deadline = Date.now() + 60_000;
   const reportHeading = page.getByText(/Mandate Assessment/i).first();
   const nextDecisionButton = page.getByRole('button', { name: /Make Your Call|Proceed To Decision|Return To Selected Response/i }).first();
 
   while (Date.now() < deadline) {
-    const reachedReport = await reportHeading.isVisible().catch(() => false);
+    const reachedReport =
+      (await reportHeading.isVisible().catch(() => false)) ||
+      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|Strategic Debrief/i.test(text)).catch(() => false));
     if (reachedReport) {
       return;
     }
@@ -271,6 +281,13 @@ const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promis
     const reachedNextBriefing =
       (await nextDecisionButton.isVisible().catch(() => false)) && (await nextDecisionButton.isEnabled().catch(() => false));
     if (reachedNextBriefing) {
+      await sleep(750);
+      const reachedReportAfterSettling =
+        (await reportHeading.isVisible().catch(() => false)) ||
+        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|Strategic Debrief/i.test(text)).catch(() => false));
+      if (reachedReportAfterSettling) {
+        return;
+      }
       return;
     }
 

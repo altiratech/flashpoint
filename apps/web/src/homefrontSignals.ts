@@ -16,25 +16,31 @@ export const buildHomefrontSignals = (
   const marketDelta = previousMeters
     ? Math.round(((meters.economicStability + meters.energySecurity) - (previousMeters.economicStability + previousMeters.energySecurity)) / 2)
     : 0;
+  const hasPreviousMeters = Boolean(previousMeters);
   const escalationHeat = Math.max(0, meters.escalationIndex - 40);
   const domesticStress = Math.max(0, 75 - meters.domesticCohesion);
   const stress = Math.max(0, 100 - marketComposite);
+  const energyStress = Math.max(0, 100 - meters.energySecurity);
+  const economicStress = Math.max(0, 100 - meters.economicStability);
+  const energyWeight = hasPreviousMeters ? 0.036 : 0.02;
+  const economicWeight = hasPreviousMeters ? 0.014 : 0.008;
+  const escalationWeight = hasPreviousMeters ? 0.021 : 0.008;
   const gasPrice = (
-    3.55 +
-    Math.max(0, 100 - meters.energySecurity) * 0.045 +
-    Math.max(0, 100 - meters.economicStability) * 0.018 +
-    escalationHeat * 0.025
+    3.45 +
+    energyStress * energyWeight +
+    economicStress * economicWeight +
+    escalationHeat * escalationWeight
   ).toFixed(2);
   const groceryIndex = 100 + Math.round(
-    Math.max(0, 100 - meters.economicStability) * 0.45 +
-    Math.max(0, 100 - meters.energySecurity) * 0.35 +
-    domesticStress * 0.2
+    economicStress * (hasPreviousMeters ? 0.42 : 0.24) +
+    energyStress * (hasPreviousMeters ? 0.3 : 0.16) +
+    domesticStress * (hasPreviousMeters ? 0.18 : 0.08)
   );
   const savingsMove = Math.min(
     24,
     Math.round(
-      Math.max(0, 100 - meters.economicStability) * 0.14 +
-      meters.escalationIndex * 0.06 +
+      economicStress * (hasPreviousMeters ? 0.13 : 0.07) +
+      meters.escalationIndex * (hasPreviousMeters ? 0.055 : 0.025) +
       Math.max(0, previousMeters ? previousMeters.economicStability - meters.economicStability : 0) * 0.25
     )
   );
@@ -45,10 +51,10 @@ export const buildHomefrontSignals = (
       id: 'fuel',
       label: 'Gas',
       value: `$${gasPrice}`,
-      detail: marketDelta < 0 || meters.energySecurity < 58
+      detail: hasPreviousMeters && (marketDelta < 0 || meters.energySecurity < 58)
         ? 'Stations are changing prices before officials settle on a public line.'
-        : 'Prices are jumpy enough that people notice before the first warning.',
-      tone: meters.energySecurity < 45 || escalationHeat > 35 ? 'danger' : meters.energySecurity < 62 || stress > 35 ? 'warning' : 'steady'
+        : 'Drivers are noticing the first jump, but it has not become a panic line yet.',
+      tone: meters.energySecurity < 45 || escalationHeat > 35 ? 'danger' : meters.energySecurity < 58 || stress > 42 ? 'warning' : 'steady'
     },
     {
       id: 'groceries',
@@ -63,9 +69,9 @@ export const buildHomefrontSignals = (
       id: 'savings',
       label: '401k',
       value: `-${savingsMove}%`,
-      detail: savingsMove >= 8
+      detail: savingsMove >= 8 && hasPreviousMeters
         ? 'People are opening retirement apps and seeing the crisis in red.'
-        : 'Markets are nervous enough for normal families to notice.',
+        : 'Markets are red enough for normal families to notice, not crash enough for panic.',
       tone: savingsMove >= 10 ? 'danger' : savingsMove >= 6 ? 'warning' : 'steady'
     },
     {

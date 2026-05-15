@@ -3,19 +3,22 @@
 Product: Flashpoint / ESCALATION scenario and response simulation.
 
 Current state:
-- `main` has a local v1 gameplay hardening slice ready to commit; do not push without deployment approval because `main` pushes trigger the live site pipeline.
-- ALT-38 deployed API/web verification is complete: Pages uses `VITE_API_BASE_URL=https://escalation-api.rjameson.workers.dev`, deploy verification checks the bundled API origin, and recent production smoke/telemetry/rate-limit paths are proven.
-- The core playable loop works locally: setup -> live briefing -> decision windows -> committed choices -> mandate report.
-- Setup is lighter and more game-like: duplicate admin-style Run Profile/Operator Notes surfaces are gone, Replay Settings is collapsed, and the first screen now shows a local U.S. household crisis image.
-- Live briefings keep the stronger scene image in the hero slot, demote maps/SVGs to supporting evidence, and carry Homefront pressure through gas, groceries, 401k, and family-text signals.
-- Lower live-briefing detail is less card-heavy: Truth Model items render as compact reads, Watch Items default to one outside signal, and Immediate Outcome uses one scan-friendly readout instead of three repeated cards.
-- The final report now includes a Homefront section so ordinary-life consequences remain visible at the end of the run.
-- Browser smoke has default, varied, public-econ, and deployed-output paths; the local harness accepts current UI labels and checks public/economic coverage categories instead of unreachable exact-image assertions.
+- `main` is ahead of `origin/main` with local playable-v1 hardening commits; do not push without deployment approval because `main` pushes trigger the live site pipeline.
+- ALT-38 deployed API/web verification is complete; no Cloudflare, D1, DNS, workflow-secret, or production-config changes are in the current local slice.
+- The flagship loop is locally playable end-to-end: setup -> first briefing -> decision review -> committed choices -> immediate consequences -> mandate report -> setup return -> active-run/report reopen and local cleanup.
+- Setup is lighter and game-like, with the U.S. household crisis image promoted and admin-style chrome reduced.
+- Briefings are less card-heavy, keep stronger photographic crisis evidence in the hero slot, and carry Homefront pressure through gas, groceries, retirement, and family-text signals.
+- Opening Homefront values are now tense without overstating day-one panic; later meter deterioration still escalates ordinary-life pressure.
+- The selected-response review strip owns the primary commit action so decision mode no longer shows duplicate commit controls.
+- The final mandate report preserves selected variant/custom action labels and includes Homefront consequences.
+- Active-run recovery now resolves expired countdowns on resume instead of reopening stale decisions.
+- The setup `Continue Latest Run` panel now has a direct Remove action for the latest active run.
+- Browser smoke coverage includes default, varied, public-econ, desktop recovery/reopen/cleanup, and 390px mobile recovery/reopen/cleanup paths.
 
 Validation:
-- Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run lint`, full `npm test`, `git diff --check`, `npm run build`.
-- Passed browser checks: default full-run smoke, varied full-run smoke, public-econ full-run smoke, desktop screenshots, density-slice screenshot review, and 390px mobile setup -> first briefing -> decision view.
-- Mobile verification confirmed no horizontal overflow at 390px; refreshed local console output had no app runtime errors after the favicon fix.
+- Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.
+- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, `npm run smoke:browser:public-econ`, `npm run smoke:browser:recovery`, and 390px mobile recovery smoke via `PLAYTEST_OUTPUT_DIR=output/playwright-mobile PLAYTEST_VIEWPORT_WIDTH=390 PLAYTEST_VIEWPORT_HEIGHT=900 npm run smoke:browser:recovery`.
 
 Next:
-- Recommended next slice: tune Homefront thresholds/copy across later turns and continue image QA on non-default paths.
+- Ryan decides whether to approve push/deploy for the latest local hardening commit.
+- Remaining non-blocking product work: decide whether selected-decision/final-report imagery should become a feature, and tune natural-offer image paths for the remaining diagnostic gaps (`tw_us_semiconductor_fab_disruption`, `tw_us_white_house_press_briefing`, `tw_us_market_crash_chip_crisis`).

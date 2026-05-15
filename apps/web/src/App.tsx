@@ -1251,6 +1251,22 @@ const App = () => {
         return;
       }
 
+      if (
+        resumedEpisode.activeCountdown &&
+        resumedEpisode.activeCountdown.expiresAt <= Date.now()
+      ) {
+        const timeoutResponse = await submitInaction(resumedEpisode.episodeId, {
+          expectedTurn: resumedEpisode.turn,
+          source: 'timeout'
+        });
+        await applyEpisodeUpdate(timeoutResponse.episode);
+        recordRunHistory(buildRunHistoryEvent('run_resumed', {
+          episodeId: timeoutResponse.episode.episodeId,
+          scenarioId: timeoutResponse.episode.scenarioId
+        }));
+        return;
+      }
+
       setEpisode(resumedEpisode);
       setReport(null);
       setSelectedResponse(null);
@@ -2023,14 +2039,6 @@ const App = () => {
                 <strong>Your Move</strong>
                 <span>{selectedResponseLabel ?? 'Choose a response'}</span>
               </div>
-              <button
-                type="button"
-                className={`console-button ${selectedAction ? 'console-button-primary' : 'console-button-secondary'} min-w-[12.5rem]`}
-                onClick={() => void handleActionCommit()}
-                disabled={!selectedAction || loading || episode.status !== 'active'}
-              >
-                {selectedAction ? 'Commit Your Move' : 'Pick A Response'}
-              </button>
             </div>
           </div>
 
