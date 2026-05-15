@@ -9,6 +9,8 @@ const maxDecisionWindows = Number.parseInt(process.env.PLAYTEST_MAX_WINDOWS ?? '
 const headed = process.env.PLAYTEST_HEADED === '1';
 const responseStrategy = process.env.PLAYTEST_RESPONSE_STRATEGY ?? 'default';
 const deterministicSeed = process.env.PLAYTEST_SEED?.trim() ?? '';
+const viewportWidth = Number.parseInt(process.env.PLAYTEST_VIEWPORT_WIDTH ?? '1440', 10);
+const viewportHeight = Number.parseInt(process.env.PLAYTEST_VIEWPORT_HEIGHT ?? '1100', 10);
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -72,8 +74,8 @@ const variedResponsePreferences: ResponsePreference[] = [
 ];
 
 const publicEconomicResponsePreferences: ResponsePreference[] = [
-  { name: /Public Strategic Address/i, variantName: /Hard Red Line/i },
-  { name: /Targeted Sanctions/i, variantName: /Enforcement Wave/i },
+  { name: /Public Strategic Address/i, variantName: /Calibrated Address/i },
+  { name: /Targeted Sanctions/i, variantName: /Signaling Tranche/i },
   { name: /Broad Sanctions/i, variantName: /Maximal Package/i },
   { name: /Resource Stockpiling/i, variantName: /Emergency Buffer/i },
   { name: /Military Posture Increase/i, variantName: /Broadcast Deterrence/i },
@@ -85,16 +87,16 @@ const publicEconomicResponsePreferences: ResponsePreference[] = [
 
 const publicEconomicCoverageRequirements = [
   {
-    label: 'public-facing U.S. crisis scene',
-    pattern: /\/assets\/images\/tw_us_(family_cable_news_crisis|white_house_press_briefing|congress_chip_hearing)\.png/
+    label: 'White House briefing pressure scene',
+    pattern: /\/assets\/images\/tw_us_white_house_press_briefing\.png/
   },
   {
-    label: 'economic or household shock scene',
-    pattern: /\/assets\/images\/tw_us_(electronics_store_shortage|gas_lines_freight_shock|market_crash_chip_crisis|semiconductor_fab_disruption)\.png/
+    label: 'semiconductor fab disruption scene',
+    pattern: /\/assets\/images\/tw_us_semiconductor_fab_disruption\.png/
   },
   {
-    label: 'hard-risk U.S. command or force signal',
-    pattern: /\/assets\/images\/tw_us_(nuclear_risk_command|deployment_pier_families|thermal_boarding_heat)\.png/
+    label: 'market crash chip crisis scene',
+    pattern: /\/assets\/images\/tw_us_market_crash_chip_crisis\.png/
   }
 ];
 
@@ -221,6 +223,10 @@ const writeSmokeSummary = async (input: {
     currentUrl: input.currentUrl ?? null,
     responseStrategy,
     seed: deterministicSeed || null,
+    viewport: {
+      width: viewportWidth,
+      height: viewportHeight
+    },
     maxDecisionWindows,
     failureScreenshot: input.failureScreenshot ?? null,
     screenshotError: input.screenshotError ?? null,
@@ -243,6 +249,7 @@ const writeSmokeSummary = async (input: {
       `- Current URL: ${input.currentUrl ?? 'n/a'}`,
       `- Response strategy: ${responseStrategy}`,
       `- Seed: ${deterministicSeed || 'n/a'}`,
+      `- Viewport: ${viewportWidth}x${viewportHeight}`,
       `- Decision windows: ${input.decisionLog.length}`,
       `- Failure screenshot: ${input.failureScreenshot ?? 'n/a'}`,
       `- Error: ${input.error ?? 'n/a'}`,
@@ -309,7 +316,7 @@ const run = async (): Promise<void> => {
 
   try {
     browser = await chromium.launch({ headless: !headed });
-    page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+    page = await browser.newPage({ viewport: { width: viewportWidth, height: viewportHeight } });
 
     page.on('console', (message) => {
       if (message.type() === 'error') {

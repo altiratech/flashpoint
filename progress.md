@@ -2,6 +2,8 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Fixed briefing image priority so the consequence images selected by the engine/API become the next briefing's main visual evidence instead of being displaced by generic beat preview art.
+- Tightened the public/economic browser smoke path to choose Calibrated Address and Signaling Tranche, then fail unless the White House briefing, semiconductor-fab disruption, and market-crash/chip-crisis images appear in real screenshots. Added viewport controls to the full-run smoke and verified the path at 390px.
 - Added state-derived aftermath imagery to the final mandate report using existing local raster assets, with selector logic that avoids maps, artifacts, SVGs, and generated placeholder IDs.
 - Added report visual regression coverage for catastrophic and stabilization endings so the report image is selected from coherent crisis/homefront evidence instead of promoted generic visuals.
 - Verified the slice with content/image diagnostics, balance simulation, lint, full tests, token regression, build, default/varied/public-econ browser smokes, and desktop plus 390px recovery/report screenshot review. Selected-decision imagery remains intentionally absent for v1 so the commit moment stays focused.

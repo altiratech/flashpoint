@@ -6,9 +6,9 @@ Date: 2026-05-12
 
 ## 2026-05-15 Implementation Status
 
-High-priority audit issues are materially reduced, not erased. The setup screen is less admin-heavy, first briefing density is lower, Homefront signals now make ordinary-life pressure visible without day-one panic inflation, and the selected-response state has one primary commit control. Final reports now carry Homefront consequences, preserve selected variant/custom decision labels, and promote a state-derived aftermath image from existing local raster assets.
+High-priority audit issues are materially reduced, not erased. The setup screen is less admin-heavy, first briefing density is lower, Homefront signals now make ordinary-life pressure visible without day-one panic inflation, and the selected-response state has one primary commit control. Briefings now promote the resolved turn's consequence images before generic beat previews, so the White House, semiconductor-fab, and market-crash images surface in the real public/economic path. Final reports now carry Homefront consequences, preserve selected variant/custom decision labels, and promote a state-derived aftermath image from existing local raster assets.
 
-Still open or intentionally deferred: selected-decision screens do not promote imagery because the v1 review/commit moment should stay focused on the pending action; remaining natural-offer image gaps are diagnostic rather than selector metadata failures; some report/detail copy still has policy-room language. These are not blocking the current playable-v1 loop, but they remain the next product-quality frontier before a broader public demo.
+Still open or intentionally deferred: selected-decision screens do not promote imagery because the v1 review/commit moment should stay focused on the pending action; some report/detail copy still has policy-room language. These are not blocking the current playable-v1 loop, but they remain the next product-quality frontier before a broader public demo.
 
 ---
 

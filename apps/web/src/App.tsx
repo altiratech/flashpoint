@@ -1783,11 +1783,11 @@ const App = () => {
     selectedAction,
     selectedVariant
   });
-  const briefingImageAsset = previewImageAssets[0] ?? episode.imageAsset ?? null;
+  const briefingImageAsset = episode.imageAsset ?? previewImageAssets[0] ?? null;
   const briefingSupportingImageAssets = [
-    ...previewImageAssets.slice(1),
-    ...(episode.imageAsset ? [episode.imageAsset] : []),
-    ...episode.supportingImageAssets
+    ...(episode.imageAsset ? episode.supportingImageAssets : previewImageAssets.slice(1)),
+    ...(episode.imageAsset ? previewImageAssets : []),
+    ...(!episode.imageAsset ? episode.supportingImageAssets : [])
   ]
     .filter((asset, index, array) => array.findIndex((entry) => entry.id === asset.id) === index)
     .slice(0, hasSelectedDecisionVisualContext ? 3 : 2);

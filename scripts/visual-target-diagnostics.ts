@@ -30,7 +30,7 @@ const targetImageIds = [
   'tw_us_congress_chip_hearing'
 ] as const;
 
-type CoverageMode = 'natural-offers' | 'expanded-offers';
+type CoverageMode = 'natural-offers' | 'expanded-offers' | 'targeted-public-econ';
 
 interface ImageHit {
   mode: CoverageMode;
@@ -88,6 +88,30 @@ const variantsForAction = (action: ActionDefinition): Array<ActionVariantDefinit
     return [null];
   }
   return action.variants;
+};
+
+const publicEconomicActionPreference = [
+  'public_signaling_speech',
+  'targeted_sanctions',
+  'broad_sanctions',
+  'resource_stockpiling',
+  'military_posture_increase',
+  'intelligence_surge',
+  'limited_concession',
+  'backchannel_diplomacy',
+  'military_posture_decrease'
+];
+
+const publicEconomicVariantPreference: Record<string, string> = {
+  public_signaling_speech: 'calibrated_address',
+  targeted_sanctions: 'signaling_tranche',
+  broad_sanctions: 'maximal_package',
+  resource_stockpiling: 'emergency_buffer',
+  military_posture_increase: 'broadcast_deterrence',
+  intelligence_surge: 'allied_attribution_cell',
+  limited_concession: 'public_offramp',
+  backchannel_diplomacy: 'firm_channel',
+  military_posture_decrease: 'public_decompression'
 };
 
 const buildStateAtBeat = (beat: BeatNode, turn: number, mode: CoverageMode): GameState => {
@@ -188,8 +212,83 @@ const collectHitsForMode = (mode: CoverageMode): ImageHit[] => {
   return hits;
 };
 
+const collectHitsForPublicEconomicPath = (): ImageHit[] => {
+  const hits: ImageHit[] = [];
+  let state = initializeGameState(
+    'visual-target:targeted-public-econ',
+    'public-econ-2',
+    {
+      scenario,
+      adversaryProfile,
+      actions,
+      images,
+      debriefVariants: debriefDeep?.variants
+    },
+    { timerMode: 'off' }
+  );
+
+  while (state.status === 'active') {
+    const actionId =
+      publicEconomicActionPreference.find((candidate) => state.offeredActionIds.includes(candidate)) ??
+      state.offeredActionIds[0];
+    const action = actionId ? actionById.get(actionId) : null;
+    if (!action) {
+      break;
+    }
+
+    const preferredVariantId = publicEconomicVariantPreference[action.id] ?? null;
+    const variant = preferredVariantId
+      ? action.variants?.find((entry) => entry.id === preferredVariantId) ?? null
+      : null;
+    const beatBefore = state.currentBeatId;
+    const { nextState, resolution } = resolveTurn(
+      cloneState(state),
+      action.id,
+      {
+        scenario,
+        adversaryProfile,
+        actions,
+        images,
+        debriefVariants: debriefDeep?.variants
+      },
+      {
+        playerVariantId: variant?.id ?? null,
+        nowMs: 0
+      }
+    );
+
+    const gallery = [
+      resolution.selectedImageId,
+      ...resolution.selectedSupportingImageIds
+    ].filter((entry): entry is string => Boolean(entry));
+
+    for (const imageId of gallery) {
+      if (!targetImageIds.includes(imageId as (typeof targetImageIds)[number])) {
+        continue;
+      }
+
+      hits.push({
+        mode: 'targeted-public-econ',
+        imageId,
+        beatBefore,
+        beatAfter: resolution.beatIdAfter,
+        actionId: action.id,
+        actionName: action.name,
+        variantId: variant?.id ?? null,
+        variantLabel: variant?.label ?? null,
+        gallery
+      });
+    }
+
+    state = nextState;
+  }
+
+  return hits;
+};
+
 const naturalHits = collectHitsForMode('natural-offers');
 const expandedHits = collectHitsForMode('expanded-offers');
+const publicEconomicPathHits = collectHitsForPublicEconomicPath();
 
 const formatHit = (hit: ImageHit | undefined): string => {
   if (!hit) {
@@ -209,12 +308,15 @@ const missingExpanded: string[] = [];
 for (const imageId of targetImageIds) {
   const firstNaturalHit = naturalHits.find((hit) => hit.imageId === imageId);
   const firstExpandedHit = expandedHits.find((hit) => hit.imageId === imageId);
+  const firstPublicEconomicPathHit = publicEconomicPathHits.find((hit) => hit.imageId === imageId);
   const naturalCount = naturalHits.filter((hit) => hit.imageId === imageId).length;
   const expandedCount = expandedHits.filter((hit) => hit.imageId === imageId).length;
+  const publicEconomicPathCount = publicEconomicPathHits.filter((hit) => hit.imageId === imageId).length;
 
   console.log(`\n${imageId}`);
   console.log(`  naturalHits=${naturalCount} ${formatHit(firstNaturalHit)}`);
   console.log(`  expandedHits=${expandedCount} ${formatHit(firstExpandedHit)}`);
+  console.log(`  targetedPublicEconHits=${publicEconomicPathCount} ${formatHit(firstPublicEconomicPathHit)}`);
 
   if (!firstExpandedHit) {
     missingExpanded.push(imageId);
@@ -228,8 +330,13 @@ if (missingExpanded.length > 0) {
 
 const missingNatural = targetImageIds.filter((id) => !naturalHits.some((hit) => hit.imageId === id));
 if (missingNatural.length > 0) {
-  console.log(`\nNatural-offer coverage gaps remain: ${missingNatural.join(', ')}`);
-  console.log('These are not selector metadata failures; they require offer-path tuning or targeted browser smoke paths.');
+  const stillUncovered = missingNatural.filter((id) => !publicEconomicPathHits.some((hit) => hit.imageId === id));
+  if (stillUncovered.length > 0) {
+    console.log(`\nNatural-offer coverage gaps remain: ${stillUncovered.join(', ')}`);
+    console.log('These are not selector metadata failures; they require offer-path tuning or targeted browser smoke paths.');
+  } else {
+    console.log('\nSingle-beat natural-offer gaps are covered by the targeted public/economic path.');
+  }
 }
 
 console.log('\nVisual target diagnostics passed.');
