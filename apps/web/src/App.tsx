@@ -1750,36 +1750,6 @@ const App = () => {
     ? currentBeat.windowContext.sections
     : dynamicContextSections;
   const activeTruthModel = currentBeat?.truthModel ?? null;
-  const whyItMattersSummary =
-    activeWindowContextSections[0]?.body ??
-    currentBeat?.sceneFragments[0] ??
-    currentScenarioWorld?.economicBackdrop.straitEconomicValue ??
-    currentDirective ??
-    'This development matters because it can change how the crisis is read across the room, the market, and the corridor.';
-  const turnResolutionGuidance = showTakeNoAction
-    ? 'Select one response and confirm it, or hold position if you want one more window of observation before you move.'
-    : 'Select one response, inspect the detail, and confirm it to advance the scenario.';
-  const decisionPromptSummary =
-    activeWindowContextSections[1]?.body ??
-    turnResolutionGuidance;
-  const executiveSummary = [
-    {
-      label: 'What changed',
-      detail:
-        activeTruthModel?.verifiedFacts?.[0]?.title ??
-        episode.briefing.headlines[0] ??
-        episode.briefing.briefingParagraph ??
-        'New pressure is entering the scenario, but the full change summary is still loading.'
-    },
-    {
-      label: 'Why it matters',
-      detail: whyItMattersSummary
-    },
-    {
-      label: 'Decision required now',
-      detail: decisionPromptSummary
-    }
-  ];
   const summaryLead =
     episode.briefing.headlines[0] ??
     currentBeat?.memoLine ??
@@ -1787,22 +1757,22 @@ const App = () => {
     currentBeat?.sceneFragments[0] ??
     currentDirective;
   const hasSelectedDecisionVisualContext = Boolean(selectedAction || selectedVariant);
-  const previewImageAssets = hasSelectedDecisionVisualContext
-    ? pickPreviewImageAssets(reference, currentScenario, currentBeat, {
-        recentImageIds: [
-          ...(episode.recentTurn?.selectedImageId ? [episode.recentTurn.selectedImageId] : []),
-          ...(episode.recentTurn?.selectedSupportingImageIds ?? [])
-        ],
-        selectedAction,
-        selectedVariant
-      })
-    : [];
+  const previewImageAssets = pickPreviewImageAssets(reference, currentScenario, currentBeat, {
+    recentImageIds: [
+      ...(episode.recentTurn?.selectedImageId ? [episode.recentTurn.selectedImageId] : []),
+      ...(episode.recentTurn?.selectedSupportingImageIds ?? [])
+    ],
+    selectedAction,
+    selectedVariant
+  });
   const briefingImageAsset = previewImageAssets[0] ?? episode.imageAsset ?? null;
-  const briefingSupportingImageAssets = hasSelectedDecisionVisualContext
-    ? [...previewImageAssets.slice(1), ...(episode.imageAsset ? [episode.imageAsset] : []), ...episode.supportingImageAssets]
-      .filter((asset, index, array) => array.findIndex((entry) => entry.id === asset.id) === index)
-      .slice(0, 3)
-    : episode.supportingImageAssets;
+  const briefingSupportingImageAssets = [
+    ...previewImageAssets.slice(1),
+    ...(episode.imageAsset ? [episode.imageAsset] : []),
+    ...episode.supportingImageAssets
+  ]
+    .filter((asset, index, array) => array.findIndex((entry) => entry.id === asset.id) === index)
+    .slice(0, hasSelectedDecisionVisualContext ? 3 : 2);
   const briefingImageCaptionOverride = episode.imageAsset ? null : currentBeat?.visualCue?.caption ?? null;
   const arrangedBriefingVisuals = arrangeBriefingVisuals(briefingImageAsset, briefingSupportingImageAssets);
   const appliedBriefingImageCaptionOverride =
@@ -1955,22 +1925,6 @@ const App = () => {
                   {turnStageActionLabel}
                 </button>
               </div>
-            </div>
-          </section>
-
-          <section className="console-panel console-panel-muted px-3 py-2.5 sm:px-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="label">Executive Summary</p>
-              </div>
-            </div>
-            <div className="mt-2 grid gap-2 lg:grid-cols-3">
-              {executiveSummary.map((entry) => (
-                <article key={entry.label} className="console-subpanel px-3 py-2.5">
-                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{entry.label}</p>
-                  <p className="mt-1.5 text-[0.84rem] leading-relaxed text-textMain">{entry.detail}</p>
-                </article>
-              ))}
             </div>
           </section>
 

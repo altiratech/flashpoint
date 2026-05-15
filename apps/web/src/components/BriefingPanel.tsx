@@ -174,6 +174,54 @@ const describeShiftInScene = (key: MeterKey, delta: number): string => {
     : 'The pace slackens for the moment, but nobody in the room thinks the danger is gone.';
 };
 
+const buildHomefrontSignals = (
+  meters: MeterState,
+  previousMeters?: MeterState
+): Array<{ id: string; label: string; value: string; detail: string; tone: 'danger' | 'warning' | 'steady' }> => {
+  const marketComposite = Math.round((meters.economicStability + meters.energySecurity) / 2);
+  const marketDelta = previousMeters
+    ? Math.round(((meters.economicStability + meters.energySecurity) - (previousMeters.economicStability + previousMeters.energySecurity)) / 2)
+    : 0;
+  const stress = Math.max(0, 100 - marketComposite);
+  const gasPrice = (3.65 + stress * 0.035 + Math.max(0, meters.escalationIndex - 55) * 0.012).toFixed(2);
+  const groceryIndex = 100 + Math.round(Math.max(0, 70 - meters.economicStability) * 0.7 + Math.max(0, 60 - meters.energySecurity) * 0.45);
+  const savingsMove = Math.min(14, Math.round((100 - meters.economicStability) * 0.12 + meters.escalationIndex * 0.03));
+  const domesticDelta = previousMeters ? meters.domesticCohesion - previousMeters.domesticCohesion : 0;
+
+  return [
+    {
+      id: 'fuel',
+      label: 'Gas',
+      value: `$${gasPrice}`,
+      detail: marketDelta < 0 ? 'Fuel desks are repricing before officials settle on language.' : 'Prices are jumpy even before the first public warning.',
+      tone: meters.energySecurity < 45 ? 'danger' : meters.energySecurity < 62 ? 'warning' : 'steady'
+    },
+    {
+      id: 'groceries',
+      label: 'Groceries',
+      value: `${groceryIndex}`,
+      detail: meters.economicStability < 55 ? 'Stores are ordering early and warning suppliers about empty shelves.' : 'Retailers are watching freight and chip-linked inventory.',
+      tone: meters.economicStability < 45 ? 'danger' : meters.economicStability < 62 ? 'warning' : 'steady'
+    },
+    {
+      id: 'savings',
+      label: '401k',
+      value: `-${savingsMove}%`,
+      detail: savingsMove >= 8 ? 'People are opening retirement apps and seeing the crisis in red.' : 'Markets are nervous enough for normal families to notice.',
+      tone: savingsMove >= 8 ? 'danger' : savingsMove >= 5 ? 'warning' : 'steady'
+    },
+    {
+      id: 'family',
+      label: 'Family Text',
+      value: domesticDelta < 0 || meters.domesticCohesion < 55 ? 'Are we okay?' : 'Should we fill up?',
+      detail: meters.domesticCohesion < 55
+        ? 'The crisis has left the briefing room and entered group chats.'
+        : 'People are not panicking yet, but they are asking practical questions.',
+      tone: meters.domesticCohesion < 45 ? 'danger' : meters.domesticCohesion < 62 ? 'warning' : 'steady'
+    }
+  ];
+};
+
 export const BriefingPanel = ({
   turn,
   briefing,
@@ -583,12 +631,68 @@ export const BriefingPanel = ({
       : 'h-[12.5rem] sm:h-[14rem] xl:h-[15rem]';
   const shouldShowTheaterDiagram = Boolean(scenarioWorld?.theaterDiagram) &&
     (turn === 1 || (!imageAsset && supportingImageAssets.length === 0));
+  const homefrontSignals = buildHomefrontSignals(meters, previousMeters);
 
   return (
     <section className="console-panel console-panel-muted p-4 sm:p-5">
+      {imageAsset ? (
+        <figure className="relative overflow-hidden rounded-md border border-accent/45 bg-surface shadow-hard">
+          <img
+            src={imageAsset.path}
+            alt={imageAsset.alt}
+            className={`h-[15rem] w-full bg-surface sm:h-[16rem] xl:h-[16rem] ${
+              imageAsset.kind === 'map' || imageAsset.kind === 'artifact' ? 'object-contain p-2' : 'object-cover'
+            }`}
+            loading="eager"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/92 via-black/72 to-transparent px-4 pb-4 pt-16 sm:px-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="label text-accent">{imagePanelLabel(imageAsset)}</p>
+              <span className="action-required-status border-accent/50 bg-black/45 text-accent">
+                {imagePanelMode(imageAsset)}
+              </span>
+            </div>
+            <figcaption className="mt-2 max-w-4xl text-[0.95rem] leading-relaxed text-textMain">
+              {imageCaptionOverride ?? imageAsset.caption}
+            </figcaption>
+          </div>
+        </figure>
+      ) : null}
+
+      <section className="mt-4 rounded-md border border-warning/35 bg-warning/8 px-3 py-3 sm:px-4">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div className="min-w-0">
+            <p className="label text-warning">Homefront</p>
+            <p className="mt-1 text-[0.92rem] leading-relaxed text-textMain">
+              What the crisis feels like before anyone calls it a war.
+            </p>
+          </div>
+          <div className="grid min-w-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {homefrontSignals.map((signal) => (
+              <article
+                key={signal.id}
+                className={`rounded-md border px-3 py-2 ${
+                  signal.tone === 'danger'
+                    ? 'border-red-300/45 bg-red-300/10'
+                    : signal.tone === 'warning'
+                      ? 'border-warning/45 bg-warning/10'
+                      : 'border-borderTone bg-panelRaised/45'
+                }`}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{signal.label}</p>
+                  <p className="font-display text-[1.05rem] text-textMain">{signal.value}</p>
+                </div>
+                <p className="mt-1 text-[0.84rem] leading-snug text-textMuted">{signal.detail}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <div
-        className={`grid gap-4 ${
-          imageAsset || supportingImageAssets.length > 0 || shouldShowTheaterDiagram
+        className={`mt-4 grid gap-4 ${
+          supportingImageAssets.length > 0 || shouldShowTheaterDiagram
             ? 'xl:grid-cols-[1.04fr_0.96fr]'
             : ''
         }`}
@@ -646,30 +750,8 @@ export const BriefingPanel = ({
           ) : null}
         </div>
 
-        {imageAsset || supportingImageAssets.length > 0 || shouldShowTheaterDiagram ? (
+        {supportingImageAssets.length > 0 || shouldShowTheaterDiagram ? (
           <div className="space-y-3">
-            {imageAsset ? (
-              <figure className="overflow-hidden rounded-md border border-borderTone/80 bg-surface/65">
-                <div className="flex items-center justify-between border-b border-borderTone/80 px-3 py-2">
-                  <p className="label">{imagePanelLabel(imageAsset)}</p>
-                  <span className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
-                    {imagePanelMode(imageAsset)}
-                  </span>
-                </div>
-                <img
-                  src={imageAsset.path}
-                  alt={imageAsset.alt}
-                  className={`h-[17rem] w-full bg-surface sm:h-[19rem] xl:h-[21rem] ${
-                    imageAsset.kind === 'map' || imageAsset.kind === 'artifact' ? 'object-contain p-2' : 'object-cover'
-                  }`}
-                  loading="lazy"
-                />
-                <figcaption className="border-t border-borderTone/80 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
-                  {imageCaptionOverride ?? imageAsset.caption}
-                </figcaption>
-              </figure>
-            ) : null}
-
             {supportingImageAssets.length > 0 ? (
               <div className={supportGridClass}>
                 {supportingImageAssets.map((asset) => (
