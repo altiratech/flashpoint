@@ -304,12 +304,23 @@ const compare = (left: number, op: BranchCondition['conditions'][number]['op'], 
   return left === right;
 };
 
-const formatConditionOp = (op: BranchCondition['conditions'][number]['op']): string => {
-  if (op === 'lt') return '<';
-  if (op === 'lte') return '<=';
-  if (op === 'gt') return '>';
-  if (op === 'gte') return '>=';
-  return '=';
+const formatBranchKey = (key: string): string =>
+  key
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .toLowerCase();
+
+const formatRequiredActionTag = (tag: string): string => {
+  const labels: Record<string, string> = {
+    diplomacy: 'diplomatic',
+    military: 'military',
+    economic: 'economic',
+    intel: 'intelligence',
+    messaging: 'public-message',
+    cyber: 'cyber'
+  };
+
+  return labels[tag] ?? formatBranchKey(tag);
 };
 
 const branchSort = (left: BranchCondition, right: BranchCondition): number => {
@@ -339,7 +350,7 @@ const buildBranchReason = (
   branch: BranchCondition
 ): string => {
   if (branch.requiresActionTag && !(selectedAction?.tags.includes(branch.requiresActionTag) ?? false)) {
-    return `Requires action tag "${branch.requiresActionTag}", which the selected action did not provide.`;
+    return `This path needed a ${formatRequiredActionTag(branch.requiresActionTag)} move, and your response sent a different signal.`;
   }
 
   const failed = branch.conditions.find((condition) => {
@@ -354,15 +365,18 @@ const buildBranchReason = (
     const observed = readConditionObserved(entry, failed);
     if (observed === null) {
       if (failed.source === 'latent') {
-        return `Depends on latent-state gate (${failed.key}) that remained hidden during turn-time output.`;
+        return `This path depended on hidden pressure that was not high enough to surface during the run.`;
       }
-      return `Condition on ${failed.key} could not be reconstructed from turn-time visible state.`;
+      return `The run did not expose enough visible evidence to prove this path was open.`;
     }
-    return `Gate not met: ${failed.key} ${formatConditionOp(failed.op)} ${failed.value} (observed ${round(observed)}).`;
+    return `The ${formatBranchKey(failed.key)} reading was ${round(observed)}, so this path did not open.`;
   }
 
   return 'A higher-priority branch resolved first under this turn state.';
 };
+
+const beatDisplayLabel = (beat?: ScenarioDefinition['beats'][number] | null): string | null =>
+  beat?.headlines[0] ?? beat?.memoLine ?? beat?.sceneFragments[0] ?? beat?.id ?? null;
 
 const buildBranchNotTaken = (
   state: GameState,
@@ -392,6 +406,7 @@ const buildBranchNotTaken = (
       .filter((branch) => branch.targetBeatId !== entry.beatIdAfter)
       .map((branch) => ({
         targetBeatId: branch.targetBeatId,
+        targetBeatLabel: beatDisplayLabel(beatMap.get(branch.targetBeatId)),
         reason: buildBranchReason(entry, selectedAction, branch)
       }));
 
@@ -412,7 +427,9 @@ const buildBranchNotTaken = (
         turn: entry.turn,
         beatId: entry.beatIdBefore,
         selectedActionId: entry.playerActionId,
+        selectedActionLabel: selectedAction?.name ?? entry.playerActionCustomLabel ?? null,
         selectedBeatId: entry.beatIdAfter,
+        selectedBeatLabel: beatDisplayLabel(beatMap.get(entry.beatIdAfter)),
         alternatives: alternatives.slice(0, 3)
       }
     });

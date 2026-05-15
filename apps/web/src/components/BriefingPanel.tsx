@@ -226,7 +226,7 @@ export const BriefingPanel = ({
         details.push(normalizeTickerLine(briefing.tickerLine));
       }
       if (details.length === 0) {
-        details.push('Operators are still trying to match the latest report against theater feeds and commercial traffic data.');
+        details.push('Details still coming in.');
       }
       return details;
     });
@@ -252,19 +252,19 @@ export const BriefingPanel = ({
         {
           id: 'verified',
           title: 'What We Know',
-          items: truthModel.verifiedFacts,
+          items: truthModel.verifiedFacts.slice(0, 2),
           accent: 'text-positive'
         },
         {
           id: 'theories',
           title: 'What We Think',
-          items: truthModel.workingTheories,
+          items: truthModel.workingTheories.slice(0, 2),
           accent: 'text-accent'
         },
         {
           id: 'unknowns',
           title: "What We Don't Know",
-          items: truthModel.unknowns,
+          items: truthModel.unknowns.slice(0, 2),
           accent: 'text-warning'
         }
       ] as const).filter((section) => section.items.length > 0)
@@ -455,7 +455,7 @@ export const BriefingPanel = ({
                 className="text-[0.68rem] uppercase tracking-[0.12em] text-accent"
                 onClick={() => setShowAllSignals((current) => !current)}
               >
-                {showAllSignals ? 'Show fewer watch items' : `Show ${hiddenSignalCount} more watch items`}
+                {showAllSignals ? 'Show fewer signals' : `Open ${hiddenSignalCount} supporting signal${hiddenSignalCount === 1 ? '' : 's'}`}
               </button>
             </div>
           ) : null}
@@ -510,9 +510,7 @@ export const BriefingPanel = ({
           </button>
           {showOperationalReadout ? (
             <div className="mt-3 space-y-3 border-t border-borderTone/70 pt-3">
-              <p className="text-[0.84rem] leading-relaxed text-textMuted">
-                <span className="text-textMain">Order frame:</span> {recentActionNarrative.detail.preActionBrief}
-              </p>
+              <p className="text-[0.84rem] leading-relaxed text-textMuted">{recentActionNarrative.detail.preActionBrief}</p>
               <p className="text-[0.82rem] leading-relaxed text-textMain">{recentActionNarrative.detail.executionNarrative}</p>
               <div className="grid gap-2 xl:grid-cols-2">
                 <article className="rounded-md border border-borderTone/70 bg-surface/35 p-2">

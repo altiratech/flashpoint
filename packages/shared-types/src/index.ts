@@ -463,6 +463,7 @@ export interface UnseenSystemEvent {
 
 export interface BranchNotTakenOption {
   targetBeatId: string;
+  targetBeatLabel?: string | null;
   reason: string;
 }
 
@@ -470,7 +471,9 @@ export interface BranchNotTakenSummary {
   turn: number;
   beatId: string;
   selectedActionId: string;
+  selectedActionLabel?: string | null;
   selectedBeatId: string;
+  selectedBeatLabel?: string | null;
   alternatives: BranchNotTakenOption[];
 }
 

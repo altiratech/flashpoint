@@ -656,12 +656,17 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             {report.fullCausality.branchesNotTaken.map((entry, entryIndex) => (
               <article key={`${entry.turn}:${entry.beatId}:${entry.selectedBeatId}:${entryIndex}`} className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
                 <p className="text-sm text-textMain">
-                  Decision window {entry.turn} | Chosen response {entry.selectedActionId}
+                  Decision window {entry.turn} | Chosen response {entry.selectedActionLabel ?? entry.selectedActionId}
                 </p>
+                {entry.selectedBeatLabel ? (
+                  <p className="mt-1 text-xs text-textMuted">
+                    The run moved toward {entry.selectedBeatLabel}.
+                  </p>
+                ) : null}
                 <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-textMuted">
                   {entry.alternatives.map((alt, altIndex) => (
                     <li key={`${entry.turn}:${entry.beatId}:${alt.targetBeatId}:${altIndex}`}>
-                      {alt.reason}
+                      {alt.targetBeatLabel ? `${alt.targetBeatLabel}: ` : ''}{alt.reason}
                     </li>
                   ))}
                 </ul>

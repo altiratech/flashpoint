@@ -817,16 +817,24 @@ const formatRiskCategory = (category?: string | null): string | null => {
     .join(' ');
 };
 
-const resetViewScrollAndFocus = (): void => {
+const resetViewScrollAndFocus = (targetSelector?: string): void => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return;
   }
 
-  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  const primarySurface =
+    (targetSelector ? document.querySelector(targetSelector) : null) ??
+    document.querySelector('main');
 
-  const primarySurface = document.querySelector('main');
   if (!(primarySurface instanceof HTMLElement)) {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     return;
+  }
+
+  if (targetSelector) {
+    primarySurface.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'auto' });
+  } else {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }
 
   primarySurface.setAttribute('tabindex', '-1');
@@ -878,9 +886,10 @@ const App = () => {
   ]);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(resetViewScrollAndFocus);
+    const focusSelector = episode && turnStage === 'decision' ? '.action-required-shell' : undefined;
+    const frame = window.requestAnimationFrame(() => resetViewScrollAndFocus(focusSelector));
     return () => window.cancelAnimationFrame(frame);
-  }, [viewResetKey]);
+  }, [episode, turnStage, viewResetKey]);
 
   useEffect(() => {
     writeActiveRuns(activeRuns);
@@ -2043,7 +2052,8 @@ const App = () => {
             </div>
           </div>
 
-          <div className="sticky top-2 z-20 mt-4 rounded-md border border-accent/55 bg-surface/95 px-3 py-3 shadow-hard backdrop-blur sm:px-4">
+          {selectedAction ? (
+            <div className="sticky top-2 z-20 mt-4 rounded-md border border-accent/55 bg-surface/95 px-3 py-3 shadow-hard backdrop-blur sm:px-4">
             <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -2103,7 +2113,8 @@ const App = () => {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          ) : null}
 
           <div className="relative z-[1] mt-4 grid min-h-0 min-w-0 gap-4 xl:grid-cols-[1.06fr_0.72fr]">
             <ActionCards

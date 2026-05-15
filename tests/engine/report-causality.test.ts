@@ -92,6 +92,14 @@ describe('post-game causality report', () => {
     expect(Array.isArray(report.fullCausality.unseenSystemEvents)).toBe(true);
     expect(Array.isArray(report.fullCausality.branchesNotTaken)).toBe(true);
     expect(report.fullCausality.branchesNotTaken.length).toBeLessThanOrEqual(6);
+    for (const branch of report.fullCausality.branchesNotTaken) {
+      expect(branch.selectedActionLabel).toBeTruthy();
+      expect(branch.selectedActionLabel).not.toContain('_');
+      for (const alternative of branch.alternatives) {
+        expect(alternative.reason).not.toContain('Gate not met');
+        expect(alternative.reason).not.toContain('Requires action tag');
+      }
+    }
   });
 
   it('prefers terminal-beat-specific deep debrief commentary when available', () => {
