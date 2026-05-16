@@ -51,6 +51,47 @@ const MAX_BRANCH_NOT_TAKEN = 6;
 
 const round = (value: number): number => Number(value.toFixed(2));
 
+const strongestMeterShift = (
+  before: MeterState,
+  after: MeterState
+): { meter: MeterKey; delta: number } | null => {
+  const ranked = meterKeys
+    .map((meter) => ({ meter, delta: after[meter] - before[meter] }))
+    .sort((left, right) => Math.abs(right.delta) - Math.abs(left.delta));
+  const top = ranked[0];
+  return top && Math.abs(top.delta) >= 0.5 ? top : null;
+};
+
+const describeMeterShift = (meter: MeterKey, delta: number): string => {
+  if (meter === 'escalationIndex') {
+    return delta >= 0 ? 'pushed escalation pressure higher' : 'pulled escalation pressure down';
+  }
+
+  return delta >= 0
+    ? `strengthened ${meterDisplayName[meter]}`
+    : `weakened ${meterDisplayName[meter]}`;
+};
+
+const describePressureDirection = (before: MeterState, after: MeterState): string => {
+  const delta = stressScore(after) - stressScore(before);
+  if (delta >= 3) {
+    return 'The next window opened with less room for mistakes.';
+  }
+  if (delta <= -3) {
+    return 'The next window opened with a little more room to maneuver.';
+  }
+  return 'It changed how the room read the next window.';
+};
+
+const summarizePivotalImpact = (entry: TurnHistoryEntry): string => {
+  const shift = strongestMeterShift(entry.meterBefore, entry.meterAfter);
+  if (!shift) {
+    return 'This was the turn where the run hardened without a single visible meter swinging the room.';
+  }
+
+  return `This was the turn that changed the run most: it ${describeMeterShift(shift.meter, shift.delta)}. ${describePressureDirection(entry.meterBefore, entry.meterAfter)}`;
+};
+
 const getTimeline = (state: GameState): ReportTimelinePoint[] => {
   return state.history.map((entry) => ({
     turn: entry.turn,
@@ -111,7 +152,8 @@ const pickAlternative = (
 
       return {
         actionId: action.id,
-        score: stressScore(projected)
+        score: stressScore(projected),
+        projected
       };
     })
     .sort((left, right) => left.score - right.score);
@@ -126,18 +168,22 @@ const pickAlternative = (
 
   const actual = stressScore(pivotal.meterAfter);
   const diff = actual - best.score;
+  const shift = strongestMeterShift(pivotal.meterAfter, best.projected);
+  const shiftText = shift
+    ? `It would likely have ${describeMeterShift(shift.meter, shift.delta)}`
+    : 'It would likely have changed the room more than the public picture';
 
   if (diff > 4) {
     return {
       actionId: best.actionId,
-      predictedImpact: `Would likely have lowered immediate pressure by about ${diff.toFixed(1)} points and left less danger for the next window.`
+      predictedImpact: `${shiftText} and left less danger for the next window.`
     };
   }
 
   if (diff > 0) {
     return {
       actionId: best.actionId,
-      predictedImpact: `Would likely have made this turn slightly steadier by about ${diff.toFixed(1)} points.`
+      predictedImpact: `${shiftText} and made the next window slightly steadier.`
     };
   }
 
@@ -864,7 +910,7 @@ export const buildPostGameReport = (
       turn: pivotal.turn,
       actionId: pivotal.playerActionId,
       actionName: pivotalActionName,
-      reason: `This was the turn that moved the run the most (${Math.abs(stressScore(pivotal.meterAfter) - stressScore(pivotal.meterBefore)).toFixed(1)} points).`
+      reason: summarizePivotalImpact(pivotal)
     },
     beliefEvolution: state.history.map((entry) => ({
       turn: entry.turn,
