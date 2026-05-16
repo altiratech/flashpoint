@@ -173,6 +173,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Added consequence context to the final report opening recap. The pivotal-decision card now includes why that decision mattered, and the alternate-path card now includes the likely impact, so the ending explains what happened and what could have gone differently before the player scrolls deeper.
+- Hardened report evidence in the browser smoke harness by adding a `99-report-recap.png` viewport capture after scrolling to the recap. Verification after this slice: `npm run lint`, targeted report tests, full `npm test`, `git diff --check`, `npm run build`, desktop browser smoke with recap screenshot review, and 390px browser smoke with recap screenshot review.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Tightened the final report copy so the end state reads more like a player-facing recap and less like an internal assessment sheet. Labels such as `Mandate Assessment`, `Run Snapshot`, `Road Not Taken`, `Final Pressure`, and `Baseline outcome model` were replaced with `Final Report`, `Run Recap`, `Another Path`, `Final Strain`, and `Bottom line`.
 - Updated browser smokes to detect the new report labels. Verification after this copy slice: `npm run lint`, targeted report tests, full `npm test`, `git diff --check`, `npm run build`, default browser smoke, recovery/reopen browser smoke, and 390px report-copy smoke with screenshot review.
 - Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.

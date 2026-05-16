@@ -86,6 +86,20 @@ const finalMeterSnapshot = (report: PostGameReport): string => [
   `Economy ${Math.round(report.finalMeters.economicStability)}`
 ].join(' / ');
 
+const compactPreview = (value: string, maxLength = 150): string => {
+  const normalized = value.trim().replace(/\s+/g, ' ');
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  const sentenceEnd = normalized.slice(0, maxLength).search(/[.!?](?=\s|$)/);
+  if (sentenceEnd >= 0) {
+    return normalized.slice(0, sentenceEnd + 1);
+  }
+
+  return `${normalized.slice(0, maxLength).replace(/\s+\S*$/, '')}...`;
+};
+
 const computeObjectiveScore = (objective: MissionObjective, report: PostGameReport): number => {
   const scores = objective.primaryMeters.map((meter) => {
     const raw = report.finalMeters[meter];
@@ -176,6 +190,8 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
   const endStateRead = deepDebrief
     ? `${deepDebrief.grade.title} (${deepDebrief.grade.score})`
     : report.outcomeExplanation;
+  const pivotalDecisionPreview = compactPreview(report.pivotalDecision.reason);
+  const alternativeLinePreview = compactPreview(report.alternativeLine.predictedImpact);
   const homefrontSignals = buildHomefrontSignals(report.finalMeters);
   const homefrontDangerCount = homefrontSignals.filter((signal) => signal.tone === 'danger').length;
   const homefrontWarningCount = homefrontSignals.filter((signal) => signal.tone === 'warning').length;
@@ -254,12 +270,14 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             <p className="mt-2 text-sm leading-relaxed text-textMain">
               Window {report.pivotalDecision.turn}: {report.pivotalDecision.actionName}
             </p>
+            <p className="mt-2 text-sm leading-relaxed text-textMuted">{pivotalDecisionPreview}</p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
             <p className="label">Another Path</p>
             <p className="mt-2 text-sm leading-relaxed text-textMain">
               Window {report.alternativeLine.turn}: {report.alternativeLine.suggestedActionName}
             </p>
+            <p className="mt-2 text-sm leading-relaxed text-textMuted">{alternativeLinePreview}</p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
             <p className="label">Final Strain</p>

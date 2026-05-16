@@ -264,6 +264,8 @@ const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]
   const file = path.join(outputDir, `${safeName(name)}.png`);
   if (name === '99-report') {
     await page.screenshot({ path: file, fullPage: false, timeout: 10_000 });
+    await page.getByText(/Run Recap/i).first().evaluate((element) => element.scrollIntoView({ block: 'start' }));
+    await page.screenshot({ path: path.join(outputDir, '99-report-recap.png'), fullPage: false, timeout: 10_000 });
     return readVisibleImages(page);
   }
 
