@@ -56,7 +56,7 @@ const tradeoffTone: Record<TradeoffScorecardStatus, string> = {
 };
 
 const reportSectionLinks = [
-  ['Mandate', '#mandate-scorecards'],
+  ['Mission', '#mandate-scorecards'],
   ['Homefront', '#homefront-impact'],
   ['Costs', '#tradeoff-scorecards'],
   ['Timeline', '#scenario-timeline'],
@@ -101,12 +101,12 @@ const summarizeObjective = (objective: MissionObjective, report: PostGameReport,
     .join(' · ');
 
   if (status === 'held') {
-    return `${objective.description} Final read: ${meterReadout}.`;
+    return `${objective.description} End read: ${meterReadout}.`;
   }
   if (status === 'strained') {
-    return `${objective.description} This objective held only partially by the close of the episode. Final read: ${meterReadout}.`;
+    return `${objective.description} This line held only partially by the close of the episode. End read: ${meterReadout}.`;
   }
-  return `${objective.description} The mandate broke down on this line by the end of the episode. Final read: ${meterReadout}.`;
+  return `${objective.description} This line failed by the end of the episode. End read: ${meterReadout}.`;
 };
 
 const deriveObjectiveAssessments = (
@@ -147,18 +147,18 @@ const deriveMandateHeadline = (
   if (report.outcome === 'stabilization' && failed === 0 && average >= 68) {
     return {
       title: 'Mandate Held Under Pressure',
-      summary: `The run met the core mandate with ${held}/${objectives.length} primary objectives held and no outright failures.`
+      summary: `The run met the core mission with ${held}/${objectives.length} primary objectives held and no outright failures.`
     };
   }
   if (failed <= 1 && report.outcome !== 'war' && average >= 46) {
     return {
       title: 'Mandate Partially Held',
-      summary: `The run preserved parts of the mandate, but at least one objective was strained or broken under accumulated pressure.`
+      summary: `The run kept parts of the mission alive, but at least one objective was strained or broken under accumulated pressure.`
     };
   }
   return {
     title: 'Mandate Broken',
-    summary: `The run failed to preserve enough of the mission mandate once the crisis moved into its decisive turns.`
+    summary: `The run failed to preserve enough of the mission once the crisis moved into its decisive turns.`
   };
 };
 
@@ -189,7 +189,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4 lg:px-6">
       <section className="card p-5">
-        <p className="label">Mandate Assessment</p>
+        <p className="label">Final Report</p>
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="font-display text-2xl text-accent sm:text-3xl">{mandateHeadline.title}</h1>
           <button
@@ -197,7 +197,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             className="w-fit rounded-md border border-accent px-4 py-2 text-sm text-accent hover:bg-accent/10"
             onClick={onRestart}
           >
-            Return To Scenario Setup
+            Return To Setup
           </button>
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.88fr)_minmax(22rem,1fr)] lg:items-stretch">
@@ -205,7 +205,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             <p className="text-sm leading-relaxed text-textMain">{mandateHeadline.summary}</p>
             <p className="mt-2 text-sm leading-relaxed text-textMuted">{report.fullCausality.outcomeNarrative.summary}</p>
             <p className="mt-2 text-sm leading-relaxed text-textMuted">{report.fullCausality.outcomeNarrative.causalNote}</p>
-            <p className="mt-3 text-xs text-textMuted">Baseline outcome model: {report.outcomeExplanation}</p>
+            <p className="mt-3 text-xs text-textMuted">Bottom line: {report.outcomeExplanation}</p>
           </div>
           {reportVisual ? (
             <figure className="overflow-hidden rounded-md border border-accent/45 bg-black/40">
@@ -235,7 +235,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
       <section className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="label">Run Snapshot</p>
+            <p className="label">Run Recap</p>
             <h2 className="mt-2 font-display text-2xl text-textMain">
               {formatOutcomeLabel(report.outcome)} after {finalTurn} decision windows
             </h2>
@@ -246,7 +246,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
-            <p className="label">End State</p>
+            <p className="label">Where It Ended</p>
             <p className="mt-2 text-sm leading-relaxed text-textMain">{endStateRead}</p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
@@ -256,13 +256,13 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             </p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
-            <p className="label">Road Not Taken</p>
+            <p className="label">Another Path</p>
             <p className="mt-2 text-sm leading-relaxed text-textMain">
               Window {report.alternativeLine.turn}: {report.alternativeLine.suggestedActionName}
             </p>
           </article>
           <article className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
-            <p className="label">Final Pressure</p>
+            <p className="label">Final Strain</p>
             <p className="mt-2 text-sm leading-relaxed text-textMain">{finalMeterSnapshot(report)}</p>
           </article>
         </div>
@@ -316,9 +316,9 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
         <section id="mandate-scorecards" className="card scroll-mt-4 p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="label">Mandate Scorecards</p>
+              <p className="label">Mission Scorecards</p>
               <p className="mt-2 text-sm text-textMuted">
-                Success is measured against the scenario mandate, not a generic win/loss score.
+                The game scores the mission you were given, not a generic win/loss.
               </p>
             </div>
           </div>

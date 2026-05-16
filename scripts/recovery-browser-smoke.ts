@@ -23,7 +23,7 @@ const waitForBriefing = async (page: Page): Promise<void> => {
 };
 
 const waitForReport = async (page: Page): Promise<void> => {
-  await page.getByText(/Mandate Assessment/i).first().waitFor({ timeout: 20_000 });
+  await page.getByText(/Final Report/i).first().waitFor({ timeout: 20_000 });
 };
 
 const capture = async (page: Page, name: string): Promise<void> => {
@@ -47,13 +47,13 @@ const chooseAndCommitFirstResponse = async (
 
 const waitForPostCommit = async (page: Page): Promise<'briefing' | 'report'> => {
   const deadline = Date.now() + 30_000;
-  const report = page.getByText(/Mandate Assessment/i).first();
+  const report = page.getByText(/Final Report/i).first();
   const nextBriefing = page.getByRole('button', { name: /Make Your Call|Proceed To Decision|Return To Selected Response/i }).first();
 
   while (Date.now() < deadline) {
     const reachedReport =
       (await report.isVisible().catch(() => false)) ||
-      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
+      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Final Report|Run Recap|What Happened And Why/i.test(text)).catch(() => false));
     if (reachedReport) {
       return 'report';
     }
@@ -61,7 +61,7 @@ const waitForPostCommit = async (page: Page): Promise<'briefing' | 'report'> => 
       await page.waitForTimeout(750);
       const reachedReportAfterSettling =
         (await report.isVisible().catch(() => false)) ||
-        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
+        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Final Report|Run Recap|What Happened And Why/i.test(text)).catch(() => false));
       if (reachedReportAfterSettling) {
         return 'report';
       }

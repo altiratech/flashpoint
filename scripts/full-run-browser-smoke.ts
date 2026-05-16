@@ -350,13 +350,13 @@ const writeSmokeSummary = async (input: {
 
 const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
   const deadline = Date.now() + 60_000;
-  const reportHeading = page.getByText(/Mandate Assessment/i).first();
+  const reportHeading = page.getByText(/Final Report/i).first();
   const nextDecisionButton = page.getByRole('button', { name: /Make Your Call|Proceed To Decision|Return To Selected Response/i }).first();
 
   while (Date.now() < deadline) {
     const reachedReport =
       (await reportHeading.isVisible().catch(() => false)) ||
-      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
+      (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Final Report|Run Recap|What Happened And Why/i.test(text)).catch(() => false));
     if (reachedReport) {
       return;
     }
@@ -367,7 +367,7 @@ const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promis
       await sleep(750);
       const reachedReportAfterSettling =
         (await reportHeading.isVisible().catch(() => false)) ||
-        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Mandate Assessment|Run Snapshot|What Happened And Why/i.test(text)).catch(() => false));
+        (await page.locator('body').innerText({ timeout: 1_000 }).then((text) => /Final Report|Run Recap|What Happened And Why/i.test(text)).catch(() => false));
       if (reachedReportAfterSettling) {
         return;
       }
@@ -424,7 +424,7 @@ const run = async (): Promise<void> => {
     );
 
     for (let index = 1; index <= maxDecisionWindows; index += 1) {
-      if (await page.getByText(/Mandate Assessment/i).first().isVisible().catch(() => false)) {
+      if (await page.getByText(/Final Report/i).first().isVisible().catch(() => false)) {
         break;
       }
 
@@ -453,7 +453,7 @@ const run = async (): Promise<void> => {
 
       await waitForPostCommitAdvance(page, index);
 
-      if (await page.getByText(/Mandate Assessment/i).first().isVisible().catch(() => false)) {
+      if (await page.getByText(/Final Report/i).first().isVisible().catch(() => false)) {
         await page.getByText(/What Happened And Why/i).first().waitFor({ timeout: 10_000 });
         imageLog.push(`99-report: ${(await captureStep(page, '99-report')).map((entry) => entry.src).join(', ') || 'no images'}`);
         break;
@@ -469,7 +469,7 @@ const run = async (): Promise<void> => {
       );
     }
 
-    if (!(await page.getByText(/Mandate Assessment/i).first().isVisible().catch(() => false))) {
+    if (!(await page.getByText(/Final Report/i).first().isVisible().catch(() => false))) {
       throw new Error(`Run did not reach the post-game report within ${maxDecisionWindows} windows.`);
     }
 

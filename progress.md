@@ -173,6 +173,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Tightened the final report copy so the end state reads more like a player-facing recap and less like an internal assessment sheet. Labels such as `Mandate Assessment`, `Run Snapshot`, `Road Not Taken`, `Final Pressure`, and `Baseline outcome model` were replaced with `Final Report`, `Run Recap`, `Another Path`, `Final Strain`, and `Bottom line`.
+- Updated browser smokes to detect the new report labels. Verification after this copy slice: `npm run lint`, targeted report tests, full `npm test`, `git diff --check`, `npm run build`, default browser smoke, recovery/reopen browser smoke, and 390px report-copy smoke with screenshot review.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Added beat-specific timed pressure copy to the flagship opening. Standard timed mode now shows authored urgency text in the briefing and selected-decision clock, including after the first clock extension, so the countdown feels like pressure instead of a passive timer.
 - Hardened the pressure-text contract in shared content selection and browser smoke coverage. Verification after this slice: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`, `npm run smoke:browser:timed`, 390px timed smoke, and default `npm run smoke:browser`.
 - Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
