@@ -83,6 +83,43 @@ const describePressureDirection = (before: MeterState, after: MeterState): strin
   return 'It changed how the room read the next window.';
 };
 
+const describeReadGap = (error: number): string => {
+  if (error >= 12) {
+    return 'badly';
+  }
+  return 'enough to matter';
+};
+
+const describeAverageBelief = (
+  value: number,
+  labels: { low: string; medium: string; high: string }
+): string => {
+  if (value >= 0.66) {
+    return labels.high;
+  }
+  if (value >= 0.34) {
+    return labels.medium;
+  }
+  return labels.low;
+};
+
+const describeTurnFrequency = (count: number, total: number): string => {
+  if (count <= 0) {
+    return 'never';
+  }
+  if (count === total) {
+    return 'every turn';
+  }
+  const share = count / Math.max(1, total);
+  if (share >= 0.66) {
+    return 'most turns';
+  }
+  if (share >= 0.34) {
+    return 'about half the time';
+  }
+  return 'only occasionally';
+};
+
 const summarizePivotalImpact = (entry: TurnHistoryEntry): string => {
   const shift = strongestMeterShift(entry.meterBefore, entry.meterAfter);
   if (!shift) {
@@ -211,7 +248,7 @@ const buildMisjudgments = (state: GameState): string[] => {
       const midpoint = (range.low + range.high) / 2;
       const error = Math.abs(trueValue - midpoint);
       if (error >= 7) {
-        mistakes.push(`Window ${entry.turn}: the room misread ${meterDisplayName[meter as MeterKey]} by about ${error.toFixed(1)} points because the picture was noisy.`);
+        mistakes.push(`Window ${entry.turn}: the room misread ${meterDisplayName[meter as MeterKey]} ${describeReadGap(error)} because the picture was noisy.`);
       }
       if (mistakes.length >= 3) {
         break;
@@ -567,9 +604,24 @@ const buildAdversaryLogicSummary = (
       : deescalatoryTurns > escalatoryTurns
         ? 'kept looking for chances to cool things down'
         : 'swung between pressure and restraint';
+  const triggerRead = describeAverageBelief(avgThreshold, {
+    low: 'unlikely to trigger a larger fight',
+    medium: 'dangerous but still controllable',
+    high: 'close to a larger fight'
+  });
+  const bluffRead = describeAverageBelief(avgBluff, {
+    low: 'unlikely to be bluffing',
+    medium: 'hard to read',
+    high: 'probably bluffing'
+  });
+  const humiliationRead = describeAverageBelief(avgHumiliation, {
+    low: 'face-saving pressure stayed low',
+    medium: 'face-saving pressure kept shaping choices',
+    high: 'face-saving pressure dominated the response'
+  });
 
   const profileLabel = adversaryProfile?.name ?? 'Scenario-embedded adversary model';
-  return `${profileLabel} ${stance}. It chose pressure on ${escalatoryTurns} of ${rivalActions.length} turns. By the end of the run, its trigger-risk read averaged ${avgThreshold.toFixed(2)}, its bluff read averaged ${avgBluff.toFixed(2)}, and humiliation pressure averaged ${avgHumiliation.toFixed(2)}.`;
+  return `${profileLabel} ${stance}. It chose pressure ${describeTurnFrequency(escalatoryTurns, rivalActions.length)}. By the end, it read the situation as ${triggerRead}; it treated U.S. signals as ${bluffRead}; ${humiliationRead}.`;
 };
 
 const buildRivalLeaderReveal = (

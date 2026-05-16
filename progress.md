@@ -173,6 +173,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-15
 
+- Replaced the remaining model/math language in final report missed-read and Beijing-read generated copy. The report now says where the room was badly wrong or wrong enough to matter, and describes Beijing's pressure/read pattern in plain language instead of "about N points," decimals, or averaged probability fields.
+- Hardened report smoke evidence with a `99-report-missed.png` capture so the missed-room area is visible in desktop and mobile artifacts. Verification after this slice: `npm run lint`, targeted report causality test, full `npm test`, `git diff --check`, `npm run build`, desktop full-run browser smoke on `127.0.0.1:5174`, 390px full-run browser smoke on `127.0.0.1:5174`, and screenshot review of report recap/missed-room surfaces.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Replaced score-delta language in final report recap generation with plain consequence language. Pivotal decisions now explain the meter consequence in words, and alternate paths describe the type of pressure they likely would have changed instead of saying "about N points."
 - Added regression coverage so pivotal and alternate recap copy does not reintroduce visible point-math language. Verification after this slice: `npm run lint`, `npm test -- tests/engine/report-causality.test.ts`, full `npm test`, `git diff --check`, `npm run build`, desktop browser smoke with report-recap screenshot review, and 390px browser smoke with report-recap screenshot review.
 - Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
