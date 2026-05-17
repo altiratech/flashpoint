@@ -2,6 +2,10 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 
 ## 2026-05-17
 
+- Tightened the remaining copy-regression guardrails after the Beijing-read fix. The final report's `Roads Not Taken` entries now say `Your move`, and the full-run/recovery browser smokes no longer accept the old `Selected Response`, `Commit Selected Response`, `Return To Selected Response`, or `Response envelope` labels as passing fallbacks.
+- Verification after the guardrail slice: stale-label grep across `apps/web/src`, `scripts`, and `tests` returned no hits; `npm run lint`; targeted report tests; `git diff --check`; default full-run browser smoke; recovery browser smoke; full `npm test`; `npm run build`; screenshot review of `output/playwright-copy-guard-desktop/99-report-beijing-read.png`.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 - Closed the remaining final-report Beijing-read artifact gap: the bottom report section no longer renders a decimal belief table with `Bluff risk`, `Trigger risk`, or `Humiliation pressure`; it now renders per-window qualitative cards.
 - Hardened `scripts/full-run-browser-smoke.ts` so every full report smoke captures `99-report-beijing-read.png` and fails if the legacy table labels or `0.xx` values return in that section.
 - Verification after this report-readability fix: `npm test -- tests/web/report-copy.test.ts`, `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, desktop full-run browser smoke, 390px full-run browser smoke, and screenshot review of `output/playwright-beijing-read-copy-desktop/99-report-beijing-read.png` plus `output/playwright-beijing-read-copy-mobile/99-report-beijing-read.png`.

@@ -14,10 +14,10 @@ Current state:
 - Optional custom-response input now stays collapsed and quiet until opened, keeping the normal response-selection workflow dominant on desktop and mobile.
 - Action cards and selected-response consequence reads now use direct player-facing language; bare ambiguous commands like `sanctions` still route to review instead of accidental execution.
 - The final mandate report preserves selected variant/custom action labels, includes Homefront consequences, promotes a state-derived aftermath image, and surfaces pivotal-decision and alternate-path consequences in the opening recap.
-- Final report labels, advisor readouts, missed-read notes, and Beijing-read sections use plainer English instead of policy-room shorthand, visible score math, decimal belief tables, or probability-style model averages.
+- Final report labels, advisor readouts, missed-read notes, roads-not-taken labels, and Beijing-read sections use plainer English instead of policy-room shorthand, visible score math, decimal belief tables, or probability-style model averages.
 - Timed mode is now real from the flagship opening: Standard timed starts with an authored 90-second clock, pressure copy appears in the briefing and decision clock, the first decision can extend time, and expired countdowns resolve across briefing/decision views and on resume.
 - The setup `Continue Latest Run` panel now has a direct Remove action for the latest active run.
-- Browser smoke coverage includes default, varied, strict public-econ, timed desktop/mobile, desktop recovery/reopen/cleanup, 390px mobile recovery/reopen/cleanup, and 390px public-econ image coverage; the smoke harness now captures top-of-report, report-recap, missed-room, and Beijing-read screenshots without hanging on the tall report.
+- Browser smoke coverage includes default, varied, strict public-econ, timed desktop/mobile, desktop recovery/reopen/cleanup, 390px mobile recovery/reopen/cleanup, and 390px public-econ image coverage; the smoke harness now captures top-of-report, report-recap, missed-room, and Beijing-read screenshots without hanging on the tall report, and no longer accepts old selected-response/response-envelope labels as passing fallbacks.
 
 Validation:
 - Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.

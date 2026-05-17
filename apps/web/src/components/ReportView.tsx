@@ -754,7 +754,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
             {report.fullCausality.branchesNotTaken.map((entry, entryIndex) => (
               <article key={`${entry.turn}:${entry.beatId}:${entry.selectedBeatId}:${entryIndex}`} className="rounded-md border border-borderTone/70 bg-panelRaised/40 p-3">
                 <p className="text-sm text-textMain">
-                  Decision window {entry.turn} | Chosen response {entry.selectedActionLabel ?? entry.selectedActionId}
+                  Decision window {entry.turn} | Your move: {entry.selectedActionLabel ?? entry.selectedActionId}
                 </p>
                 {entry.selectedBeatLabel ? (
                   <p className="mt-1 text-xs text-textMuted">

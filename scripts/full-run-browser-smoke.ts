@@ -223,7 +223,7 @@ const chooseFirstAvailableResponse = async (page: Page, windowIndex: number): Pr
 
   const label = (await responseButton.innerText()).split('\n')[0]?.trim() ?? 'unknown-response';
   await responseButton.click();
-  await page.getByText(/Review Before Commit|Selected Response|Your Move/i).last().waitFor({ state: 'visible', timeout: 5_000 });
+  await page.getByText(/Review Before Commit|Your Move/i).last().waitFor({ state: 'visible', timeout: 5_000 });
 
   if (selectedPreference?.variantName) {
     const variantButton = responsePanel.getByRole('button', { name: selectedPreference.variantName }).last();
@@ -232,13 +232,8 @@ const chooseFirstAvailableResponse = async (page: Page, windowIndex: number): Pr
     }
   }
 
-  await page.getByRole('button', { name: /Commit Your Move|Commit Selected Response/i }).first().waitFor({ state: 'visible', timeout: 5_000 });
-  const selectedLine = await responsePanel
-    .getByText(/How hard to push:|Response envelope:/i)
-    .last()
-    .innerText()
-    .catch(() => '');
-  return selectedLine ? `${label} · ${selectedLine.replace(/^(How hard to push|Response envelope):\s*/i, '').trim()}` : label;
+  await page.getByRole('button', { name: /Commit Your Move/i }).first().waitFor({ state: 'visible', timeout: 5_000 });
+  return label;
 };
 
 const readVisibleImages = async (page: Page): Promise<VisibleImageRead[]> => {
@@ -362,7 +357,7 @@ const writeSmokeSummary = async (input: {
 const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
   const deadline = Date.now() + 60_000;
   const reportHeading = page.getByText(/Final Report/i).first();
-  const nextDecisionButton = page.getByRole('button', { name: /Make Your Call|Proceed To Decision|Return To Selected Response/i }).first();
+  const nextDecisionButton = page.getByRole('button', { name: /Make Your Call|Proceed To Decision/i }).first();
 
   while (Date.now() < deadline) {
     const reachedReport =
@@ -439,7 +434,7 @@ const run = async (): Promise<void> => {
         break;
       }
 
-      if (!(await clickByRole(page, /Make Your Call|Proceed To Decision|Return To Selected Response/i))) {
+      if (!(await clickByRole(page, /Make Your Call|Proceed To Decision/i))) {
         throw new Error(`Could not enter decision mode for window ${index}.`);
       }
 
@@ -458,7 +453,7 @@ const run = async (): Promise<void> => {
         }`
       );
 
-      if (!(await clickByRole(page, /Commit Your Move|Commit Selected Response/i))) {
+      if (!(await clickByRole(page, /Commit Your Move/i))) {
         throw new Error(`Could not commit selected response for window ${index}.`);
       }
 

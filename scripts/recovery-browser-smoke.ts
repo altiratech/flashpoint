@@ -34,7 +34,7 @@ const chooseAndCommitFirstResponse = async (
   page: Page,
   beforeCommit?: () => Promise<void>
 ): Promise<void> => {
-  await clickByRole(page, /Make Your Call|Proceed To Decision|Return To Selected Response/i);
+  await clickByRole(page, /Make Your Call|Proceed To Decision/i);
   const responsePanel = page.locator('section', { hasText: /What Do You Do\?|Available Moves/i }).first();
   await responsePanel.waitFor({ state: 'visible', timeout: 10_000 });
   const openButton = responsePanel.getByRole('button', { name: /Backchannel Diplomacy/i }).first();
@@ -42,13 +42,13 @@ const chooseAndCommitFirstResponse = async (
   await openButton.click();
   await page.getByText(/Review Before Commit|Your Move/i).last().waitFor({ state: 'visible', timeout: 5_000 });
   await beforeCommit?.();
-  await clickByRole(page, /Commit Your Move|Commit Selected Response/i);
+  await clickByRole(page, /Commit Your Move/i);
 };
 
 const waitForPostCommit = async (page: Page): Promise<'briefing' | 'report'> => {
   const deadline = Date.now() + 30_000;
   const report = page.getByText(/Final Report/i).first();
-  const nextBriefing = page.getByRole('button', { name: /Make Your Call|Proceed To Decision|Return To Selected Response/i }).first();
+  const nextBriefing = page.getByRole('button', { name: /Make Your Call|Proceed To Decision/i }).first();
 
   while (Date.now() < deadline) {
     const reachedReport =
