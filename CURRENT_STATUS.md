@@ -20,8 +20,8 @@ Current state:
 - Browser smoke coverage includes default, varied, strict public-econ, timed desktop/mobile, desktop recovery/reopen/cleanup, 390px mobile recovery/reopen/cleanup, and 390px public-econ image coverage; the smoke harness now captures top-of-report, report-recap, missed-room, and Beijing-read screenshots without hanging on the tall report, and no longer accepts old selected-response/response-envelope labels as passing fallbacks.
 
 Validation:
-- Passed: `npm run validate:content`, `npm run diagnose:visual-targets`, `npm run diagnose:decision-visuals`, `npm run simulate:balance`, `npm run lint`, full `npm test`, `npm run test:token-regression`, `git diff --check`, `npm run build`.
-- Passed browser checks: `npm run smoke:browser`, `npm run smoke:browser:varied`, strict `npm run smoke:browser:public-econ`, `npm run smoke:browser:timed`, 390px timed smoke, `npm run smoke:browser:recovery`, no-fallback-art default smoke, 390px mobile recovery smoke, 390px decision-entry/review smoke, rendered-report readability smoke, 390px custom-response-through-report smoke, and fresh desktop/390px Beijing-read report smokes.
+- Current recheck passed: `npm run ci:phase1`, `npm run lint`, `npm run build`, fresh desktop and 390px full-run browser smokes, and fresh 390px recovery/reopen smoke.
+- Prior browser coverage also includes varied, strict public-econ, timed desktop/mobile, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
