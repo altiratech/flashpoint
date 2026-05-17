@@ -21,8 +21,9 @@ Current state:
 - Browser smoke coverage includes default, varied, strict public-econ, timed desktop/mobile, desktop recovery/reopen/cleanup, 390px mobile recovery/reopen/cleanup, and 390px public-econ image coverage; the smoke harness now captures top-of-report, report-recap, missed-room, and Beijing-read screenshots without hanging on the tall report, and no longer accepts old selected-response/response-envelope labels as passing fallbacks.
 
 Validation:
-- Current recheck passed: `npm run ci:phase1`, `npm run lint`, `npm run build`, fresh desktop and 390px full-run browser smokes, and fresh 390px recovery/reopen smoke.
-- Prior browser coverage also includes varied, strict public-econ, timed desktop/mobile, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
+- Current 2026-05-17 code-gate recheck passed: `npm run ci:phase1`, `npm run lint`, and `npm run build`.
+- Fresh local browser rerun in this shell is blocked by local environment, not app behavior: `npm run dev` cannot start the API because Wrangler requires Node >=22 while this shell has Node v20.17.0; web-only Vite hangs on `/api/reference/bootstrap`. Latest saved desktop, 390px mobile, and 390px recovery smoke artifacts in `output/` remain the current browser proof.
+- Prior browser coverage also includes fresh desktop and 390px full-run smokes, fresh 390px recovery/reopen smoke, varied, strict public-econ, timed desktop/mobile, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
