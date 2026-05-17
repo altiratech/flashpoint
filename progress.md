@@ -1,5 +1,12 @@
 Original prompt: Ok please start working through each Linear task. Keep going until you are finished
 
+## 2026-05-17
+
+- Closed the remaining final-report Beijing-read artifact gap: the bottom report section no longer renders a decimal belief table with `Bluff risk`, `Trigger risk`, or `Humiliation pressure`; it now renders per-window qualitative cards.
+- Hardened `scripts/full-run-browser-smoke.ts` so every full report smoke captures `99-report-beijing-read.png` and fails if the legacy table labels or `0.xx` values return in that section.
+- Verification after this report-readability fix: `npm test -- tests/web/report-copy.test.ts`, `npm run lint`, full `npm test`, `git diff --check`, `npm run build`, desktop full-run browser smoke, 390px full-run browser smoke, and screenshot review of `output/playwright-beijing-read-copy-desktop/99-report-beijing-read.png` plus `output/playwright-beijing-read-copy-mobile/99-report-beijing-read.png`.
+- Not pushed: pushing `main` would deploy, and deployment still requires Ryan's explicit approval.
+
 ## 2026-05-15
 
 - Quarantined generic `img_###.svg` fallback art from live briefing support visuals whenever stronger evidence assets are available. The full-run browser smoke now fails if generic fallback art appears in the playable image log.

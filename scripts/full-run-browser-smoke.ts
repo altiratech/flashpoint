@@ -268,6 +268,13 @@ const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]
     await page.screenshot({ path: path.join(outputDir, '99-report-recap.png'), fullPage: false, timeout: 10_000 });
     await page.getByText(/What The Room Missed/i).first().evaluate((element) => element.scrollIntoView({ block: 'start' }));
     await page.screenshot({ path: path.join(outputDir, '99-report-missed.png'), fullPage: false, timeout: 10_000 });
+    const beijingReadSection = page.getByText(/How Beijing's Read Changed/i).first().locator('xpath=ancestor::section[1]');
+    await beijingReadSection.evaluate((element) => element.scrollIntoView({ block: 'start' }));
+    await page.screenshot({ path: path.join(outputDir, '99-report-beijing-read.png'), fullPage: false, timeout: 10_000 });
+    const beijingReadText = (await beijingReadSection.textContent()) ?? '';
+    if (/Bluff risk|Trigger risk|Humiliation pressure|\b0\.\d+\b/i.test(beijingReadText)) {
+      throw new Error('Final report Beijing-read section still exposes legacy probability/table language.');
+    }
     return readVisibleImages(page);
   }
 

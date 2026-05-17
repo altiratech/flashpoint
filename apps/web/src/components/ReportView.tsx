@@ -176,6 +176,85 @@ const deriveMandateHeadline = (
   };
 };
 
+type BeijingReadSnapshot = PostGameReport['beliefEvolution'][number];
+
+interface BeijingReadSummary {
+  turn: number;
+  headline: string;
+  signalRead: string;
+  pressureRead: string;
+  faceRead: string;
+}
+
+const movementPhrase = (current: number, previous: number | null): string => {
+  if (previous === null) {
+    return 'the opening read';
+  }
+
+  const delta = current - previous;
+  if (delta >= 0.08) {
+    return 'moved upward';
+  }
+  if (delta <= -0.08) {
+    return 'eased';
+  }
+  return 'held mostly steady';
+};
+
+const describeSignalRead = (entry: BeijingReadSnapshot): string => {
+  if (entry.bluffProb >= 0.68) {
+    return 'Beijing treated U.S. warnings as fragile and kept looking for hesitation.';
+  }
+  if (entry.bluffProb >= 0.46) {
+    return 'Beijing was unsure whether Washington would hold the line.';
+  }
+  return 'Beijing had a harder time dismissing the U.S. signal as theater.';
+};
+
+const describePressureRead = (entry: BeijingReadSnapshot, previous: BeijingReadSnapshot | null): string => {
+  const movement = movementPhrase(entry.thresholdHighProb, previous?.thresholdHighProb ?? null);
+  if (entry.thresholdHighProb >= 0.76) {
+    return `Pressure to test the next line was high and ${movement}.`;
+  }
+  if (entry.thresholdHighProb >= 0.54) {
+    return `Pressure to probe for advantage was live and ${movement}.`;
+  }
+  return `Pressure to push harder stayed contained and ${movement}.`;
+};
+
+const describeFaceRead = (entry: BeijingReadSnapshot): string => {
+  if (entry.humiliation >= 0.58) {
+    return 'Face-saving pressure was a central constraint on every off-ramp.';
+  }
+  if (entry.humiliation >= 0.28) {
+    return 'Face-saving mattered, but it did not dominate the room.';
+  }
+  return 'Face-saving pressure stayed low enough for quieter exits to remain usable.';
+};
+
+export const summarizeBeijingReadEvolution = (
+  entries: BeijingReadSnapshot[]
+): BeijingReadSummary[] =>
+  entries.map((entry, index) => {
+    const previous = index > 0 ? entries[index - 1] ?? null : null;
+    const pressureRead = describePressureRead(entry, previous);
+    const headline = entry.thresholdHighProb >= 0.76
+      ? 'Close to a larger fight'
+      : entry.bluffProb >= 0.68
+        ? 'Testing for hesitation'
+        : entry.humiliation >= 0.58
+          ? 'Face-saving pressure mattered'
+          : 'A cautious read stayed possible';
+
+    return {
+      turn: entry.turn,
+      headline,
+      signalRead: describeSignalRead(entry),
+      pressureRead,
+      faceRead: describeFaceRead(entry)
+    };
+  });
+
 export const ReportView = ({ report, scenario, advisorDossiers, cinematics, images, onRestart }: ReportViewProps) => {
   const advisorNameById = new Map(advisorDossiers.map((entry) => [entry.id, entry.name]));
   const deepDebrief = report.fullCausality.deepDebrief;
@@ -201,6 +280,7 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
       ? 'The country avoided the worst shock, but families still felt the crisis in bills, phones, and retirement accounts.'
       : 'The public felt the scare, but daily life did not fully break during this run.';
   const reportVisual = selectReportVisual({ report, scenario, images });
+  const beijingReadSummaries = summarizeBeijingReadEvolution(report.beliefEvolution);
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-4 sm:px-4 lg:px-6">
@@ -698,28 +778,23 @@ export const ReportView = ({ report, scenario, advisorDossiers, cinematics, imag
 
       <section className="card p-5">
         <p className="label">How Beijing's Read Changed</p>
-        <div className="mt-3 overflow-x-auto">
-          <table className="min-w-full border-collapse text-sm">
-            <thead>
-              <tr className="text-left text-textMuted">
-                <th className="border-b border-borderTone py-2 pr-4">Window</th>
-                <th className="border-b border-borderTone py-2 pr-4">Bluff risk</th>
-                <th className="border-b border-borderTone py-2 pr-4">Trigger risk</th>
-                <th className="border-b border-borderTone py-2">Humiliation pressure</th>
-              </tr>
-            </thead>
-            <tbody>
-              {report.beliefEvolution.map((entry, index) => (
-                <tr key={`${entry.turn}:${index}`} className="text-textMain">
-                  <td className="border-b border-borderTone/60 py-2 pr-4">{entry.turn}</td>
-                  <td className="border-b border-borderTone/60 py-2 pr-4">{entry.bluffProb.toFixed(2)}</td>
-                  <td className="border-b border-borderTone/60 py-2 pr-4">{entry.thresholdHighProb.toFixed(2)}</td>
-                  <td className="border-b border-borderTone/60 py-2">{entry.humiliation.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {beijingReadSummaries.length > 0 ? (
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {beijingReadSummaries.map((entry) => (
+              <article key={entry.turn} className="rounded-md border border-borderTone/70 bg-panelRaised/35 p-3">
+                <p className="text-xs uppercase tracking-[0.14em] text-textMuted">Decision window {entry.turn}</p>
+                <h3 className="mt-2 font-display text-base text-textMain">{entry.headline}</h3>
+                <ul className="mt-3 list-disc space-y-2 pl-4 text-xs leading-relaxed text-textMuted">
+                  <li>{entry.signalRead}</li>
+                  <li>{entry.pressureRead}</li>
+                  <li>{entry.faceRead}</li>
+                </ul>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-textMuted">There was not enough Beijing response history to explain how the other side was reading the run.</p>
+        )}
       </section>
     </main>
   );
