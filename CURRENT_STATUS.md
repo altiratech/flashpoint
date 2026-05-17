@@ -5,6 +5,7 @@ Product: Flashpoint / ESCALATION scenario and response simulation.
 Current state:
 - `main` is ahead of `origin/main` with local playable-v1 hardening commits; do not push without deployment approval because `main` pushes trigger the live site pipeline.
 - ALT-38 deployed API/web verification is complete; no Cloudflare, D1, DNS, workflow-secret, or production-config changes are in the current local slice.
+- Current deployed API/web verification still passes on the existing live baseline, but deployed browser smoke with the current local harness fails after reaching the report because live Pages has not received the local report-copy contract yet.
 - The flagship loop is locally playable end-to-end: setup -> first briefing -> decision review -> committed choices -> immediate consequences -> mandate report -> setup return -> active-run/report reopen and local cleanup.
 - Setup is lighter and game-like, with the U.S. household crisis image promoted and admin-style chrome reduced.
 - Briefings are less card-heavy, cap truth reads to the strongest items, keep stronger photographic crisis evidence in the hero slot, quarantine generic `img_###` fallback art from support visuals when stronger evidence exists, carry Homefront pressure, and promote resolved-turn consequence images before generic beat previews.
