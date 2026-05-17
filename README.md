@@ -24,6 +24,12 @@ Flashpoint does not use real-world leaders or real private networks. Narrative f
 
 Requires Node 22+ and npm 10+. GitHub workflows run on Node 24; current Cloudflare local tooling (`wrangler`/`miniflare`) also requires Node 22+.
 
+If your shell is still on an older global Node, use the repo's `.node-version` / `.nvmrc` with a version manager, or run a temporary Node 22 shell:
+
+```bash
+npx -y -p node@22 -c 'npm run dev'
+```
+
 ```bash
 git clone https://github.com/altiratech/flashpoint.git
 cd flashpoint

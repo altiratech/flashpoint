@@ -22,9 +22,9 @@ Current state:
 
 Validation:
 - Current 2026-05-17 code-gate recheck passed: `npm run ci:phase1`, `npm run lint`, and `npm run build`.
-- Fresh local browser rerun in this shell remains blocked by local environment, not app behavior: this shell has Node v20.17.0 while Wrangler requires Node >=22. `npm run dev` and `npm run quickstart` now fail early with an explicit Node 22+ preflight instead of leaving web-only Vite hung on `/api/reference/bootstrap`; `.node-version` and `.nvmrc` point version managers to Node 22.
-- Latest saved desktop, 390px mobile, and 390px recovery smoke artifacts in `output/` remain the current browser proof.
-- Prior browser coverage also includes fresh desktop and 390px full-run smokes, fresh 390px recovery/reopen smoke, varied, strict public-econ, timed desktop/mobile, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
+- Fresh local browser proof passed under temporary Node 22 (`npx -y -p node@22 -c ...`): desktop full-run smoke, 390px mobile full-run smoke, 390px recovery/reopen/cleanup smoke, standard timed smoke, and 390px public-econ image-route smoke.
+- The global shell still reports Node v20.17.0, so normal `npm run dev`/`quickstart` intentionally fail early until the shell uses Node >=22; `.node-version` and `.nvmrc` point version managers to Node 22.
+- Prior browser coverage also includes varied, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
