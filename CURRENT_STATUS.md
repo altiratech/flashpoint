@@ -22,7 +22,8 @@ Current state:
 
 Validation:
 - Current 2026-05-17 code-gate recheck passed: `npm run ci:phase1`, `npm run lint`, and `npm run build`.
-- Fresh local browser rerun in this shell is blocked by local environment, not app behavior: `npm run dev` cannot start the API because Wrangler requires Node >=22 while this shell has Node v20.17.0; web-only Vite hangs on `/api/reference/bootstrap`. Latest saved desktop, 390px mobile, and 390px recovery smoke artifacts in `output/` remain the current browser proof.
+- Fresh local browser rerun in this shell remains blocked by local environment, not app behavior: this shell has Node v20.17.0 while Wrangler requires Node >=22. `npm run dev` and `npm run quickstart` now fail early with an explicit Node 22+ preflight instead of leaving web-only Vite hung on `/api/reference/bootstrap`; `.node-version` and `.nvmrc` point version managers to Node 22.
+- Latest saved desktop, 390px mobile, and 390px recovery smoke artifacts in `output/` remain the current browser proof.
 - Prior browser coverage also includes fresh desktop and 390px full-run smokes, fresh 390px recovery/reopen smoke, varied, strict public-econ, timed desktop/mobile, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
 
 Next:

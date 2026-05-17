@@ -12,6 +12,7 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
+    "predev": "node scripts/check-node-runtime.mjs",
     "dev": "concurrently -k -n api,web -c yellow,cyan \"npm run dev --workspace @wargames/api\" \"npm run dev --workspace @wargames/web\"",
     "build": "npm run validate:content && npm run build --workspace @wargames/engine && npm run build --workspace @wargames/shared-types && npm run build --workspace @wargames/content && npm run build --workspace @wargames/api && npm run build --workspace @wargames/web",
     "test": "vitest run",
@@ -38,6 +39,7 @@
     "db:migrate:plan": "npm run db:migrate:plan --workspace @wargames/api",
     "db:migrate:remote": "npm run db:migrate:remote --workspace @wargames/api",
     "db:seed": "npm run db:seed --workspace @wargames/api",
+    "prequickstart": "node scripts/check-node-runtime.mjs",
     "quickstart": "npm install && npm run generate:images && npm run db:migrate && npm run db:seed && npm run dev"
   },
   "devDependencies": {
