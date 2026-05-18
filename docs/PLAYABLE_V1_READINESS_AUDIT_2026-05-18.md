@@ -6,9 +6,9 @@ Scope: Canonical playable v1 readiness for `/Users/ryanjameson/Desktop/Lifehub/C
 
 ## Verdict
 
-Local playable-v1 readiness is supported by current repo evidence.
+Canonical playable-v1 readiness is verified by current repo, GitHub Actions, and deployed browser evidence.
 
-Canonical readiness is not complete yet because the verified local commits are not published to `origin/main`, and the deployed Pages/Worker surface has not been reverified with the current local report-copy contract.
+The approved `main` publication completed successfully, and the deployed Pages/Worker surface was reverified with the current report-copy contract.
 
 ## Current Publication State
 
@@ -16,7 +16,7 @@ Canonical readiness is not complete yet because the verified local commits are n
 - Current local head: verify with `git rev-parse HEAD`
 - Current remote head: verify with `git ls-remote origin refs/heads/main`
 - Current unpublished commit count: verify with `git rev-list --count origin/main..HEAD`
-- Deployment constraint: do not push `main` or deploy without Ryan approval, because `main` pushes trigger the live site pipeline.
+- Publication result: Ryan approved publishing; `main` was pushed and GitHub Deploy run `26008508011` passed.
 
 ## Requirement Audit
 
@@ -32,16 +32,13 @@ Canonical readiness is not complete yet because the verified local commits are n
 | Verify public-econ image route | `output/playwright-node22-rerun-public-econ-mobile/smoke-summary.json`: passed, 390x900, public-econ strategy, seed `public-econ-2`, no console/page errors. | Satisfied locally |
 | Verify local evidence integrity | `npm run verify:playable-v1:local`: passed; checks current Node 22 smoke summaries, required screenshot artifacts, recovery steps, console errors, and page errors. | Satisfied locally |
 | Commit local work | Local readiness work has been committed on `main`; verify the current latest commit with `git log --oneline --decorate -5`. | Satisfied locally |
-| Verify deployed canonical surface | Current local commits have not been pushed/deployed; production `npm run verify:deploy` and deployed browser smoke must be rerun after approval and deployment. | Blocked on approval |
+| Verify deployed canonical surface | GitHub Deploy run `26008508011` passed; local `npm run verify:deploy` passed; deployed desktop and 390px mobile browser smokes passed; required screenshots were inspected. | Satisfied |
 
 ## Remaining Gate
 
-Only Ryan can clear the next gate:
+No playable-v1 readiness gate remains open.
 
-1. Approve pushing/deploying the unpublished local commits from `main`.
-2. After deployment, run production `npm run verify:deploy`.
-3. Run deployed browser smoke against the updated Pages URL.
-4. If both deployed checks pass, update `CURRENT_STATUS.md` and `SYSTEM/COMPLETION_LOG.md`, then the active goal can be considered for completion.
+Publication and deployed verification evidence is recorded in `docs/DEPLOYED_PLAYABLE_V1_VERIFICATION_2026-05-18.md`.
 
 ## Non-Blocking Known Product Choice
 
