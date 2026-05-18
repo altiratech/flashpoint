@@ -7,7 +7,13 @@ const requiredFiles = [
   'output/playwright-node22-rerun-mobile/99-report.png',
   'output/playwright-node22-rerun-timed/01-first-briefing.png',
   'output/playwright-node22-rerun-recovery-mobile/09-report-removed.png',
-  'output/playwright-node22-rerun-public-econ-mobile/99-report.png'
+  'output/playwright-node22-rerun-public-econ-mobile/99-report.png',
+  'output/playwright-2026-05-18-refresh-desktop/99-report.png',
+  'output/playwright-2026-05-18-refresh-mobile/01-decision-selected.png',
+  'output/playwright-2026-05-18-refresh-mobile/99-report.png',
+  'output/playwright-2026-05-18-refresh-timed/01-first-briefing.png',
+  'output/playwright-2026-05-18-refresh-recovery-mobile/09-report-removed.png',
+  'output/playwright-2026-05-18-refresh-public-econ-mobile/99-report.png'
 ];
 
 const jsonChecks = [
@@ -42,10 +48,45 @@ const jsonChecks = [
       seed: 'public-econ-2',
       decisionWindows: 5
     }
+  },
+  {
+    path: 'output/playwright-2026-05-18-refresh-desktop/smoke-summary.json',
+    expect: {
+      viewport: { width: 1440, height: 1100 },
+      decisionWindows: 6
+    }
+  },
+  {
+    path: 'output/playwright-2026-05-18-refresh-mobile/smoke-summary.json',
+    expect: {
+      viewport: { width: 390, height: 900 },
+      decisionWindows: 6
+    }
+  },
+  {
+    path: 'output/playwright-2026-05-18-refresh-timed/smoke-summary.json',
+    expect: {
+      viewport: { width: 1440, height: 1100 },
+      decisionWindows: 6,
+      timerMode: 'standard',
+      timers: ['first briefing: CLOCK 90S', 'first decision: visible and extendable']
+    }
+  },
+  {
+    path: 'output/playwright-2026-05-18-refresh-public-econ-mobile/smoke-summary.json',
+    expect: {
+      viewport: { width: 390, height: 900 },
+      responseStrategy: 'public-econ',
+      seed: 'public-econ-2',
+      decisionWindows: 5
+    }
   }
 ];
 
-const recoverySummaryPath = 'output/playwright-node22-rerun-recovery-mobile/smoke-summary.md';
+const recoverySummaryPaths = [
+  'output/playwright-node22-rerun-recovery-mobile/smoke-summary.md',
+  'output/playwright-2026-05-18-refresh-recovery-mobile/smoke-summary.md'
+];
 const requiredRecoveryLines = [
   '# Flashpoint Recovery Browser Smoke: passed',
   '- Viewport: 390x900',
@@ -128,15 +169,17 @@ for (const check of jsonChecks) {
   }
 }
 
-try {
-  const recoverySummary = await readFile(recoverySummaryPath, 'utf8');
-  for (const requiredLine of requiredRecoveryLines) {
-    if (!recoverySummary.includes(requiredLine)) {
-      errors.push(`${recoverySummaryPath}: missing ${JSON.stringify(requiredLine)}`);
+for (const recoverySummaryPath of recoverySummaryPaths) {
+  try {
+    const recoverySummary = await readFile(recoverySummaryPath, 'utf8');
+    for (const requiredLine of requiredRecoveryLines) {
+      if (!recoverySummary.includes(requiredLine)) {
+        errors.push(`${recoverySummaryPath}: missing ${JSON.stringify(requiredLine)}`);
+      }
     }
+  } catch (error) {
+    errors.push(`${recoverySummaryPath}: unable to read (${error.message})`);
   }
-} catch (error) {
-  errors.push(`${recoverySummaryPath}: unable to read (${error.message})`);
 }
 
 if (errors.length > 0) {
@@ -148,4 +191,6 @@ if (errors.length > 0) {
 }
 
 console.log('Playable v1 local evidence verification passed.');
-console.log(`Checked ${jsonChecks.length} smoke summaries, ${requiredFiles.length} screenshots/artifacts, and recovery flow steps.`);
+console.log(
+  `Checked ${jsonChecks.length} smoke summaries, ${requiredFiles.length} screenshots/artifacts, and ${recoverySummaryPaths.length} recovery flow summaries.`
+);
