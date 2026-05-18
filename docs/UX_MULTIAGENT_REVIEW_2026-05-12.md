@@ -20,6 +20,21 @@ The strongest direction is not more generic spectacle. It is making the player f
 4. Everyday-American stakes are present in content but too secondary in the UI. The main surfaces still emphasize meters, advisors, and policy-room labels before shelves, gas, jobs, families, phones, and panic.
 5. The visual hierarchy is too card-heavy. Many cards are useful individually, but together they flatten urgency.
 
+## 2.1 Implementation Status As Of 2026-05-18
+
+The diagnosis above is retained as the reason for the playable-v1 polish lane, but the original "fix now" items should no longer be treated as open local P0/P1 blockers.
+
+Current local evidence shows:
+- Scroll/focus hygiene exists for setup -> live, resume -> live, turn advance, report open, and return-to-setup transitions.
+- Timed mode now shows an authored first briefing clock, decision-clock pressure copy, and an enabled first-window `Extend Clock` control.
+- Selected-response review is the primary pre-commit surface, and the normal response-selection flow no longer requires the custom-response panel.
+- Generic `img_###` fallback art is rejected by the browser smoke harness when it appears in visible gameplay evidence.
+- Setup and major briefing/report surfaces now prioritize stronger domestic/economic imagery while leaving selected-decision imagery intentionally absent for v1.
+
+Verified local evidence is tracked by `npm run verify:playable-v1:local` and the readiness audit in `docs/PLAYABLE_V1_READINESS_AUDIT_2026-05-18.md`.
+
+Remaining ideas in this review are product polish or post-v1 candidates unless a fresh browser pass finds a regression. Canonical playable-v1 readiness is still blocked on publication approval and post-deploy browser verification, not on these original local UX findings.
+
 ## 3. Cool Factor Opportunities
 
 1. Add a `Homefront` or `At Home` strip that translates crisis state into daily-life consequences: gas lines, grocery panic, 401k shock, flight cancellations, pharmacy delays, reserve-family anxiety, or local emergency notices.

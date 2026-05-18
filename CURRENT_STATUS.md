@@ -17,6 +17,7 @@ Validation:
 - The global shell still reports Node v20.17.0, so normal `npm run dev`/`quickstart` intentionally fail early until the shell uses Node >=22; `.node-version` and `.nvmrc` point version managers to Node 22.
 - Local playable-v1 evidence verifier: `npm run verify:playable-v1:local` checks the current Node 22 browser-smoke summaries, required screenshot artifacts, recovery steps, console errors, and page errors.
 - Readiness audit: `docs/PLAYABLE_V1_READINESS_AUDIT_2026-05-18.md` maps the goal requirements to current evidence, includes the local evidence verifier, avoids stale self-referential commit counts, and identifies deployment approval plus post-deploy smoke as the remaining canonical gate.
+- UX review reconciliation: `docs/UX_MULTIAGENT_REVIEW_2026-05-12.md` now marks its original fix-now findings as covered locally by the playable-v1 evidence, with remaining ideas treated as optional polish unless a fresh browser pass finds a regression.
 - Post-deploy checklist: `docs/POST_DEPLOY_VERIFICATION_CHECKLIST_2026-05-18.md` captures the exact publication, production verifier, deployed browser smoke, screenshot inspection, and writeback steps to run after approval.
 
 Next:
