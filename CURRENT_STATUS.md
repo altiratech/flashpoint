@@ -22,7 +22,8 @@ Current state:
 
 Validation:
 - Current 2026-05-17 code-gate recheck passed: `npm run ci:phase1`, `npm run lint`, and `npm run build`.
-- Fresh local browser proof passed under temporary Node 22 (`npx -y -p node@22 -c ...`): desktop full-run smoke, 390px mobile full-run smoke, 390px recovery/reopen/cleanup smoke, standard timed smoke, and 390px public-econ image-route smoke.
+- Current 2026-05-18 local browser rerun passed under temporary Node 22 (`npx -y -p node@22 -c ...`): desktop full-run smoke and 390px mobile full-run smoke, with representative screenshots inspected in `output/playwright-node22-rerun-desktop/` and `output/playwright-node22-rerun-mobile/`.
+- Prior fresh local browser proof also passed under temporary Node 22: 390px recovery/reopen/cleanup smoke, standard timed smoke, and 390px public-econ image-route smoke.
 - The global shell still reports Node v20.17.0, so normal `npm run dev`/`quickstart` intentionally fail early until the shell uses Node >=22; `.node-version` and `.nvmrc` point version managers to Node 22.
 - Prior browser coverage also includes varied, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
 
