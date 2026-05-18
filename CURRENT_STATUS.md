@@ -26,6 +26,7 @@ Validation:
 - Current 2026-05-18 extended local browser rerun also passed under temporary Node 22: standard timed desktop smoke, 390px recovery/reopen/cleanup smoke, and 390px public-econ image-route smoke, with representative timed, recovery-cleanup, and public-econ report screenshots inspected.
 - The global shell still reports Node v20.17.0, so normal `npm run dev`/`quickstart` intentionally fail early until the shell uses Node >=22; `.node-version` and `.nvmrc` point version managers to Node 22.
 - Prior browser coverage also includes varied, no-fallback-art, decision-entry/review, rendered-report readability, custom-response-through-report, and Beijing-read report smokes.
+- Readiness audit: `docs/PLAYABLE_V1_READINESS_AUDIT_2026-05-18.md` maps the goal requirements to current evidence and identifies deployment approval plus post-deploy smoke as the remaining canonical gate.
 
 Next:
 - Ryan decides whether to approve push/deploy for the latest local hardening commits.
