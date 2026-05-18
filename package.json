@@ -28,6 +28,7 @@
     "simulate:balance": "node --import tsx scripts/monte-carlo.ts",
     "test:token-regression": "node --import tsx scripts/token-regression.ts",
     "verify:deploy": "./scripts/verify-deploy.sh",
+    "verify:playable-v1:local": "node scripts/verify-playable-v1-local-evidence.mjs",
     "verify:d1:schema:remote": "node scripts/verify-d1-schema-remote.mjs",
     "verify:diagnostic-retention": "node scripts/check-diagnostic-retention.mjs",
     "verify:rate-limit:remote": "node scripts/verify-rate-limit-remote.mjs",
