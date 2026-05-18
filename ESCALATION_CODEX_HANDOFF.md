@@ -8,6 +8,14 @@ Current naming rule:
 - public product name: `Altira Flashpoint`
 - legacy internal repo/infrastructure name: `ESCALATION`
 
+## Current Supersession Note — 2026-05-18
+
+This file is a historical handoff log, not the current readiness source of truth. Read `CURRENT_STATUS.md` first for present-tense state.
+
+The early sections below predate later playable-v1 hardening. In particular, the early claims that timed runtime behavior, `Extend Timer`, no-action handling, browser validation, and repo/git context are incomplete have been superseded by later commits and current local evidence.
+
+Current local playable-v1 evidence is summarized in `docs/PLAYABLE_V1_READINESS_AUDIT_2026-05-18.md` and verified by `npm run verify:playable-v1:local`. Canonical readiness is still blocked on Ryan approval to push/deploy, followed by production `npm run verify:deploy` and deployed desktop/mobile browser smoke.
+
 ## 1) Implementation Status
 
 ### 1.1 What has been built in this thread
