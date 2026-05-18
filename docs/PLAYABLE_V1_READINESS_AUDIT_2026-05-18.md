@@ -13,9 +13,9 @@ Canonical readiness is not complete yet because the verified local commits are n
 ## Current Publication State
 
 - Local branch: `main`
-- Local head at audit time: `1cd82b03331917c66923763231928be5a63df838`
+- Local head at audit refresh time: `9755255b66897ce4b6e777996b13c54de95951b7`
 - Remote `origin/main` at audit time: `9417863f86341c5afa66600c5adbebdcdbb23f2d`
-- Local branch state: ahead of `origin/main` by 26 commits
+- Local branch state: ahead of `origin/main` by 29 commits
 - Deployment constraint: do not push `main` or deploy without Ryan approval, because `main` pushes trigger the live site pipeline.
 
 ## Requirement Audit
@@ -30,14 +30,15 @@ Canonical readiness is not complete yet because the verified local commits are n
 | Verify timed playthrough | `output/playwright-node22-rerun-timed/smoke-summary.json`: passed, standard timer mode, first briefing clock and extendable first decision confirmed, no console/page errors. | Satisfied locally |
 | Verify recovery/reopen/cleanup | `output/playwright-node22-rerun-recovery-mobile/smoke-summary.md`: passed, 390x900, active-run resume/removal and completed-report reopen/removal covered. | Satisfied locally |
 | Verify public-econ image route | `output/playwright-node22-rerun-public-econ-mobile/smoke-summary.json`: passed, 390x900, public-econ strategy, seed `public-econ-2`, no console/page errors. | Satisfied locally |
-| Commit local work | Latest local commit at audit time is `1cd82b0 Record extended local browser proof rerun`. | Satisfied locally |
+| Verify local evidence integrity | `npm run verify:playable-v1:local`: passed; checks current Node 22 smoke summaries, required screenshot artifacts, recovery steps, console errors, and page errors. | Satisfied locally |
+| Commit local work | Latest local commit at audit refresh time is `9755255 Add local playable v1 evidence verifier`. | Satisfied locally |
 | Verify deployed canonical surface | Current local commits have not been pushed/deployed; production `npm run verify:deploy` and deployed browser smoke must be rerun after approval and deployment. | Blocked on approval |
 
 ## Remaining Gate
 
 Only Ryan can clear the next gate:
 
-1. Approve pushing/deploying the 26 unpublished local commits from `main`.
+1. Approve pushing/deploying the 29 unpublished local commits from `main`.
 2. After deployment, run production `npm run verify:deploy`.
 3. Run deployed browser smoke against the updated Pages URL.
 4. If both deployed checks pass, update `CURRENT_STATUS.md` and `SYSTEM/COMPLETION_LOG.md`, then the active goal can be considered for completion.
