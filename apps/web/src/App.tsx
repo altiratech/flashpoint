@@ -315,6 +315,10 @@ const visualFamilyKey = (asset: ImageAsset): string => {
 };
 
 const previewImageRealismScore = (asset: ImageAsset): number => {
+  if (isRetiredLegacyAsset(asset)) {
+    return -90;
+  }
+
   if (asset.id.startsWith('img_')) {
     return -60;
   }
@@ -335,6 +339,17 @@ const previewImageRealismScore = (asset: ImageAsset): number => {
   return 0;
 };
 
+const retiredLegacyImageIds = new Set([
+  'tw_bs_023',
+  'tw_bs_024',
+  'tw_bs_025',
+  'tw_bs_026',
+  'tw_bs_029',
+  'tw_bs_033'
+]);
+
+const isRetiredLegacyAsset = (asset: ImageAsset): boolean => retiredLegacyImageIds.has(asset.id);
+
 const isPhotorealAsset = (asset: ImageAsset): boolean => {
   const lowerPath = asset.path.toLowerCase();
   return (
@@ -344,10 +359,27 @@ const isPhotorealAsset = (asset: ImageAsset): boolean => {
 };
 
 const isPrimarySceneAsset = (asset: ImageAsset): boolean =>
-  isPhotorealAsset(asset) && (asset.kind === 'documentary_still' || asset.kind === 'scenario_still');
+  !isRetiredLegacyAsset(asset) &&
+  isPhotorealAsset(asset) &&
+  (asset.kind === 'documentary_still' || asset.kind === 'scenario_still');
 
 const isStaleGeneratedAsset = (asset: ImageAsset): boolean =>
-  asset.id.startsWith('img_') || asset.path.toLowerCase().endsWith('.svg');
+  asset.id.startsWith('img_') || asset.path.toLowerCase().endsWith('.svg') || isRetiredLegacyAsset(asset);
+
+const isHeroEligibleAsset = (asset: ImageAsset): boolean => {
+  if (isPrimarySceneAsset(asset)) {
+    return true;
+  }
+
+  const lowerPath = asset.path.toLowerCase();
+  const lowerPerspective = String(asset.perspective).toLowerCase();
+  return (
+    !isStaleGeneratedAsset(asset) &&
+    asset.kind === 'artifact' &&
+    (lowerPerspective === 'surveillance' || lowerPerspective === 'news_frame') &&
+    (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp'))
+  );
+};
 
 const heroVisualScore = (asset: ImageAsset): number => {
   let score = 0;
@@ -449,17 +481,18 @@ const arrangeBriefingVisuals = (
     primaryAsset &&
     !primaryAsset.id.startsWith('img_') &&
     isPhotorealAsset(primaryAsset) &&
-    primaryAsset.kind !== 'map' &&
-    primaryAsset.kind !== 'artifact';
+    isHeroEligibleAsset(primaryAsset);
 
+  const deployableHeroPool = deduped.filter((asset) => !isStaleGeneratedAsset(asset));
+  const heroPool = deployableHeroPool.length > 0 ? deployableHeroPool : deduped;
   const heroAsset = primaryIsStrongScene
     ? primaryAsset
-    : ([...deduped].sort(
+    : ([...heroPool].sort(
         (left, right) => heroVisualScore(right) - heroVisualScore(left) || left.id.localeCompare(right.id)
       )[0] ??
       null);
   const evidencePool = deduped.filter((asset) => asset.id !== heroAsset?.id);
-  const nonFallbackEvidencePool = evidencePool.filter((asset) => !asset.id.startsWith('img_'));
+  const nonFallbackEvidencePool = evidencePool.filter((asset) => !isStaleGeneratedAsset(asset));
   const selectableEvidencePool = nonFallbackEvidencePool.length > 0 ? nonFallbackEvidencePool : evidencePool;
 
   const evidenceAssets = selectableEvidencePool
@@ -591,7 +624,7 @@ const pickPreviewImageAssets = (
   const usedFamilies = new Set<string>();
 
   const curatedHero = rankedCuratedPreviewAssets(allCandidates, beat.visualCue?.heroImageIds)
-    .filter((entry) => isPrimarySceneAsset(entry.asset));
+    .filter((entry) => isHeroEligibleAsset(entry.asset));
   if (!hasDecisionVisualContext && curatedHero.length > 0) {
     selected.push(curatedHero[0]!.asset);
     usedKinds.add(curatedHero[0]!.asset.kind);
@@ -600,7 +633,7 @@ const pickPreviewImageAssets = (
   }
 
   const curatedEvidence = rankedCuratedPreviewAssets(allCandidates, beat.visualCue?.evidenceImageIds).filter(
-    (entry) => !selected.some((asset) => asset.id === entry.asset.id)
+    (entry) => !selected.some((asset) => asset.id === entry.asset.id) && !isStaleGeneratedAsset(entry.asset)
   );
 
   for (const candidate of hasDecisionVisualContext ? [] : curatedEvidence) {
@@ -619,14 +652,17 @@ const pickPreviewImageAssets = (
     usedFamilies.add(family);
   }
 
-  const hasPrimarySceneCandidate = candidates.some((candidate) => isPrimarySceneAsset(candidate.asset) && candidate.score > 0);
+  const hasPrimarySceneCandidate = candidates.some((candidate) => isHeroEligibleAsset(candidate.asset) && candidate.score > 0);
   const hasRealEvidenceCandidate = candidates.some((candidate) => !isStaleGeneratedAsset(candidate.asset) && candidate.score > 0);
 
   for (const candidate of candidates) {
     if (selected.length >= count) {
       break;
     }
-    if (selected.length === 0 && hasPrimarySceneCandidate && !isPrimarySceneAsset(candidate.asset)) {
+    if (isStaleGeneratedAsset(candidate.asset) && hasRealEvidenceCandidate) {
+      continue;
+    }
+    if (selected.length === 0 && hasPrimarySceneCandidate && !isHeroEligibleAsset(candidate.asset)) {
       continue;
     }
     if (selected.length > 0 && hasRealEvidenceCandidate && isStaleGeneratedAsset(candidate.asset)) {
@@ -669,7 +705,7 @@ const pickPreviewImageAssets = (
   return reference.images.filter(
     (asset) =>
       (asset.environment === scenario.environment || asset.environment === 'generic') &&
-      isPrimarySceneAsset(asset)
+      isHeroEligibleAsset(asset)
   ).slice(0, count);
 };
 

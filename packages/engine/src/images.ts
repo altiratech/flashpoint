@@ -143,7 +143,22 @@ const countTagMatches = (asset: ImageAsset, requestedTags: string[]): number => 
   return requestedTags.reduce((count, tag) => count + (assetTags.has(tag) ? 1 : 0), 0);
 };
 
+const retiredLegacyImageIds = new Set([
+  'tw_bs_023',
+  'tw_bs_024',
+  'tw_bs_025',
+  'tw_bs_026',
+  'tw_bs_029',
+  'tw_bs_033'
+]);
+
+const isRetiredLegacyAsset = (asset: ImageAsset): boolean => retiredLegacyImageIds.has(asset.id);
+
 const scoreAssetRealism = (asset: ImageAsset): number => {
+  if (isRetiredLegacyAsset(asset)) {
+    return -90;
+  }
+
   if (asset.id.startsWith('img_')) {
     return -60;
   }
@@ -168,13 +183,32 @@ const isPrimarySceneAsset = (asset: ImageAsset): boolean => {
   const lowerPath = asset.path.toLowerCase();
   return (
     !asset.id.startsWith('img_') &&
+    !isRetiredLegacyAsset(asset) &&
     (asset.kind === 'documentary_still' || asset.kind === 'scenario_still') &&
     (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp'))
   );
 };
 
 const isStaleGeneratedAsset = (asset: ImageAsset): boolean =>
-  asset.id.startsWith('img_') || asset.path.toLowerCase().endsWith('.svg');
+  asset.id.startsWith('img_') || asset.path.toLowerCase().endsWith('.svg') || isRetiredLegacyAsset(asset);
+
+const isHeroEligibleAsset = (asset: ImageAsset): boolean => {
+  if (isPrimarySceneAsset(asset)) {
+    return true;
+  }
+
+  const lowerPath = asset.path.toLowerCase();
+  const lowerPerspective = String(asset.perspective).toLowerCase();
+  return (
+    !isStaleGeneratedAsset(asset) &&
+    asset.kind === 'artifact' &&
+    (lowerPerspective === 'surveillance' || lowerPerspective === 'news_frame') &&
+    (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp'))
+  );
+};
+
+const deployableCandidates = (entries: Array<{ asset: ImageAsset; score: number }>): Array<{ asset: ImageAsset; score: number }> =>
+  entries.filter((entry) => !isStaleGeneratedAsset(entry.asset));
 
 const scoreAsset = (
   asset: ImageAsset,
@@ -294,13 +328,14 @@ export const chooseImageAsset = ({
     .sort((left, right) => right.score - left.score || left.asset.id.localeCompare(right.asset.id));
 
   const curatedHero = rankedCuratedAssets(scoredAll, beat?.visualCue?.heroImageIds)
-    .filter((entry) => isPrimarySceneAsset(entry.asset));
+    .filter((entry) => isHeroEligibleAsset(entry.asset));
   if (curatedHero.length > 0 && actionTags.length === 0 && variantTags.length === 0) {
     return curatedHero[0]?.asset ?? null;
   }
 
-  const primaryScored = scored.filter((entry) => isPrimarySceneAsset(entry.asset));
-  const heroPool = primaryScored.length > 0 ? primaryScored : scored;
+  const deployableScored = deployableCandidates(scored);
+  const primaryScored = deployableScored.filter((entry) => isHeroEligibleAsset(entry.asset));
+  const heroPool = primaryScored.length > 0 ? primaryScored : deployableScored.length > 0 ? deployableScored : scored;
   const bestScore = heroPool[0]?.score ?? Number.NEGATIVE_INFINITY;
   const shortlisted = heroPool.filter((entry) => entry.score >= bestScore - 2);
 
@@ -308,8 +343,8 @@ export const chooseImageAsset = ({
     return shortlisted[0]?.asset ?? null;
   }
 
-  const fallback = assets
-    .filter((asset) => !recentImageIds.includes(asset.id))
+  const fallbackPool = assets.filter((asset) => !recentImageIds.includes(asset.id) && !isStaleGeneratedAsset(asset));
+  const fallback = (fallbackPool.length > 0 ? fallbackPool : assets.filter((asset) => !recentImageIds.includes(asset.id)))
     .sort((left, right) => scoreTags(right, requestedTags) - scoreTags(left, requestedTags));
 
   return fallback[0] ?? assets[0] ?? null;
@@ -380,8 +415,9 @@ export const chooseImageGallery = (
     (options.beat?.visualCue?.evidenceImageIds?.length ?? 0) > 0;
 
   const curatedHero = rankedCuratedAssets(rankedAll, options.beat?.visualCue?.heroImageIds)
-    .filter((entry) => isPrimarySceneAsset(entry.asset));
-  const curatedEvidence = rankedCuratedAssets(rankedAll, options.beat?.visualCue?.evidenceImageIds);
+    .filter((entry) => isHeroEligibleAsset(entry.asset));
+  const curatedEvidence = rankedCuratedAssets(rankedAll, options.beat?.visualCue?.evidenceImageIds)
+    .filter((entry) => !isStaleGeneratedAsset(entry.asset));
 
   if (!hasDecisionVisualContext) {
     if (curatedHero.length > 0) {
@@ -412,7 +448,7 @@ export const chooseImageGallery = (
     }
   }
 
-  const hasPrimarySceneCandidate = ranked.some((entry) => isPrimarySceneAsset(entry.asset) && entry.score > 0);
+  const hasPrimarySceneCandidate = ranked.some((entry) => isHeroEligibleAsset(entry.asset) && entry.score > 0);
   const hasRealEvidenceCandidate = ranked.some((entry) => !isStaleGeneratedAsset(entry.asset) && entry.score > 0);
 
   for (const { asset } of ranked) {
@@ -420,7 +456,10 @@ export const chooseImageGallery = (
       break;
     }
 
-    if (selected.length === 0 && hasPrimarySceneCandidate && !isPrimarySceneAsset(asset)) {
+    if (isStaleGeneratedAsset(asset) && hasRealEvidenceCandidate) {
+      continue;
+    }
+    if (selected.length === 0 && hasPrimarySceneCandidate && !isHeroEligibleAsset(asset)) {
       continue;
     }
     if (selected.length > 0 && hasRealEvidenceCandidate && isStaleGeneratedAsset(asset)) {

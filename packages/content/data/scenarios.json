@@ -4108,7 +4108,7 @@
             "tw_us_port_congestion_shipping"
           ],
           "evidenceImageIds": [
-            "tw_bs_023",
+            "tw_us_gas_lines_freight_shock",
             "tw_bs_004"
           ]
         }
@@ -4389,10 +4389,10 @@
           "branchStage": "incident",
           "caption": "A public boarding clip and failing port systems turn a gray-zone pressure campaign into a practical crisis.",
           "heroImageIds": [
-            "tw_bs_029"
+            "tw_us_thermal_boarding_heat"
           ],
           "evidenceImageIds": [
-            "tw_us_thermal_boarding_heat",
+            "tw_us_port_congestion_shipping",
             "tw_bs_036"
           ]
         }
@@ -4654,7 +4654,7 @@
             "tw_us_port_congestion_shipping"
           ],
           "evidenceImageIds": [
-            "tw_bs_023",
+            "tw_us_allied_coordination_call",
             "tw_bs_032"
           ]
         }
@@ -5531,7 +5531,7 @@
             "tw_us_port_congestion_shipping"
           ],
           "evidenceImageIds": [
-            "tw_bs_023",
+            "tw_us_gas_lines_freight_shock",
             "tw_bs_004"
           ]
         }
@@ -5757,7 +5757,7 @@
           ],
           "evidenceImageIds": [
             "tw_us_port_congestion_shipping",
-            "tw_bs_023"
+            "tw_us_gas_lines_freight_shock"
           ]
         }
       },
@@ -5985,7 +5985,7 @@
           ],
           "evidenceImageIds": [
             "tw_us_port_congestion_shipping",
-            "tw_bs_023"
+            "tw_us_electronics_store_shortage"
           ]
         }
       },

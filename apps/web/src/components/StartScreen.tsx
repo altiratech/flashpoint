@@ -69,7 +69,7 @@ const setupEvidenceImageIds = [
   'tw_us_family_cable_news_crisis',
   'tw_us_gas_lines_freight_shock',
   'tw_us_supermarket_panic',
-  'tw_bs_023'
+  'tw_us_port_congestion_shipping'
 ];
 
 const outcomeLabel: Record<OutcomeCategory, string> = {

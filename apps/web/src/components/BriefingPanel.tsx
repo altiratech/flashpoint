@@ -626,7 +626,7 @@ export const BriefingPanel = ({
             src={imageAsset.path}
             alt={imageAsset.alt}
             className={`h-[12.5rem] w-full bg-surface sm:h-[14rem] xl:h-[15rem] ${
-              imageAsset.kind === 'map' || imageAsset.kind === 'artifact' ? 'object-contain p-2' : 'object-cover'
+              imageAsset.kind === 'map' ? 'object-contain p-2' : 'object-cover'
             }`}
             loading="eager"
           />

@@ -7,6 +7,13 @@ Original prompt: Ok please start working through each Linear task. Keep going un
 - Verification after the polish slice: `npm run validate:content`, `npm run diagnose:decision-visuals`, `npm run diagnose:visual-targets`, `npm run build`, `git diff --check`, default desktop browser smoke, and 390px mobile browser smoke passed. Screenshot review covered first briefing, later briefing windows, and selected-decision mobile.
 - Not pushed: publishing the updated preview still requires Ryan's approval.
 
+## 2026-05-19
+
+- Published `e530c04` image/UX polish and status closeout `4245cca`; GitHub deploy runs `26092265833` and `26092661760`, `npm run verify:deploy`, deployed desktop smoke, deployed 390px mobile smoke, and screenshot inspection passed.
+- Ryan then surfaced a remaining stale/poorly sized watchstander image in the Unsafe Intercept path. Root cause: older `tw_bs_*` photo assets were still directly wired into some beat visual cues and were not treated as retired by the selectors.
+- Local corrective slice retired the known stale photo set (`tw_bs_023`, `tw_bs_024`, `tw_bs_025`, `tw_bs_026`, `tw_bs_029`, `tw_bs_033`) from engine/web hero selection, removed live scenario/setup references to them, made browser smoke fail if they surface, and changed briefing hero sizing so only maps use contained sizing.
+- Verification so far: `npm run validate:content`, `npm run diagnose:decision-visuals`, `npm run diagnose:visual-targets`, `npm run build`, `git diff --check`, default desktop smoke, varied desktop smoke, 390px mobile smoke, and screenshot review of the previously bad window passed locally.
+
 ## 2026-05-17
 
 - Tightened the remaining copy-regression guardrails after the Beijing-read fix. The final report's `Roads Not Taken` entries now say `Your move`, and the full-run/recovery browser smokes no longer accept the old `Selected Response`, `Commit Selected Response`, `Return To Selected Response`, or `Response envelope` labels as passing fallbacks.

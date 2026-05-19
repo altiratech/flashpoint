@@ -18,6 +18,8 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 const safeName = (value: string): string => value.replace(/[^a-z0-9_-]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
 const usFocusedImagePattern = /\/assets\/images\/tw_us_[^,\s)]+/g;
 const genericFallbackImagePattern = /\/assets\/images\/img_\d+\.svg/g;
+const retiredLegacyImagePattern =
+  /\/assets\/images\/(?:tw_bs_023_shipping_queue|tw_bs_024_command_center|tw_bs_025_destroyer_sea|tw_bs_026_empty_shelves|tw_bs_029_coast_guard_boarding|tw_bs_033_modern_cic_watch)\.(?:jpg|jpeg|png)/g;
 
 const waitForAppReady = async (page: Page): Promise<void> => {
   await page.waitForLoadState('domcontentloaded');
@@ -517,6 +519,10 @@ const run = async (): Promise<void> => {
     const genericFallbackImages = imageLog.flatMap((entry) => entry.match(genericFallbackImagePattern) ?? []);
     if (genericFallbackImages.length > 0) {
       throw new Error(`Browser smoke surfaced generic fallback art: ${[...new Set(genericFallbackImages)].join(', ')}`);
+    }
+    const retiredLegacyImages = imageLog.flatMap((entry) => entry.match(retiredLegacyImagePattern) ?? []);
+    if (retiredLegacyImages.length > 0) {
+      throw new Error(`Browser smoke surfaced retired legacy art: ${[...new Set(retiredLegacyImages)].join(', ')}`);
     }
 
     if (consoleErrors.length > 0 || pageErrors.length > 0) {
