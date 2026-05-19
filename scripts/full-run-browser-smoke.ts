@@ -257,8 +257,26 @@ const readVisibleImages = async (page: Page): Promise<VisibleImageRead[]> => {
   );
 };
 
+const waitForVisibleFigureImages = async (page: Page): Promise<void> => {
+  await page.waitForFunction(
+    () => {
+      const images = Array.from(document.querySelectorAll<HTMLImageElement>('figure img'));
+      const visibleImages = images.filter((image) => {
+        const box = image.getBoundingClientRect();
+        return box.width > 0 && box.height > 0 && box.bottom >= 0 && box.top <= window.innerHeight * 1.25;
+      });
+
+      return visibleImages.every((image) => image.complete && image.naturalWidth > 0 && image.naturalHeight > 0);
+    },
+    null,
+    { timeout: 10_000 }
+  );
+  await sleep(350);
+};
+
 const captureStep = async (page: Page, name: string): Promise<VisibleImageRead[]> => {
   const file = path.join(outputDir, `${safeName(name)}.png`);
+  await waitForVisibleFigureImages(page);
   if (name === '99-report') {
     await page.screenshot({ path: file, fullPage: false, timeout: 10_000 });
     await page.getByText(/Run Recap/i).first().evaluate((element) => element.scrollIntoView({ block: 'start' }));
