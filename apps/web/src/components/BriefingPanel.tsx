@@ -59,44 +59,37 @@ interface BriefingPanelProps {
 type BriefingSectionId = 'developments' | 'context' | 'indicators';
 
 const sourceLabel: Record<TurnDebrief['lines'][number]['tag'], string> = {
-  PlayerAction: '[Action]',
-  SecondaryEffect: '[Ripple]',
-  SystemEvent: '[System]'
+  PlayerAction: 'Your move:',
+  SecondaryEffect: 'Ripple:',
+  SystemEvent: 'System:'
 };
 
 const sectionLabels: Record<BriefingSectionId, string> = {
-  developments: 'What Just Happened',
-  context: 'Context',
-  indicators: 'Warning Signs'
+  developments: 'What Matters',
+  context: 'Why It Matters',
+  indicators: 'Meters'
 };
 
 const normalizeTickerLine = (value: string): string =>
   value.replace(/^(risk|market)\s+ticker:\s*/i, '').trim();
 
-const imagePanelLabel = (asset: ImageAsset): string => {
-  if (asset.kind === 'map') {
-    return 'Overhead Read';
+const shortBriefing = (value: string): string => {
+  const firstSentence = value.match(/^(.+?[.!?])(?:\s|$)/)?.[1]?.trim();
+  if (firstSentence && firstSentence.length <= 260) {
+    return firstSentence;
   }
-  if (asset.kind === 'artifact') {
-    return "What We're Seeing";
+  if (value.length <= 280) {
+    return value;
   }
-
-  const perspective = String(asset.perspective).toLowerCase();
-  if (perspective === 'satellite' || perspective === 'surveillance') {
-    return "What We're Seeing";
-  }
-  if (perspective === 'street') {
-    return 'On The Ground';
-  }
-  return 'Right Now';
+  return `${value.slice(0, 277).trim()}...`;
 };
 
-const imagePanelMode = (asset: ImageAsset): string => {
+const imagePanelLabel = (asset: ImageAsset): string => {
   if (asset.kind === 'map') {
-    return 'Orientation';
+    return 'Map';
   }
   if (asset.kind === 'artifact') {
-    return 'Internal Read';
+    return 'Evidence';
   }
 
   const perspective = String(asset.perspective).toLowerCase();
@@ -104,9 +97,27 @@ const imagePanelMode = (asset: ImageAsset): string => {
     return 'Evidence';
   }
   if (perspective === 'street') {
-    return 'Public Read';
+    return 'On The Ground';
   }
-  return 'Scene Read';
+  return 'Scene';
+};
+
+const imagePanelMode = (asset: ImageAsset): string => {
+  if (asset.kind === 'map') {
+    return 'Orientation';
+  }
+  if (asset.kind === 'artifact') {
+    return 'Evidence';
+  }
+
+  const perspective = String(asset.perspective).toLowerCase();
+  if (perspective === 'satellite' || perspective === 'surveillance') {
+    return 'Evidence';
+  }
+  if (perspective === 'street') {
+    return 'Public View';
+  }
+  return 'Live View';
 };
 
 const hiddenDownsideLabel = (category?: string | null): string => {
@@ -199,6 +210,8 @@ export const BriefingPanel = ({
   const [showAllDevelopments, setShowAllDevelopments] = useState(false);
   const [showAllSignals, setShowAllSignals] = useState(false);
   const [showBackground, setShowBackground] = useState(false);
+  const [showFullSituation, setShowFullSituation] = useState(false);
+  const [showImmediateOutcome, setShowImmediateOutcome] = useState(false);
   const [expandedBackgroundSectionId, setExpandedBackgroundSectionId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<BriefingSectionId>('developments');
 
@@ -210,6 +223,8 @@ export const BriefingPanel = ({
     setShowAllDevelopments(false);
     setShowAllSignals(false);
     setShowBackground(false);
+    setShowFullSituation(false);
+    setShowImmediateOutcome(false);
     setExpandedBackgroundSectionId(null);
   }, [turn, phaseTransition?.key]);
 
@@ -368,9 +383,9 @@ export const BriefingPanel = ({
       <section className="space-y-2">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="label">Start Here</p>
+            <p className="label">Read This First</p>
             <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
-              Here is what matters before you make the call.
+              The facts, guesses, and unknowns that should shape your next move.
             </p>
           </div>
           <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">
@@ -464,30 +479,45 @@ export const BriefingPanel = ({
 
       {turnDebrief && turnDebrief.lines.length > 0 ? (
         <section className="console-subpanel px-3 py-3">
-          <p className="label">Immediate Outcome</p>
-          {recentResolvedAction ? (
-            <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
-              Last move: <span className="text-textMain">{recentResolvedAction.label}</span>
-              {recentResolvedAction.summary ? ` // ${recentResolvedAction.summary}` : ''}
-            </p>
-          ) : null}
-          {immediateOutcomeCards.length > 0 ? (
-            <div className="mt-3 divide-y divide-borderTone/70 rounded-md border border-borderTone/70 bg-panelRaised/30">
-              {immediateOutcomeCards.map((card) => (
-                <article key={card.id} className="grid gap-2 px-3 py-2.5 lg:grid-cols-[11rem_minmax(0,1fr)]">
-                  <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{card.label}</p>
-                  <p className="text-[0.84rem] leading-relaxed text-textMain">{card.body}</p>
-                </article>
-              ))}
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="label">Immediate Outcome</p>
+              {recentResolvedAction ? (
+                <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
+                  Last move: <span className="text-textMain">{recentResolvedAction.label}</span>
+                  {recentResolvedAction.summary ? ` / ${recentResolvedAction.summary}` : ''}
+                </p>
+              ) : null}
             </div>
-          ) : null}
-          <div className="mt-2 space-y-2 text-[0.84rem] leading-relaxed text-textMuted">
-            {turnDebrief.lines.map((entry, index) => (
-              <p key={`${entry.tag}-${index}`}>
-                <span className="text-accent">{sourceLabel[entry.tag]}</span> {entry.text}
-              </p>
-            ))}
+            <button
+              type="button"
+              className="text-[0.68rem] uppercase tracking-[0.12em] text-accent"
+              onClick={() => setShowImmediateOutcome((current) => !current)}
+            >
+              {showImmediateOutcome ? 'Hide' : 'Open Details'}
+            </button>
           </div>
+          {showImmediateOutcome ? (
+            <>
+              {immediateOutcomeCards.length > 0 ? (
+                <div className="mt-3 divide-y divide-borderTone/70 rounded-md border border-borderTone/70 bg-panelRaised/30">
+                  {immediateOutcomeCards.map((card) => (
+                    <article key={card.id} className="grid gap-2 px-3 py-2.5 lg:grid-cols-[11rem_minmax(0,1fr)]">
+                      <p className="text-[0.68rem] uppercase tracking-[0.12em] text-textMuted">{card.label}</p>
+                      <p className="text-[0.84rem] leading-relaxed text-textMain">{card.body}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+              <div className="mt-2 space-y-2 text-[0.84rem] leading-relaxed text-textMuted">
+                {turnDebrief.lines.map((entry, index) => (
+                  <p key={`${entry.tag}-${index}`}>
+                    <span className="text-accent">{sourceLabel[entry.tag]}</span> {entry.text}
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : null}
         </section>
       ) : null}
 
@@ -582,8 +612,8 @@ export const BriefingPanel = ({
       : 'grid gap-3 md:grid-cols-2';
   const supportImageHeightClass =
     supportingImageAssets.length <= 1
-      ? 'h-[15rem] sm:h-[16.5rem] xl:h-[18rem]'
-      : 'h-[12.5rem] sm:h-[14rem] xl:h-[15rem]';
+      ? 'h-[12rem] sm:h-[13.5rem] xl:h-[15rem]'
+      : 'h-[10.5rem] sm:h-[12rem] xl:h-[13rem]';
   const shouldShowTheaterDiagram = Boolean(scenarioWorld?.theaterDiagram) &&
     (turn === 1 || (!imageAsset && supportingImageAssets.length === 0));
   const homefrontSignals = buildHomefrontSignals(meters, previousMeters);
@@ -595,7 +625,7 @@ export const BriefingPanel = ({
           <img
             src={imageAsset.path}
             alt={imageAsset.alt}
-            className={`h-[15rem] w-full bg-surface sm:h-[16rem] xl:h-[16rem] ${
+            className={`h-[12.5rem] w-full bg-surface sm:h-[14rem] xl:h-[15rem] ${
               imageAsset.kind === 'map' || imageAsset.kind === 'artifact' ? 'object-contain p-2' : 'object-cover'
             }`}
             loading="eager"
@@ -619,7 +649,7 @@ export const BriefingPanel = ({
           <div className="min-w-0">
             <p className="label text-warning">Homefront</p>
             <p className="mt-1 text-[0.92rem] leading-relaxed text-textMain">
-              What the crisis feels like before anyone calls it a war.
+              What people at home would notice first.
             </p>
           </div>
           <div className="grid min-w-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
@@ -654,10 +684,21 @@ export const BriefingPanel = ({
       >
         <div className="space-y-4">
           <article className="console-subpanel px-4 py-3">
-            <p className="label">Current Situation</p>
-            <p className="mt-3 border-l-2 border-accent/70 pl-4 text-sm leading-relaxed text-textMain">
-              {briefing.briefingParagraph}
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="label">The Situation In Plain English</p>
+                <p className="mt-3 border-l-2 border-accent/70 pl-4 text-sm leading-relaxed text-textMain">
+                  {showFullSituation ? briefing.briefingParagraph : shortBriefing(briefing.briefingParagraph)}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="shrink-0 text-[0.68rem] uppercase tracking-[0.12em] text-accent"
+                onClick={() => setShowFullSituation((current) => !current)}
+              >
+                {showFullSituation ? 'Show Less' : 'Full Briefing'}
+              </button>
+            </div>
           </article>
 
           {openingBackground ? (

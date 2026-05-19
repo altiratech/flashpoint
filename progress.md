@@ -1,5 +1,12 @@
 Original prompt: Ok please start working through each Linear task. Keep going until you are finished
 
+## 2026-05-18
+
+- Shipped a local image/UX polish response to Ryan's review. Northern Strait authored hero cues now favor the newer U.S./domestic raster assets, stale generated SVG/fallback art is blocked from normal hero/support selection when real images are available, and remaining image captions were tightened away from internal-note phrasing.
+- Simplified first-time navigation and density: the main briefing button now says `Choose Response`, long situation text is collapsed behind `Full Briefing`, immediate outcomes default to a short summary, and the decision surface collapses the full move list after a move is selected while keeping `Change Move` available.
+- Verification after the polish slice: `npm run validate:content`, `npm run diagnose:decision-visuals`, `npm run diagnose:visual-targets`, `npm run build`, `git diff --check`, default desktop browser smoke, and 390px mobile browser smoke passed. Screenshot review covered first briefing, later briefing windows, and selected-decision mobile.
+- Not pushed: publishing the updated preview still requires Ryan's approval.
+
 ## 2026-05-17
 
 - Tightened the remaining copy-regression guardrails after the Beijing-read fix. The final report's `Roads Not Taken` entries now say `Your move`, and the full-run/recovery browser smokes no longer accept the old `Selected Response`, `Commit Selected Response`, `Return To Selected Response`, or `Response envelope` labels as passing fallbacks.

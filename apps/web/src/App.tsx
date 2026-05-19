@@ -316,16 +316,16 @@ const visualFamilyKey = (asset: ImageAsset): string => {
 
 const previewImageRealismScore = (asset: ImageAsset): number => {
   if (asset.id.startsWith('img_')) {
-    return -10;
+    return -60;
   }
 
   const lowerPath = asset.path.toLowerCase();
   if (lowerPath.endsWith('.svg')) {
-    return -18;
+    return -36;
   }
 
   if (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp')) {
-    return 8;
+    return 14;
   }
 
   if (asset.kind === 'map' || asset.kind === 'artifact') {
@@ -342,6 +342,12 @@ const isPhotorealAsset = (asset: ImageAsset): boolean => {
     (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp'))
   );
 };
+
+const isPrimarySceneAsset = (asset: ImageAsset): boolean =>
+  isPhotorealAsset(asset) && (asset.kind === 'documentary_still' || asset.kind === 'scenario_still');
+
+const isStaleGeneratedAsset = (asset: ImageAsset): boolean =>
+  asset.id.startsWith('img_') || asset.path.toLowerCase().endsWith('.svg');
 
 const heroVisualScore = (asset: ImageAsset): number => {
   let score = 0;
@@ -584,7 +590,8 @@ const pickPreviewImageAssets = (
   const usedPerspectives = new Set<ImageAsset['perspective']>();
   const usedFamilies = new Set<string>();
 
-  const curatedHero = rankedCuratedPreviewAssets(allCandidates, beat.visualCue?.heroImageIds);
+  const curatedHero = rankedCuratedPreviewAssets(allCandidates, beat.visualCue?.heroImageIds)
+    .filter((entry) => isPrimarySceneAsset(entry.asset));
   if (!hasDecisionVisualContext && curatedHero.length > 0) {
     selected.push(curatedHero[0]!.asset);
     usedKinds.add(curatedHero[0]!.asset.kind);
@@ -612,9 +619,18 @@ const pickPreviewImageAssets = (
     usedFamilies.add(family);
   }
 
+  const hasPrimarySceneCandidate = candidates.some((candidate) => isPrimarySceneAsset(candidate.asset) && candidate.score > 0);
+  const hasRealEvidenceCandidate = candidates.some((candidate) => !isStaleGeneratedAsset(candidate.asset) && candidate.score > 0);
+
   for (const candidate of candidates) {
     if (selected.length >= count) {
       break;
+    }
+    if (selected.length === 0 && hasPrimarySceneCandidate && !isPrimarySceneAsset(candidate.asset)) {
+      continue;
+    }
+    if (selected.length > 0 && hasRealEvidenceCandidate && isStaleGeneratedAsset(candidate.asset)) {
+      continue;
     }
     if (selected.length > 0 && candidate.score <= 0) {
       continue;
@@ -653,7 +669,7 @@ const pickPreviewImageAssets = (
   return reference.images.filter(
     (asset) =>
       (asset.environment === scenario.environment || asset.environment === 'generic') &&
-      asset.kind !== 'map'
+      isPrimarySceneAsset(asset)
   ).slice(0, count);
 };
 
@@ -1891,7 +1907,7 @@ const App = () => {
   const turnStageActionLabel = turnStage === 'brief'
     ? selectedAction
       ? 'Return To Your Move'
-      : 'Make Your Call'
+      : 'Choose Response'
     : 'Back To Situation';
 
   return (
@@ -1995,7 +2011,7 @@ const App = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="label text-accent">The Situation</p>
                   <span className="action-required-status border-accent/55 bg-accent/10 text-accent">
-                    Review Before Deciding
+                    Read First
                   </span>
                 </div>
                 <p className="mt-2 text-[0.84rem] leading-relaxed text-textMain">{summaryLead}</p>
@@ -2059,10 +2075,10 @@ const App = () => {
               </div>
               <p className="mt-2 text-[0.82rem] leading-relaxed text-textMain">{currentDirective}</p>
               <p className="mt-2 text-sm leading-relaxed text-textMain">
-                Pick a response. Check who disagrees. Commit only when you are ready to own the fallout.
+                Choose one move, skim the risk, then commit. The next window will show what changed.
               </p>
               <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
-                Need more context first? Go back to the situation before you make the call.
+                Need more context first? Go back to the situation.
               </p>
               <div className={`mt-3 rounded-md border px-3 py-2 ${timerUrgencyClass}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -2123,7 +2139,7 @@ const App = () => {
             <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="label text-accent">Review Before Commit</p>
+                  <p className="label text-accent">Ready To Commit</p>
                   <span
                     className={`action-required-status ${
                       selectedAction
@@ -2141,7 +2157,7 @@ const App = () => {
                   {selectedResponseApproachLabel} / {selectedResponseReviewLine}
                 </p>
                 <p className="mt-1 text-[0.84rem] leading-relaxed text-warning">
-                  Risk to watch: {selectedResponseRiskLine}
+                  Watch for: {selectedResponseRiskLine}
                 </p>
               </div>
               <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">

@@ -52,8 +52,8 @@ export const buildHomefrontSignals = (
       label: 'Gas',
       value: `$${gasPrice}`,
       detail: hasPreviousMeters && (marketDelta < 0 || meters.energySecurity < 58)
-        ? 'Stations are changing prices before officials settle on a public line.'
-        : 'Drivers are noticing the first jump, but it has not become a panic line yet.',
+        ? 'Prices are moving before officials explain why.'
+        : 'Drivers see the first jump, not panic yet.',
       tone: meters.energySecurity < 45 || escalationHeat > 35 ? 'danger' : meters.energySecurity < 58 || stress > 42 ? 'warning' : 'steady'
     },
     {
@@ -61,8 +61,8 @@ export const buildHomefrontSignals = (
       label: 'Groceries',
       value: `${groceryIndex}`,
       detail: meters.economicStability < 55 || domesticStress > 25
-        ? 'Stores are ordering early and warning suppliers about empty shelves.'
-        : 'Retailers are watching freight, chips, and basic inventory.',
+        ? 'Stores are ordering early and warning suppliers.'
+        : 'Retailers are watching freight and inventory.',
       tone: meters.economicStability < 45 || groceryIndex >= 135 ? 'danger' : meters.economicStability < 62 || groceryIndex >= 120 ? 'warning' : 'steady'
     },
     {
@@ -70,8 +70,8 @@ export const buildHomefrontSignals = (
       label: '401k',
       value: `-${savingsMove}%`,
       detail: savingsMove >= 8 && hasPreviousMeters
-        ? 'People are opening retirement apps and seeing the crisis in red.'
-        : 'Markets are red enough for normal families to notice, not crash enough for panic.',
+        ? 'Retirement apps are turning red.'
+        : 'Markets are down enough for families to notice.',
       tone: savingsMove >= 10 ? 'danger' : savingsMove >= 6 ? 'warning' : 'steady'
     },
     {
@@ -79,8 +79,8 @@ export const buildHomefrontSignals = (
       label: 'Family Text',
       value: domesticDelta < 0 || meters.domesticCohesion < 55 || meters.escalationIndex > 70 ? 'Are we okay?' : 'Should we fill up?',
       detail: meters.domesticCohesion < 55 || meters.escalationIndex > 70
-        ? 'The crisis has left the briefing room and entered group chats.'
-        : 'People are not panicking yet, but they are asking practical questions.',
+        ? 'The crisis is now in group chats.'
+        : 'People are asking practical questions.',
       tone: meters.domesticCohesion < 45 || meters.escalationIndex > 78 ? 'danger' : meters.domesticCohesion < 62 || meters.escalationIndex > 60 ? 'warning' : 'steady'
     }
   ];

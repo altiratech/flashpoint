@@ -3304,12 +3304,13 @@
             "surveillance"
           ],
           "branchStage": "ambiguous",
-          "caption": "At 04:17 six vessel-sized returns appeared south of Dongsha, and three of them reappeared four nautical miles east minutes later.",
+          "caption": "Washington is trying to decide whether the Strait picture is wrong, dirty, or already being used against them.",
           "heroImageIds": [
-            "tw_bs_034"
+            "tw_us_sitroom_chip_crisis"
           ],
           "evidenceImageIds": [
-            "tw_bs_032"
+            "tw_bs_032",
+            "tw_us_allied_coordination_call"
           ]
         }
       },
@@ -3554,12 +3555,13 @@
             "surveillance"
           ],
           "branchStage": "compression",
-          "caption": "Duplicate AIS identities and mirrored transponder data are now contaminating the common picture across the lane.",
+          "caption": "The room is not arguing about one strange contact anymore. It is asking how much of the shared picture can still be trusted.",
           "heroImageIds": [
-            "tw_bs_033"
+            "tw_bs_034"
           ],
           "evidenceImageIds": [
-            "tw_bs_032"
+            "tw_bs_032",
+            "tw_us_allied_coordination_call"
           ]
         }
       },
@@ -3822,12 +3824,13 @@
             "energy"
           ],
           "branchStage": "compression",
-          "caption": "The wall now carries munitions burn, SPR drawdown, and Pacific reinforcement timelines on the same slide.",
+          "caption": "The crisis is becoming a supply-chain problem at home: fuel, chips, shipping, and political patience are all tied together.",
           "heroImageIds": [
-            "tw_bs_003"
+            "tw_us_ai_datacenter_supply_chain"
           ],
           "evidenceImageIds": [
-            "tw_bs_019"
+            "tw_us_gas_lines_freight_shock",
+            "tw_bs_003"
           ]
         }
       },
@@ -4100,11 +4103,12 @@
             "map"
           ],
           "branchStage": "coercion",
-          "caption": "The notices look administrative on paper. In the lane, they are already changing how captains move.",
+          "caption": "The pressure reaches people through ports and prices before anyone agrees what to call it.",
           "heroImageIds": [
-            "tw_bs_023"
+            "tw_us_port_congestion_shipping"
           ],
           "evidenceImageIds": [
+            "tw_bs_023",
             "tw_bs_004"
           ]
         }
@@ -4383,11 +4387,12 @@
             "militarized"
           ],
           "branchStage": "incident",
-          "caption": "The boarding clip is public, a deckhand is hurt, and west-coast port systems are failing in the same hour.",
+          "caption": "A public boarding clip and failing port systems turn a gray-zone pressure campaign into a practical crisis.",
           "heroImageIds": [
             "tw_bs_029"
           ],
           "evidenceImageIds": [
+            "tw_us_thermal_boarding_heat",
             "tw_bs_036"
           ]
         }
@@ -4644,12 +4649,12 @@
             "dawn"
           ],
           "branchStage": "false_relief",
-          "caption": "A few ships are moving again, but the enforcement hulls, route authorities, and suspicious network traffic never actually left.",
+          "caption": "Traffic is moving again, but nobody can tell whether this is relief or a pause before the next squeeze.",
           "heroImageIds": [
-            "tw_bs_023"
+            "tw_us_port_congestion_shipping"
           ],
           "evidenceImageIds": [
-            "tw_bs_007",
+            "tw_bs_023",
             "tw_bs_032"
           ]
         }
@@ -4930,12 +4935,13 @@
             "shortages"
           ],
           "branchStage": "tail_risk",
-          "caption": "War-risk cover is disappearing, chip buyers are hoarding, and one bad warning track could now land in the same hour as commercial panic.",
+          "caption": "The crisis is now visible in chip buying, retirement accounts, freight rates, and household nerves.",
           "heroImageIds": [
-            "tw_bs_020"
+            "tw_us_electronics_store_shortage"
           ],
           "evidenceImageIds": [
-            "tw_bs_012"
+            "tw_us_market_crash_chip_crisis",
+            "tw_us_semiconductor_fab_disruption"
           ]
         }
       },
@@ -5294,12 +5300,13 @@
             "market_panic"
           ],
           "branchStage": "collapse",
-          "caption": "Ports, ATMs, hotlines, and trading desks are all waiting on the same hour now.",
+          "caption": "By the final window, the crisis has reached ordinary life: shelves, savings, fuel, and family texts.",
           "heroImageIds": [
-            "tw_bs_015"
+            "tw_us_supermarket_panic"
           ],
           "evidenceImageIds": [
-            "tw_bs_010"
+            "tw_us_market_crash_chip_crisis",
+            "tw_us_nuclear_risk_command"
           ]
         }
       },
@@ -5519,11 +5526,12 @@
             "conciliatory"
           ],
           "branchStage": "collapse",
-          "caption": "Relief becomes real only when escorted hulls berth, brokers reopen cover, and the lane works under watch.",
+          "caption": "Relief is real only when ships move, ports work, and businesses stop pricing the worst case.",
           "heroImageIds": [
-            "tw_bs_016"
+            "tw_us_port_congestion_shipping"
           ],
           "evidenceImageIds": [
+            "tw_bs_023",
             "tw_bs_004"
           ]
         }
@@ -5743,12 +5751,13 @@
             "shipping"
           ],
           "branchStage": "collapse",
-          "caption": "Nothing explodes, but next week's schedules, premiums, and route plans never fully go back to normal.",
+          "caption": "Nothing explodes, but schedules, premiums, and household prices do not go back to normal.",
           "heroImageIds": [
-            "tw_bs_009"
+            "tw_us_electronics_store_shortage"
           ],
           "evidenceImageIds": [
-            "tw_bs_020"
+            "tw_us_port_congestion_shipping",
+            "tw_bs_023"
           ]
         }
       },
@@ -5970,12 +5979,13 @@
             "collapse"
           ],
           "branchStage": "collapse",
-          "caption": "The blockade becomes real the moment cover disappears, bookings freeze, and semiconductor contracts start slipping on their own.",
+          "caption": "The blockade becomes real at home when factories, ports, and buyers start acting as if the lane is already gone.",
           "heroImageIds": [
-            "tw_bs_023"
+            "tw_us_semiconductor_fab_disruption"
           ],
           "evidenceImageIds": [
-            "tw_bs_011"
+            "tw_us_port_congestion_shipping",
+            "tw_bs_023"
           ]
         }
       },
@@ -6197,12 +6207,13 @@
             "militarized"
           ],
           "branchStage": "collapse",
-          "caption": "The first strike is limited in target count. The fear it unleashes is not.",
+          "caption": "A limited strike still lands everywhere at once: command centers, markets, allies, and living rooms.",
           "heroImageIds": [
-            "tw_bs_017"
+            "tw_us_nuclear_risk_command"
           ],
           "evidenceImageIds": [
-            "tw_bs_013"
+            "tw_us_deployment_pier_families",
+            "tw_us_market_crash_chip_crisis"
           ]
         }
       },
@@ -6424,11 +6435,12 @@
             "militarized"
           ],
           "branchStage": "collapse",
-          "caption": "The coast now looks active enough that carriers, civilians, and governments all have to plan as if a real crossing could follow.",
+          "caption": "The room is now planning around direct war, civilian shock, and a global economy that may break before leaders finish speaking.",
           "heroImageIds": [
-            "tw_bs_018"
+            "tw_us_nuclear_risk_command"
           ],
           "evidenceImageIds": [
+            "tw_us_deployment_pier_families",
             "tw_bs_032"
           ]
         }

@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import type { ActionDefinition, ActionNarrativePhaseContent, ActionVariantDefinition } from '@wargames/shared-types';
 
@@ -370,6 +370,11 @@ export const ActionCards = ({
   onSelect
 }: ActionCardsProps) => {
   const [showHelp, setShowHelp] = useState(false);
+  const [showAllMoves, setShowAllMoves] = useState(!selectedActionId);
+
+  useEffect(() => {
+    setShowAllMoves(!selectedActionId);
+  }, [selectedActionId]);
 
   const sorted = useMemo(() => {
     return [...actions].sort((left, right) => left.name.localeCompare(right.name));
@@ -394,7 +399,7 @@ export const ActionCards = ({
         <div>
           <p className="label">What Do You Do?</p>
           <p className="mt-2 text-[0.84rem] leading-relaxed text-textMuted">
-            Pick a response. The advisors and consequence cards will show what could happen next.
+            Choose one move. The review bar will stay visible until you commit.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -411,14 +416,24 @@ export const ActionCards = ({
 
       {showHelp ? (
         <div className="mt-3 border border-borderTone/80 bg-panelRaised/55 px-3 py-2 text-[0.84rem] leading-relaxed text-textMuted">
-          Pick a response, check the downside, then commit when you are ready to move.
+          Choose a move, skim the risk, then commit when you are ready.
         </div>
       ) : null}
 
-      <div className="mt-3">
-        <p className="label">Available Moves</p>
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <p className="label">{selectedAction ? 'Selected Move' : 'Available Moves'}</p>
+        {selectedAction ? (
+          <button
+            type="button"
+            className="text-[0.68rem] uppercase tracking-[0.12em] text-accent"
+            onClick={() => setShowAllMoves((current) => !current)}
+          >
+            {showAllMoves ? 'Hide Options' : 'Change Move'}
+          </button>
+        ) : null}
       </div>
 
+      {showAllMoves ? (
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         {sorted.map((action) => {
           const active = action.id === selectedActionId;
@@ -451,10 +466,10 @@ export const ActionCards = ({
                     {action.tags.slice(0, 2).join(' · ') || 'Response option'}
                   </p>
                   <p className="mt-2 text-[0.84rem] leading-relaxed text-textMain/90">
-                    {defaultVariant?.summary ?? actionOneLiner(action)}
+                    {actionOneLiner(action)}
                   </p>
                   <p className="mt-1 text-[0.88rem] leading-relaxed text-textMuted">
-                    {downside ? `${downside.label}: ${downside.detail}` : firstShockLine(action)}
+                    {downside ? `Watch for: ${downside.label.toLowerCase()}.` : firstShockLine(action)}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
                     <span className="px-0.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] text-positive">
@@ -476,6 +491,19 @@ export const ActionCards = ({
           );
         })}
       </div>
+      ) : selectedAction ? (
+        <div className="mt-2 rounded-md border border-accent/55 bg-accent/10 px-3 py-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="font-display text-[0.96rem] text-textMain">{selectedCustomLabel ?? selectedAction.name}</p>
+            <span className={`px-1.5 py-0.5 text-[0.68rem] uppercase tracking-[0.12em] ${visibilityTone(selectedAction.visibility)}`}>
+              {selectedAction.visibility}
+            </span>
+          </div>
+          <p className="mt-1 text-[0.84rem] leading-relaxed text-textMuted">
+            {selectedVariantLabel ? `Approach: ${selectedVariantLabel}. ` : ''}{selectedPlainRead?.lands ?? actionOneLiner(selectedAction)}
+          </p>
+        </div>
+      ) : null}
 
       {customResponseSlot ? <div className="mt-4">{customResponseSlot}</div> : null}
 
@@ -539,10 +567,7 @@ export const ActionCards = ({
 
               <p className="label">What Happens First</p>
               <p className="text-[0.84rem] leading-relaxed text-textMain">
-                {selectedVariant?.summary ?? actionOneLiner(selectedAction)}
-              </p>
-              <p className="text-[0.84rem] leading-relaxed text-textMuted">
-                {selectedAction.summary}
+                {selectedPlainRead?.lands ?? selectedVariant?.summary ?? actionOneLiner(selectedAction)}
               </p>
             </div>
 

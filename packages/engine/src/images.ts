@@ -145,16 +145,16 @@ const countTagMatches = (asset: ImageAsset, requestedTags: string[]): number => 
 
 const scoreAssetRealism = (asset: ImageAsset): number => {
   if (asset.id.startsWith('img_')) {
-    return -10;
+    return -60;
   }
 
   const lowerPath = asset.path.toLowerCase();
   if (lowerPath.endsWith('.svg')) {
-    return -18;
+    return -36;
   }
 
   if (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp')) {
-    return 8;
+    return 14;
   }
 
   if (asset.kind === 'map' || asset.kind === 'artifact') {
@@ -163,6 +163,18 @@ const scoreAssetRealism = (asset: ImageAsset): number => {
 
   return 0;
 };
+
+const isPrimarySceneAsset = (asset: ImageAsset): boolean => {
+  const lowerPath = asset.path.toLowerCase();
+  return (
+    !asset.id.startsWith('img_') &&
+    (asset.kind === 'documentary_still' || asset.kind === 'scenario_still') &&
+    (lowerPath.endsWith('.jpg') || lowerPath.endsWith('.jpeg') || lowerPath.endsWith('.png') || lowerPath.endsWith('.webp'))
+  );
+};
+
+const isStaleGeneratedAsset = (asset: ImageAsset): boolean =>
+  asset.id.startsWith('img_') || asset.path.toLowerCase().endsWith('.svg');
 
 const scoreAsset = (
   asset: ImageAsset,
@@ -281,13 +293,16 @@ export const chooseImageAsset = ({
     }))
     .sort((left, right) => right.score - left.score || left.asset.id.localeCompare(right.asset.id));
 
-  const curatedHero = rankedCuratedAssets(scoredAll, beat?.visualCue?.heroImageIds);
+  const curatedHero = rankedCuratedAssets(scoredAll, beat?.visualCue?.heroImageIds)
+    .filter((entry) => isPrimarySceneAsset(entry.asset));
   if (curatedHero.length > 0 && actionTags.length === 0 && variantTags.length === 0) {
     return curatedHero[0]?.asset ?? null;
   }
 
-  const bestScore = scored[0]?.score ?? Number.NEGATIVE_INFINITY;
-  const shortlisted = scored.filter((entry) => entry.score >= bestScore - 2);
+  const primaryScored = scored.filter((entry) => isPrimarySceneAsset(entry.asset));
+  const heroPool = primaryScored.length > 0 ? primaryScored : scored;
+  const bestScore = heroPool[0]?.score ?? Number.NEGATIVE_INFINITY;
+  const shortlisted = heroPool.filter((entry) => entry.score >= bestScore - 2);
 
   if (shortlisted.length > 0 && bestScore > 0) {
     return shortlisted[0]?.asset ?? null;
@@ -364,7 +379,8 @@ export const chooseImageGallery = (
     (options.beat?.visualCue?.heroImageIds?.length ?? 0) > 0 ||
     (options.beat?.visualCue?.evidenceImageIds?.length ?? 0) > 0;
 
-  const curatedHero = rankedCuratedAssets(rankedAll, options.beat?.visualCue?.heroImageIds);
+  const curatedHero = rankedCuratedAssets(rankedAll, options.beat?.visualCue?.heroImageIds)
+    .filter((entry) => isPrimarySceneAsset(entry.asset));
   const curatedEvidence = rankedCuratedAssets(rankedAll, options.beat?.visualCue?.evidenceImageIds);
 
   if (!hasDecisionVisualContext) {
@@ -396,9 +412,19 @@ export const chooseImageGallery = (
     }
   }
 
+  const hasPrimarySceneCandidate = ranked.some((entry) => isPrimarySceneAsset(entry.asset) && entry.score > 0);
+  const hasRealEvidenceCandidate = ranked.some((entry) => !isStaleGeneratedAsset(entry.asset) && entry.score > 0);
+
   for (const { asset } of ranked) {
     if (selected.length >= count) {
       break;
+    }
+
+    if (selected.length === 0 && hasPrimarySceneCandidate && !isPrimarySceneAsset(asset)) {
+      continue;
+    }
+    if (selected.length > 0 && hasRealEvidenceCandidate && isStaleGeneratedAsset(asset)) {
+      continue;
     }
 
     const beatMatchCount = countTagMatches(asset, beatTags);

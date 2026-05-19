@@ -357,7 +357,7 @@ const writeSmokeSummary = async (input: {
 const waitForPostCommitAdvance = async (page: Page, windowIndex: number): Promise<void> => {
   const deadline = Date.now() + 60_000;
   const reportHeading = page.getByText(/Final Report/i).first();
-  const nextDecisionButton = page.getByRole('button', { name: /Make Your Call|Proceed To Decision/i }).first();
+  const nextDecisionButton = page.getByRole('button', { name: /Choose Response|Make Your Call|Proceed To Decision/i }).first();
 
   while (Date.now() < deadline) {
     const reachedReport =
@@ -434,7 +434,7 @@ const run = async (): Promise<void> => {
         break;
       }
 
-      if (!(await clickByRole(page, /Make Your Call|Proceed To Decision/i))) {
+      if (!(await clickByRole(page, /Choose Response|Make Your Call|Proceed To Decision/i))) {
         throw new Error(`Could not enter decision mode for window ${index}.`);
       }
 

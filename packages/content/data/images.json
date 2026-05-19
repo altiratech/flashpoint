@@ -792,7 +792,7 @@
       "covert"
     ],
     "alt": "Leaked internal memorandum summarizing fears of coercion, chip shock, and alliance fracture in the Taiwan Strait.",
-    "caption": "Some of the most alarming sentences in a crisis are the ones written for internal eyes only."
+    "caption": "A leaked warning tells the public what officials were worried about before they were ready to say it."
   },
   {
     "id": "tw_bs_015",
@@ -1007,7 +1007,7 @@
       "red_line"
     ],
     "alt": "Modern U.S. Navy watchstander at a combat information center console",
-    "caption": "Visible deterrence looks like this: real watchstanders checking fuel, reload time, and the next track while the hotline lags behind the picture."
+    "caption": "This is what a visible military signal costs: crews work faster, fuel burns faster, and one bad read can move the crisis again."
   },
   {
     "id": "tw_bs_034",
@@ -1137,7 +1137,7 @@
       "screen"
     ],
     "alt": "US data-center operations team tracking chip and infrastructure supply risk during the Taiwan crisis.",
-    "caption": "The AI economy depends on parts, power, and shipping assumptions that suddenly feel less like background infrastructure and more like strategic exposure."
+    "caption": "The AI economy depends on parts, power, and shipping routes that can stop feeling normal overnight."
   },
   {
     "id": "tw_us_supermarket_panic",
@@ -1162,7 +1162,7 @@
       "collapse"
     ],
     "alt": "US supermarket aisle crowded with anxious shoppers buying water and essentials during a widening crisis.",
-    "caption": "This is how a Taiwan crisis reaches Americans who never look at a shipping map: empty space on shelves, long lines, and the fear that tomorrow costs more."
+    "caption": "This is how a Taiwan crisis reaches people who never look at a shipping map: empty shelves, long lines, and prices that change overnight."
   },
   {
     "id": "tw_us_nuclear_risk_command",
@@ -1197,7 +1197,7 @@
       "militarized"
     ],
     "alt": "US command-center personnel watching a distant nuclear-risk scenario display over open water.",
-    "caption": "The worst branch is not an abstraction on a slide. It is the moment every screen in the room says the ceiling may be gone."
+    "caption": "The worst branch is the moment every screen in the room says this may no longer stay conventional or contained."
   },
   {
     "id": "tw_us_thermal_boarding_heat",
@@ -1251,7 +1251,7 @@
       "collapse"
     ],
     "alt": "US trading floor reacting to red market screens during a Taiwan chip and AI supply crisis.",
-    "caption": "The crisis reaches Washington through cables and briefings. It reaches everyone else through prices, portfolios, and the sudden discovery that chip supply is a national balance sheet."
+    "caption": "Washington sees cables and briefings. Everyone else sees prices, portfolios, and chip supply becoming a household problem."
   },
   {
     "id": "tw_us_family_cable_news_crisis",
@@ -1276,7 +1276,7 @@
       "tail_risk"
     ],
     "alt": "American household watching generic cable-news coverage of the Taiwan crisis, chip shortages, and market stress.",
-    "caption": "When the story moves from strategy rooms to living rooms, every official sentence has to compete with bills, phones, and the fear that normal prices may not return."
+    "caption": "Once the crisis reaches living rooms, official statements compete with bills, phones, and family worries."
   },
   {
     "id": "tw_us_tech_layoffs_ai_chips",
@@ -1326,7 +1326,7 @@
       "tail_risk"
     ],
     "alt": "US container port at dusk with idle cranes, container stacks, and trucks waiting during a shipping shock.",
-    "caption": "Before the word blockade is spoken, the economy can already feel it: cranes pause, trucks wait, and the schedule quietly stops being a schedule."
+    "caption": "Before anyone says blockade, the economy can feel it: cranes pause, trucks wait, and schedules stop holding."
   },
   {
     "id": "tw_us_white_house_press_briefing",
@@ -1515,6 +1515,6 @@
       "phase_crisis"
     ],
     "alt": "US officials in a secure allied coordination call about Taiwan, chips, shipping, and escalation risk.",
-    "caption": "Alliance trust is not an abstract meter. It is a late-night call where every capital wants proof that the others will still be there after markets open."
+    "caption": "Alliance trust is a late-night call where every capital wants proof that the others will still be there after markets open."
   }
 ]
